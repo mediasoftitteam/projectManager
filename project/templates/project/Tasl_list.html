@@ -1,0 +1,91 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% block title %}
+    <title>مدیریت تسک ها</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+
+    <!-- load static file in django -->
+    {% load staticfiles %}
+
+    <div class="alert alert-primary" role="alert">
+        تسک ها
+    </div>
+
+
+    <!-- body -->
+    <div>
+        <div class="container py-1">
+
+            <div class="row pagination-sm" id="project-list">
+
+                {% for task in tasks %}
+                    <!-- Card -->
+                    <div class="card promoting-card mr-2" style="width: 300px">
+
+                        <!-- Card content -->
+                        <div class="card-body d-flex flex-row">
+
+                            <!-- Avatar -->
+                            {% if task.employee.pic %}
+                                <img src="{{ task.employee.pic.url }}" class="rounded-circle mr-3" height="50px" width="50px" alt="avatar" style="object-fit: cover">
+
+                            {% else %}
+                                <img src="{% static 'project/images/demo.PNG' %}" class="rounded-circle mr-3" height="50px" width="50px" alt="avatar"style="object-fit: cover">
+                            {%  endif %}
+
+                            <!-- Content -->
+                            <div>
+                                <!-- Title -->
+                                <h4 class="card-title font-weight-bold mb-2">{{ task.title }}</h4>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="d-flex justify-content-center">
+                            <!-- Subtitle -->
+                            <p class="card-text"><i class="far fa-clock pr-2"></i>{{ task.taskDate }} - {{ task.dueDate }}</p>
+
+                        </div>
+
+                        <!-- Card image -->
+                        <div class="view overlay">
+                            {% if task.project.pic %}
+                                <img class="card-img-top rounded-0" src="{{ task.project.pic.url }}" alt="Card image cap" style="object-fit: cover">
+
+                            {% else %}
+                                <img class="card-img-top rounded-0" src="{% static 'project/images/demo.PNG' %}" alt="Card image cap" style="object-fit: cover">
+                            {%  endif %}
+                            <a href="#!">
+                                <div class="mask rgba-white-slight"></div>
+                            </a>
+                        </div>
+
+                        <!-- Card content -->
+                        <div class="card-body">
+
+                            <div class="collapse-content">
+
+                                <!-- Text -->
+                                <p class="card-text"> پروژه: {{ task.project.title }}</p>
+                                <p class="card-text">وضعیت: {{ task.status }}</p>
+                                <p class="card-text collapse" id="collapseContent">توضیحات: {{ task.description }}</p>
+                                <!-- Button -->
+                                <a class="btn btn-flat red-text p-1 my-1 mr-0 mml-1 collapsed" data-toggle="collapse" href="#collapseContent" aria-expanded="false" aria-controls="collapseContent"></a>
+                                <i class="fas fa-share-alt text-muted float-right p-1 my-1" data-toggle="tooltip" data-placement="top" title="Share this post"></i>
+                                <i class="fas fa-heart text-muted float-right p-1 my-1 mr-3" data-toggle="tooltip" data-placement="top" title="I like it"></i>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <!-- Card -->
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

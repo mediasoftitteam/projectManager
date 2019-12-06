@@ -1,0 +1,27 @@
+# ignore an entire directory   
+/.idea/
+/project/__pycache__/
+/project/migrations/
+/project/static/project/webfonts/
+/venv/ 
+/__pycache__/
+/project/api/__pycache__/
+/media/
+
+
+# ignore a file type
+# *.json
+*.pyc
+*.sqlite3
+*.xml
+*.log
+
+# add an exception (using !) to the preceding rule to track a specific file
+# !package.json
+
+# ignore a single file
+# mycode.class
+stderr.log
+/project/__init__.py
+/project_manager/__init__.py
+/project/api/__init__.py

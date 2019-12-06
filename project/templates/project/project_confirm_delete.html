@@ -1,0 +1,21 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% block title %}
+    <title>مدیریت پروژه</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+    <!-- load static file in django -->
+    {% load staticfiles %}
+
+    <h1>Project Delete</h1>
+    <form method="post">
+        {% csrf_token %}
+        Are you sure you want to delete "{{ project.title }}" ?
+        <input type="submit" value="Submit" />
+    </form>
+
+<!-- end of body block -->
+{% endblock %}
+
+

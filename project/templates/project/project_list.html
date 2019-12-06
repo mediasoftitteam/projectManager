@@ -1,0 +1,426 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% block title %}
+    <title>مدیریت پروژه</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+    <!-- load static file in django -->
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'project/styles.css' %}">
+
+    <div class="alert alert-primary" role="alert">
+        پروژه ها
+    </div>
+
+    <!-- body -->
+    <div>
+        <div class="container py-1">
+
+            <div class="row pagination-sm" id="project-list">
+
+                {% for project in projects %}
+                    <!-- Card -->
+                    <div class="card m-1">
+                        <!-- Card image -->
+                        <div class="view overlay">
+                            {% if project.pic %}
+                                <img src={{ project.pic.url }} class="card-img-top" alt="{{ project.title }}" style="width: 250px; height: 250px; object-fit: cover">
+                            {% else %}
+                                <img src={% static 'project/images/demo.PNG' %} class="align-self-end"  alt="{{ project.title }}" style="width: 250px; height: 250px; object-fit: cover">
+                            {%  endif %}
+                            <a href="{% url 'project:project-detail' project.id %}">
+                                <div class="mask rgba-white-slight"></div>
+                            </a>
+                        </div>
+                        <!-- Edit Button -->
+                        <button type="button" onclick="showEditModal({ 'm_id': {{ project.id }}
+                                ,'m_projectOwner': '{{ project.projectOwner }}'
+                                ,'m_startDate': '{{ project.startDate|date:"Y-m-d" }}'
+                                ,'m_deadline': '{{ project.deadline|date:"Y-m-d" }}'
+                                ,'m_money': '{{ project.money }}'
+                                ,'m_description': '{{ project.description }}'
+                                ,'m_title': '{{ project.title }}'})"
+                                class="btn btn-floating btn-action ml-auto mr-4 mdb-color lighten-3"  data-toggle="modal" data-target="#modelProjectEdit"><i class="fa fa-edit pl-1" style="color: #e5e5e5; font-size: 20px"></i></button>
+
+                        <!-- Card content -->
+                        <div class="card-body">
+
+                            <!-- Title -->
+                            <h4 class="card-title">{{ project.title }}</h4>
+                            <hr>
+                            <!-- Text -->
+                            <p class="card-text">
+                                {{ project.projectOwner }}
+                            <hr>
+                            {{ project.money }}
+                            </p>
+
+                        </div>
+                        <!-- Card footer -->
+                        <div class="rounded-bottom mdb-color lighten-3 text-center pt-3">
+                            <ul class="list-unstyled list-inline font-small">
+                                {#                          <a href="{% url 'project:project-delete' project.id %}" data-toggle="modal" data-target="#basicExampleModal">#}
+                                <a href="#" onclick="showDeleteModal({{ project.id }})" data-toggle="modal" data-target="#basicExampleModal">
+                                    <li class="list-inline-item white-text float-left mb-3 ml-3 "><i class="far fa-trash" style="color: #3d799c"></i></li>
+                                </a>
+                                <li class="list-inline-item white-text"><i class="far fa-calendar-alt"></i> {{ project.startDate }} </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <!-- loading container -->
+        <div class="mx-auto my-4" id="products-loading"></div>
+
+        <!-- add new project -->
+        <div class="mx-auto my-4">
+            <button type="button" class="btn-lg btn-default btn-floating"  data-toggle="modal" data-target="#modelProjectNew"><i class="fa fa-plus"></i></button>
+        </div>
+
+    </div>
+
+
+    <!-- Modal delete -->
+    <input type="hidden" id="selected-delet-id" selected-id="2">
+    <div class="modal fade" id="basicExampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            آیا از حذف پروزه مطمئن هستید؟
+          </div>
+          <div id="model-a-tag" class="modal-footer">
+              <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+              <a >
+                  <button type="button" class="btn btn-secondary">تایید</button>
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal new -->
+    <div class="modal fade" id="modelProjectNew" tabindex="-1" role="dialog" aria-labelledby="modelProjectNewLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- model header -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="modelProjectNewLabel">ایجاد پروژه جدید</h5>
+            </div>
+            <div class="card-body pr-5">
+                <!-- form -->
+                <form name="FormProject" action="{% url 'project:project-create' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateProjectForm()">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    <!-- picture field is empty or not? -->
+                    <input type="hidden" id="picValidator" name="isPicValid" value="true">
+                    <!-- model body -->
+                    <div class="modal-body">
+                        <div class="col-md-12 col-xl-12">
+                            <!-- Grid row (title) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" name="title" class="form-control">
+                                        <label for="contact-Subject" class="">عنوان پروژه</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (start/end date) -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="md-form">
+                                        <input type="date" value="2019-11-21" id="input-new-startDate" name="startDate" class="form-control">
+                                        <label for="contact-Subject" class="">تاریخ شروع</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="md-form">
+                                        <input type="date" value="2019-11-21" id="input-new-deadline" name="deadline" class="form-control">
+                                        <label for="contact-Subject" class="">تاریخ پایان</label>
+{#                                        <input placeholder="Selected date" type="text" id="date-picker-deadline" class="form-control datepicker" data-value="[2019,6,1]">#}
+{#                                        <label for="date-picker-example">تاریخ پایان</label>#}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (Owner) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" name="projectOwner" class="form-control">
+                                        <label for="contact-Subject" class="">کارفرما</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (money) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" id="input-new-money" name="money" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه کل</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (description) -->
+                            <div class="row mb-4">
+
+                                <!-- Grid column -->
+                                <div class="col-md-12">
+
+                                    <div class="md-form">
+                                        <textarea type="text" name="description" class="md-textarea form-control" rows="3"></textarea>
+                                        <label for="contact-message">توضیحات</label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Grid row (image) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="file-field">
+                                        <div class="btn btn-primary btn-sm float-left">
+                                          <span>انتخاب تصویر</span>
+                                          <input type="file"  name="pic" id="uploadeImgProject">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                          <input class="file-path validate" type="text" placeholder="Upload your file">
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- model footer -->
+                    <div id="model-a-tag" class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+                        <a >
+                            <button type="submit" class="btn btn-secondary">تایید</button>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal edit -->
+    <div class="modal fade" id="modelProjectEdit" tabindex="-1" role="dialog" aria-labelledby="modelProjectEditLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- model header -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="modelProjectEditLabel">تغییر پروژه</h5>
+            </div>
+            <div class="card-body pr-5">
+                <!-- form -->
+                <form name="FormProjectEdit" action="{% url 'project:project-update' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateProjectEditForm()">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    <!-- picture field is empty or not? -->
+                    <input type="hidden" id="picValidator_edit" name="isPicValid" value="true">
+                    <!-- selected project id -->
+                    <input type="hidden" id="selcted-project-id" name="projectId">
+                    <!-- model body -->
+                    <div class="modal-body">
+                        <div class="col-md-12 col-xl-12">
+
+                            <!-- Grid row (title) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input id="input-edit-title" type="text" name="title" class="form-control">
+                                        <label for="contact-Subject" class="">عنوان پروژه</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (start/end date) -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="md-form">
+                                        <input id="input-edit-startDate" type="date" name="startDate" class="form-control">
+                                        <label for="contact-Subject" class="">تاریخ شروع</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="md-form">
+                                        <input id="input-edit-deadline" type="date" name="deadline" class="form-control">
+                                        <label for="contact-Subject" class="">تاریخ پایان</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (Owner) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input id="input-edit-projectOwner" type="text" name="projectOwner" class="form-control">
+                                        <label for="contact-Subject" class="">کارفرما</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (money) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input id="input-edit-money" type="text" name="money" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه کل</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (description) -->
+                            <div class="row mb-4">
+
+                                <!-- Grid column -->
+                                <div class="col-md-12">
+
+                                    <div class="md-form">
+                                        <textarea id="input-edit-description" type="text" name="description" class="md-textarea form-control" rows="3"></textarea>
+                                        <label for="contact-message">توضیحات</label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Grid row (image) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="file-field">
+                                        <div class="btn btn-primary btn-sm float-left">
+                                          <span>انتخاب تصویر</span>
+                                          <input type="file"  name="pic" id="input-edit-pic">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                          <input class="file-path validate" type="text" placeholder="Upload your file">
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- model footer -->
+                    <div id="model-a-tag" class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+                        <a >
+                            <button type="submit" class="btn btn-secondary">تایید</button>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+    <!-- base url address -->
+    <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
+
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="{% static 'project/js/jquery.min.js' %}"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="{% static 'project/js/mdb.min.js' %}"></script>
+
+    <script>
+        //-- handle delete modal --//
+        function showDeleteModal(prj_id) {
+            $("#selected-delet-id").attr("selected-id", prj_id);
+            let idd = $("#selected-delet-id").attr("selected-id");
+            let a_tag = $("#model-a-tag");
+            let base_url = $("#url-base").attr("data-url");
+            a_tag.empty();
+            a_tag.append(
+                `<button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>` +
+                `<a href='${base_url}${idd}/project-delete/'">` +
+                `<button type="button" class="btn btn-secondary">تایید</button>` +
+                `</a>`
+            );
+        }
+    </script>
+
+    <script type="text/javascript">
+        //-- validate image field in new project form --//
+        function validateProjectForm() {
+            let pic = document.forms["FormProject"]["uploadeImgProject"].value;
+            if (pic === null || pic === "") {
+                $('#picValidator').attr('value', false)
+            }
+            let startDate = document.forms["FormProject"]["input-new-startDate"].value;
+            {#alert("starttt = " + startDate)#}
+            if (startDate === null || startDate === "") {
+                let d = new Date;
+                let fullYear = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDay()
+                $('#input-new-startDate').attr('value', fullYear.toString())
+                {#alert($('#input-new-startDate').attr('value'))#}
+                {#return false#}
+            }
+            let deadline = document.forms["FormProject"]["input-new-deadline"].value;
+            if (deadline === null || deadline === "") {
+                let d = new Date;
+                let fullYear = d.getFullYear() + "-" + d.getMonth() + "-" + d.getDay()
+                {#$('#deadline').attr('value', fullYear)#}
+                {#return false#}
+            }
+            let mony = document.forms["FormProject"]["input-new-money"].value;
+            if (mony === null || mony === "") {
+                $('#input-new-money').attr('value', 0)
+            }
+        }
+        //-- validate image field in edit project form --//
+        function validateProjectEditForm() {
+            let pic = document.forms["FormProjectEdit"]["input-edit-pic"].value;
+            if (pic === null || pic === "") {
+                $('#picValidator_edit').attr('value', false)
+            }
+        }
+    </script>
+
+    <script>
+        //-- fill edit modal fields --//
+        function showEditModal(project) {
+            console.log(project)
+
+             $('#input-edit-title').attr('value', project.m_title)
+             $('#input-edit-deadline').attr('value', project.m_deadline)
+             $('#input-edit-description').attr('value', project.m_description)
+             $('#input-edit-money').attr('value', project.m_money)
+             $('#input-edit-projectOwner').attr('value', project.m_projectOwner)
+             $('#input-edit-startDate').attr('value', project.m_startDate)
+             $('#selcted-project-id').attr('value', project.m_id)
+        }
+
+        // Data Picker Initialization
+        $('.datepicker').pickadate({
+            formatSubmit: 'yyyy/mm/dd'
+        });
+    </script>
+
+
+<!-- end of body block -->
+{% endblock %}
+
+

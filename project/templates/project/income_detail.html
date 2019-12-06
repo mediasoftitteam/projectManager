@@ -1,0 +1,19 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% block title %}
+    <title>مشخصات ورودی ها</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+    <!-- load static file in django -->
+    {% load staticfiles %}
+
+    <h1>مشخصات ورودی</h1>
+    <h2>Name: {{income.project.title}}</h2>
+    <h2>Name: {{income.money}}</h2>
+    <h2>Name: {{income.incomeDate}}</h2>
+{#    Pages: {{ object.pages }}#}
+<!-- end of body block -->
+{% endblock %}
+
+

@@ -1,0 +1,17 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% block title %}
+    <title>مشخصات کارمندی</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+    <!-- load static file in django -->
+    {% load staticfiles %}
+
+    <h1>مشخصات کارمند</h1>
+    <h2>Name: {{employee.fullName}}</h2>
+{#    Pages: {{ object.pages }}#}
+<!-- end of body block -->
+{% endblock %}
+
+

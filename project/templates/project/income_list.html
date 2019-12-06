@@ -1,0 +1,307 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% block title %}
+    <title>مدیریت پروژه</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+    <!-- load static file in django -->
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'project/styles.css' %}">
+
+    <div class="alert alert-primary" role="alert">
+        ورودی ها
+    </div>
+
+    <div class="container-fluid mt-md-0" style="margin-top: 70px; ">
+        <div class="card">
+            <div class="card-header d-table pr-5">
+                <h5 class="card-title d-table-cell align-middle">اطلاعات هزینه ها</h5>
+            </div>
+            <div class="card-body pr-5">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>پروژه</th>
+                                <th>تصویر</th>
+                                <th>تاریخ</th>
+                                <th>هزینه</th>
+                                <th>هزینه/درآمد</th>
+                                <th>توضیحات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for income in incomes %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ income.project.title }}</td>
+                                    <td>-</td>
+                                    <td>{{ income.incomeDate.date }}</td>
+                                    <td>{{ income.money }}</td>
+                                    <td>{{ income.isOutcome }}</td>
+                                    <td>{{ income.description }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- add new income -->
+    <div class="mx-auto my-4">
+            <button type="button" class="btn-lg btn-default btn-floating"  data-toggle="modal" data-target="#modelIncomeNew"><i class="fa fa-plus"></i></button>
+    </div>
+
+    <div class="row mx-auto d-none">
+        <div class="col-12 col-md-10">
+            <div class="row mx-auto" id="product-list">
+
+                {% for income in incomes %}
+                    <!-- Card -->
+                    <div class="card col-width m-1">
+
+                      <!-- Card image -->
+                      <div class="view overlay">
+                        {% if income.project.pic %}#}
+                            <img src={{ income.project.pic.url }} class="card-img-top"  alt="{{ income.project.title }}">
+                        {% else %}
+                            <img src={% static 'project/images/demo.PNG' %} class="align-self-end"  alt="{{ income.project.title }}">
+                        {%  endif %}
+                        <a>
+                          <div class="mask rgba-white-slight"></div>
+                        </a>
+                      </div>
+
+                      <!-- Button -->
+                       <a href="{% url "project:income-update" income.id %}" >
+                           <button type="button" class="btn btn-floating btn-action ml-auto mr-4 mdb-color lighten-3"><i class="fa fa-edit pl-1" style="color: #e5e5e5; font-size: 20px"></i></button>
+                       </a>
+
+                      <!-- Card content -->
+                      <div class="card-body">
+
+                        <!-- Title -->
+                        <h4 class="card-title">{{ income.project.title }}</h4>
+                        <hr>
+                        <!-- Text -->
+                        <p class="card-text">
+                            {{ income.project.projectOwner }}
+                          <hr>
+                            {{ income.money }} تومان
+                        </p>
+
+                      </div>
+
+                      <!-- Card footer -->
+                      <div class="rounded-bottom mdb-color lighten-3 text-center pt-3">
+                        <ul class="list-unstyled list-inline font-small">
+{#                          <a href="{% url 'project:project-delete' project.id %}" data-toggle="modal" data-target="#basicExampleModal">#}
+                          <a href="#" onclick="showDeleteModalIncome({{ income.project.id }})" data-toggle="modal" data-target="#basicExampleModalIncome">
+                              <li class="list-inline-item pr-2 white-text float-left mb-3 ml-3 "><i class="far fa-trash"></i></li>
+                          </a>
+                          <li class="list-inline-item pr-2 white-text"><i class="far fa-calendar-alt"></i> {{ income.incomeDate.date }} </li>
+
+                        </ul>
+                      </div>
+
+                    </div>
+                    <!-- Card -->
+                {% endfor %}
+
+            </div>
+            <div class="mx-auto my-4" id="products-loading"></div>
+
+            <!-- add new income -->
+            <div class="mx-auto my-4">
+                <a href="{% url "project:income-create" %}" >
+                    <button type="button" class="btn-lg btn-default btn-floating"><i class="fa fa-plus"></i></button>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <input type="hidden" id="selected-delet-id-income" selected-id="2">
+    <div class="modal fade" id="basicExampleModalIncome" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelIncome"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabelIncome"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            آیا از حذف این آیتم مطمئن هستید؟
+          </div>
+          <div id="model-a-tag-income" class="modal-footer">
+              <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+              <a >
+                  <button type="button" class="btn btn-secondary">تایید</button>
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
+
+    <!-- Modal new -->
+    <div class="modal fade" id="modelIncomeNew" tabindex="-1" role="dialog" aria-labelledby="modelIncomeNewLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- model header -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="modelIncomeNewLabel">ایجاد پروژه جدید</h5>
+            </div>
+            <div class="card-body pr-5">
+                <!-- form -->
+                <form name="FormIncome" action="{% url 'project:income-create' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateIncomeForm()">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    <!-- picture field is empty or not? -->
+                    <input type="hidden" id="picValidator" name="isPicValid" value="true">
+                    <!-- model body -->
+                    <div class="modal-body">
+                        <div class="col-md-12 col-xl-12">
+                            <!-- Grid row (title) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" name="title" class="form-control">
+                                        <label for="contact-Subject" class="">عنوان پروژه</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (start/end date) -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="md-form">
+                                        <input type="date" id="input-new-startDate" name="startDate" class="form-control">
+                                        <label for="contact-Subject" class="">تاریخ شروع</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="md-form">
+                                        <input type="date" id="input-new-deadline" name="deadline" class="form-control">
+                                        <label for="contact-Subject" class="">تاریخ پایان</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (Owner) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" name="projectOwner" class="form-control">
+                                        <label for="contact-Subject" class="">کارفرما</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (money) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" name="money" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه کل</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (image) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input id="uploadeImgProject" type="file" name="pic" class="form-control">
+                                        <label for="contact-Subject" class="">تصویر</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (description) -->
+                            <div class="row mb-4">
+
+                                <!-- Grid column -->
+                                <div class="col-md-12">
+
+                                    <div class="md-form">
+                                        <textarea type="text" name="description" class="md-textarea form-control" rows="3"></textarea>
+                                        <label for="contact-message">توضیحات</label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- model footer -->
+                    <div id="model-a-tag" class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+                        <a >
+                            <button type="submit" class="btn btn-secondary">تایید</button>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+        //-- validate image field in new Income form --//
+        function validateIncomeForm() {
+            let pic = document.forms["FormIncome"]["uploadeImgIncome"].value;
+            if (pic === null || pic === "") {
+                $('#picValidator').attr('value', false)
+            }
+            if (startDate === null || startDate === "") {
+                console.log("date = " + Date.now().toString())
+                $('#input-new-startDate').attr('value', Date.now().toString())
+            }
+            let deadline = document.forms["FormIncome"]["input-new-deadline"].value;
+            if (deadline === null || deadline === "") {
+                $('#deadline').attr('value', Date.now().toString())
+            }
+        }
+        //-- validate image field in edit Income form --//
+        function validateIncomeEditForm() {
+            let pic = document.forms["FormIncomeEdit"]["input-edit-pic"].value;
+            if (pic === null || pic === "") {
+                $('#picValidator_edit').attr('value', false)
+            }
+        }
+    </script>
+
+    <script>
+        function showDeleteModalIncome(prj_id) {
+            $("#selected-delet-id-income").attr("selected-id", prj_id);
+            let idd = $("#selected-delet-id-income").attr("selected-id");
+            let a_tag = $("#model-a-tag-income");
+            let base_url = $("#url-base").attr("data-url");
+            a_tag.empty();
+            a_tag.append(
+                `<button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>` +
+                `<a href='${base_url}${idd}/income-delete/'"> ${idd}` +
+                    `<button type="button" class="btn btn-secondary">تایید</button>` +
+                `</a>`
+            );
+        }
+    </script>
+
+<!-- end of body block -->
+{% endblock %}
+
+

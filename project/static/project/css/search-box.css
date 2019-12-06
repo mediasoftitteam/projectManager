@@ -1,0 +1,63 @@
+#global-search-box{
+    margin-left: -5px;
+    background-color: rgb(102, 102, 102);
+    height: 100%;
+    border-radius: 5px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+/*#global-search-box:hover > #global-search-txt{*/
+/*    width: 250px;*/
+/*    padding: 0 6px;*/
+
+/*}*/
+#global-search-txt::placeholder{
+    color: rgba(255, 255, 255, 0.6);
+    opacity: 1;
+}
+#global-search-btn:hover > .fa-search{
+    color: rgb(102, 102, 102) !important;
+    transition: 0.5s;
+}
+#global-search-btn:hover{
+    background: white;
+    transition: 0.5s;
+}
+#global-search-btn{
+    background: none;
+    float: right;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#global-search-txt{
+    text-align: center;
+    border: none;
+    background: none;
+    outline: none;
+    padding: 0;
+    float: left;
+    color: white;
+    font-size: 14px;
+    transition: 0.5s;
+    line-height: 40px;
+    width: 250px;
+}
+#global-search-txt:hover{
+    background: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active  {
+    border-radius: 5px;
+    border: 0 !important;
+    -webkit-text-fill-color: white;
+    -webkit-box-shadow: 0 0 0px 1000px rgb(102, 102, 102) inset;
+}

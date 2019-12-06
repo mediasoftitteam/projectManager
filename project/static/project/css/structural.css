@@ -1,0 +1,22 @@
+@media (max-width: 768px) {
+    .card-body{
+
+    }
+}
+.card-body > a{
+    width: fit-content;
+    display: block;
+    margin-bottom: 5px;
+    color: black;
+    font-size: 15px;
+}
+.card-body > a:hover{
+    color: rgb(48, 126, 136);
+}
+.fa-circle{
+    color: #C0C0C0;
+    font-size: 10px;
+}
+.card-body > img{
+    border-color: black!important;
+}

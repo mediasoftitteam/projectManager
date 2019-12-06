@@ -1,0 +1,35 @@
+.product-pic{
+    width: 300px;
+    height: 300px;
+}
+.card{
+    background-color: #F5F5F5;
+}
+.card img{
+    width: 100% ;
+    height: 100%;
+}
+.card button{
+    margin-top: -28px;
+    width: 80px;
+}
+.custom-upload{
+    padding: 1em;
+}
+@media (max-width: 768px) {
+    .card-container{
+        justify-content: center;
+    }
+}
+.loading{
+    border: 2px solid #f3f3f3; /* Light grey */
+    border-top: 2px solid black; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

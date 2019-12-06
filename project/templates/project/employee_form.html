@@ -1,0 +1,61 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% block title %}
+    <title>اطلاعات کارمندی</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+    <!-- load static file in django -->
+    {% load staticfiles %}
+{#    <form method="post">#}
+{#        {% csrf_token %}#}
+{#        {{ form.as_p }}#}
+{#        <input type="submit" value="Submit" />#}
+{#    </form>#}
+    <div class="container-fluid mt-md-0" style="margin-top: 70px; ">
+        <div class="card">
+            <div class="card-header d-table pr-5">
+                <h5 class="card-title d-table-cell align-middle">اطلاعات پروژه</h5>
+            </div>
+            <div class="card-body pr-5">
+                <form class="form-horizontal" method="post">{% csrf_token %}
+                    <fieldset>
+{#                        <legend>{{ title }}</legend>#}
+                        {% for field in form %}
+                            {% if field.errors %}
+                                <div class="control-group error">
+                                    <label class="control-label">{{ field.label }}</label>
+                                    <div class="controls">{{ field }}
+                                        <span class="help-inline">
+                                            {% for error in  field.errors %}{{ error }}{% endfor %}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="control-group">
+                                    <i class="fa fa-angle-double-left prefix"></i>
+                                    <label class="control-label">{{ field.label }}</label>
+                                    <div class="controls md-form">{{ field }}
+                                        {% if field.help_text %}
+                                            <p class="help-inline"><small>{{ field.help_text }}</small></p>
+                                        {% endif %}
+                                    </div>
+{#                                {% endif %}#}
+
+                                </div>
+                            {% endif %}
+                            <hr>
+                        {% endfor %}
+                    </fieldset>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-rounded" >Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<!-- end of body block -->
+{% endblock %}
+
+

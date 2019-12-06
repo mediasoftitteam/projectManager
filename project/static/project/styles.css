@@ -1,0 +1,149 @@
+{% load staticfiles %}
+@font-face {
+    font-family: 'IRANSans';
+    src: url("./fonts/IRANSans.ttf");
+}
+
+@media (min-width: 768px) {
+    .civil{
+        display: none !important;
+    }
+}
+@media (max-width: 768px) {
+    .civilprime{
+        display: none !important;
+    }
+    .imageSize{
+        width: 60%;
+    }
+}
+a:hover{
+    text-decoration: none;
+}
+#navbar{
+    opacity:0.95;
+}
+#nav{
+    border-top: 1px solid #619298;
+    margin-top: 7px;
+}
+@media (min-width: 768px) {
+     #nav{
+        border-top: 0;
+        margin-top: 0;
+    }
+}
+@media (max-width: 1000px) {
+    #jumbotoron{
+    display: none !important;
+}
+    .shadow-sm{
+        display: none !important;
+    }
+
+}
+.hr{
+    display: block;
+    margin-top: 0;
+    margin-bottom: 10px;
+    border-width: 1px;
+}
+.alert-dark hr {
+    border-top-color: #dee2e6;
+}
+.icon {
+    width: 40px;
+}
+
+#go-to-top{
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0,0,0,0.3);
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    text-align: center;
+    line-height: 2.4em;
+    transition-duration: 0.8s;
+}
+#go-to-top:hover{
+    background-color: #307e88;
+}
+.icon:hover{
+    color: #307e88;
+}
+
+#company-lists {
+    padding-right: 7px;
+    height: 100%;
+    margin-top: 8px;
+}
+#company-lists a{
+    color: rgb(58, 132, 142);
+    cursor: pointer;
+}
+#company-lists a:hover{
+    color: red;
+}
+@media (min-width: 0) {
+    .col-width{
+        width: 100%;
+        float: left;
+    }
+}
+@media (min-width: 576px) {
+    .col-width{
+        width: 50%;
+        float: left;
+    }
+}
+@media (min-width: 950px) {
+    .col-width{
+        width: 33.33%;
+        float: left;
+    }
+}
+@media (min-width: 1200px) {
+    .col-width{
+        width: 25% !important;
+        float: left !important;
+    }
+}
+@media (min-width: 1700px) {
+    .col-width{
+        width: 20% !important;
+        float: left !important;
+    }
+}
+
+@media (min-width: 576px) {
+    .container{
+        max-width: 100%;
+    }
+}
+@media (min-width: 992px) {
+    .container{
+        max-width: 950px!important;
+    }
+}
+@media (min-width: 1200px) {
+    .container{
+        max-width: 1400px !important;
+    }
+}
+
+a{
+    color: black;
+}
+a:hover{
+    color: rgb(21, 103, 153);
+}
+
+.disabledItem {
+    pointer-events: none;
+    opacity: 0.4;
+}
