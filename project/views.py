@@ -224,8 +224,49 @@ def income_delete(request, income_id):
 
 @user_passes_test(lambda u: u.is_superuser)
 def task_list(request):
-    tasks = models.Task.objects.all()
-    return render(request, 'project/tasl_list.html', {'tasks': tasks})
+    employees = models.Employee.objects.all()
+    projects = models.Project.objects.all()
+    page = request.GET.get('page', 1)
+    page_size = request.GET.get('page-size', 10)
+    search = request.GET.get('search', '')
+
+    tasks = models.Task.objects.filter(Q(employee__fullName__icontains=search)
+                                                 | Q(project__title__icontains=search)
+                                                 | Q(taskDate__icontains=search)
+                                                 | Q(dueDate__icontains=search)
+                                                 | Q(description__icontains=search)
+                                                 | Q(title__icontains=search)
+                                                 | Q(status__icontains=search)
+                                                 )
+
+    paginator = Paginator(tasks, page_size)
+    try:
+        tasks = paginator.page(page)
+    except PageNotAnInteger:
+        tasks = paginator.page(1)
+    except EmptyPage:
+        tasks = paginator.page(paginator.num_pages)
+
+    return render(request, 'project/task_list.html', {'tasks': tasks,
+                                                        'employees': employees,
+                                                        'projects': projects,
+                                                        'search': search,
+                                                        'page_size': page_size})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def task_create(request):
+    return None
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def task_update(request):
+    return None
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def task_delete(request, task_id):
+    return None
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -314,3 +355,102 @@ def salary_update(request):
     salary.save()
 
     return redirect('project:salary-list')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def debt_list(request):
+    employees = models.Employee.objects.all()
+    page = request.GET.get('page', 1)
+    page_size = request.GET.get('page-size', 10)
+    search = request.GET.get('search', '')
+
+    debts = models.Debt.objects.filter(Q(employee__fullName__icontains=search)
+                                                 | Q(title__icontains=search)
+                                                 | Q(description__icontains=search)
+                                                 | Q(status__icontains=search)
+                                                 | Q(debtDate__icontains=search)
+                                                 | Q(paymentDebtDate__icontains=search)
+                                                 | Q(price__icontains=search)
+                                                 )
+
+    paginator = Paginator(debts, page_size)
+    try:
+        debts = paginator.page(page)
+    except PageNotAnInteger:
+        debts = paginator.page(1)
+    except EmptyPage:
+        debts = paginator.page(paginator.num_pages)
+
+    return render(request, 'project/debt_list.html', {'debts': debts,
+                                                        'employees': employees,
+                                                        'search': search,
+                                                        'page_size': page_size})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def debt_create(request):
+    post_data = request.POST
+    m_user = User.objects.get(id=post_data['user'])
+    m_employee = models.Employee.objects.get(id=post_data['employee'])
+    m_price = int(post_data['price'])
+    m_title = post_data['title']
+    m_status = post_data['status']
+    m_description = post_data['description']
+
+    try:
+        m_debt_date = (post_data['debtDate'])
+        m_payment_debt_date = (post_data['paymentDebtDate'])
+    except ValueError:
+        m_debt_date = str(timezone.now)
+        m_payment_debt_date = str(timezone.now)
+
+    p = models.Debt(user=m_user
+                    , employee=m_employee
+                    , title=m_title
+                    , status=m_status
+                    , price=m_price
+                    , debtDate=m_debt_date
+                    , paymentDebtDate=m_payment_debt_date
+                    , description=m_description)
+    p.save()
+
+    return redirect('project:debt-list')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def debt_update(request):
+    post_data = request.POST
+    m_user = User.objects.get(id=post_data['user'])
+    m_employee = models.Employee.objects.get(id=post_data['employee'])
+    try:
+        m_debt_date = (post_data['debtDate'])
+        m_payment_debt_date = (post_data['paymentDebtDate'])
+    except ValueError:
+        m_debt_date = str(timezone.now)
+        m_payment_debt_date = str(timezone.now)
+
+    m_price = int(post_data['price'])
+    m_title = post_data['title']
+    m_status = post_data['status']
+    m_description = post_data['description']
+    m_id = post_data['debtId']
+
+    debt = get_object_or_404(models.Debt, pk=m_id)
+    debt.user = m_user
+    debt.employee = m_employee
+    debt.debtDate = m_debt_date
+    debt.paymentDebtDate = m_payment_debt_date
+    debt.description = m_description
+    debt.price = m_price
+    debt.title = m_title
+    debt.status = m_status
+    debt.save()
+
+    return redirect('project:debt-list')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def debt_delete(request, debt_id):
+    debt = get_object_or_404(models.Debt, pk=debt_id)
+    debt.delete()
+    return redirect('project:debt-list')

@@ -29,10 +29,19 @@ urlpatterns = [
 
     # tasks urls
     url(r'^task-list/$', views.task_list, name='task-list'),
+    url(r'^task-new/$', views.task_create, name='task-create'),
+    url(r'^task-update/$', views.task_update, name='task-update'),
+    url(r'^(?P<task_id>[0-9]+)/task-delete/$', views.task_delete, name='task-delete'),
 
     # salary urls
     url(r'^salary-list/$', views.salary_list, name='salary-list'),
     url(r'^salary-new/$', views.salary_create, name='salary-create'),
     url(r'^salary-update/$', views.salary_update, name='salary-update'),
     url(r'^(?P<salary_id>[0-9]+)/salary-delete/$', views.salary_delete, name='salary-delete'),
+
+    # debt urls
+    url(r'^debt-list/$', views.debt_list, name='debt-list'),
+    url(r'^debt-new/$', views.debt_create, name='debt-create'),
+    url(r'^debt-update/$', views.debt_update, name='debt-update'),
+    url(r'^(?P<debt_id>[0-9]+)/debt-delete/$', views.debt_delete, name='debt-delete'),
 ]
