@@ -82,6 +82,7 @@ class Task(models.Model):
     description = models.CharField(max_length=120, null=True, blank=True, help_text='توضیحات')
     title = models.CharField(max_length=120, null=True, blank=True, help_text='عنوان')
     status = models.CharField(max_length=50, null=True, blank=True, help_text='وضعیت')
+    pic = models.ImageField('uploaded image', null=True, blank=True, upload_to=scramble_uploaded_filename)
 
     class Meta:
         ordering = ["taskDate"]

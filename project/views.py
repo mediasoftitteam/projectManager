@@ -230,7 +230,7 @@ def task_list(request):
     page_size = request.GET.get('page-size', 10)
     search = request.GET.get('search', '')
 
-    tasks = models.Task.objects.filter(Q(employee__fullName__icontains=search)
+    tasks = models.Task.objects.filter(Q(employees__fullName__icontains=search)
                                                  | Q(project__title__icontains=search)
                                                  | Q(taskDate__icontains=search)
                                                  | Q(dueDate__icontains=search)
@@ -256,17 +256,76 @@ def task_list(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def task_create(request):
-    return None
+    post_data = request.POST
+    m_user = User.objects.get(id=post_data['user'])
+    m_employee = models.Employee.objects.get(id=post_data['employee'])
+    m_project = models.Project.objects.get(id=post_data['project'])
+    m_pic = None
+    if post_data['isTaskPicValid'] == 'true':
+        m_pic = request.FILES['pic']
+    try:
+        m_taskDate = (post_data['taskDate'])
+        m_dueDate = (post_data['dueDate'])
+    except ValueError:
+        m_taskDate = str(timezone.now)
+        m_dueDate = str(timezone.now)
+
+    m_title = post_data['title']
+    m_status = post_data['status']
+    m_description = post_data['description']
+    p = models.Task(user=m_user
+                           , employees=m_employee
+                           , project=m_project
+                           , pic=m_pic
+                           , taskDate=m_taskDate
+                           , dueDate=m_dueDate
+                           , title=m_title
+                           , status=m_status
+                           , description=m_description)
+    p.save()
+
+    return redirect('project:task-list')
 
 
 @user_passes_test(lambda u: u.is_superuser)
 def task_update(request):
-    return None
+    post_data = request.POST
+    m_user = User.objects.get(id=post_data['user'])
+    m_employee = models.Employee.objects.get(id=post_data['employee'])
+    m_project = models.Project.objects.get(id=post_data['project'])
+    try:
+        m_taskDate = (post_data['taskDate'])
+        m_dueDate = (post_data['dueDate'])
+    except ValueError:
+        m_taskDate = str(timezone.now)
+        m_dueDate = str(timezone.now)
+
+    m_title = post_data['title']
+    m_status = post_data['status']
+    m_description = post_data['description']
+    m_id = post_data['taskId']
+
+    task = get_object_or_404(models.Task, pk=m_id)
+    task.user = m_user
+    task.employee = m_employee
+    task.project = m_project
+    if post_data['isTaskPicValid'] == 'true':
+        task.pic = request.FILES['pic']
+    task.taskDate = m_taskDate
+    task.dueDate = m_dueDate
+    task.description = m_description
+    task.status = m_status
+    task.title = m_title
+    task.save()
+
+    return redirect('project:task-list')
 
 
 @user_passes_test(lambda u: u.is_superuser)
 def task_delete(request, task_id):
-    return None
+    task = get_object_or_404(models.Task, pk=task_id)
+    task.delete()
+    return redirect('project:task-list')
 
 
 @user_passes_test(lambda u: u.is_superuser)
