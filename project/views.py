@@ -513,3 +513,90 @@ def debt_delete(request, debt_id):
     debt = get_object_or_404(models.Debt, pk=debt_id)
     debt.delete()
     return redirect('project:debt-list')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def company_equipment_list(request):
+    page = request.GET.get('page', 1)
+    page_size = request.GET.get('page-size', 10)
+    search = request.GET.get('search', '')
+
+    companyEquipments = models.CompanyEquipment.objects.filter(Q(title__icontains=search)
+                                       | Q(description__icontains=search)
+                                       | Q(buyDate__icontains=search)
+                                       | Q(price__icontains=search)
+                                       )
+
+    paginator = Paginator(companyEquipments, page_size)
+    try:
+        companyEquipments = paginator.page(page)
+    except PageNotAnInteger:
+        companyEquipments = paginator.page(1)
+    except EmptyPage:
+        companyEquipments = paginator.page(paginator.num_pages)
+
+    return render(request, 'project/companyEquipment_list.html', {'companyEquipments': companyEquipments,
+                                                      'search': search,
+                                                      'page_size': page_size})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def company_equipment_create(request):
+    post_data = request.POST
+    m_user = User.objects.get(id=post_data['user'])
+    m_title = post_data['title']
+    m_price = int(post_data['price'])
+    m_pic = None
+    if post_data['isEqmPicValid'] == 'true':
+        m_pic = request.FILES['pic']
+    try:
+        m_buyDate = (post_data['buyDate'])
+    except ValueError:
+        m_buyDate = str(timezone.now)
+
+    m_description = post_data['description']
+    p = models.CompanyEquipment(user=m_user
+                                , title=m_title
+                                , price=m_price
+                                , pic=m_pic
+                                , buyDate=m_buyDate
+                                , description=m_description)
+    p.save()
+
+    return redirect('project:companyEquipment-list')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def company_equipment_update(request):
+    post_data = request.POST
+    m_user = User.objects.get(id=post_data['user'])
+    try:
+        m_buyDate = (post_data['buyDate'])
+    except ValueError:
+        m_buyDate = str(timezone.now)
+
+    m_price = int(post_data['price'])
+    m_title = post_data['title']
+    m_description = post_data['description']
+    m_id = post_data['eqmId']
+    print("-----")
+    print(m_id)
+
+    eqm = get_object_or_404(models.CompanyEquipment, pk=m_id)
+    eqm.user = m_user
+    eqm.buyDate = m_buyDate
+    eqm.price = m_price
+    eqm.title = m_title
+    eqm.description = m_description
+    if post_data['isEqmPicValid'] == 'true':
+        eqm.pic = request.FILES['pic']
+    eqm.save()
+
+    return redirect('project:companyEquipment-list')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def company_equipment_delete(request, companyEquipment_id):
+    eqm = get_object_or_404(models.CompanyEquipment, pk=companyEquipment_id)
+    eqm.delete()
+    return redirect('project:companyEquipment-list')

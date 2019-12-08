@@ -1,0 +1,485 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% block title %}
+    <title>مدیریت تسک ها</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+
+    <!-- load static file in django -->
+    {% load staticfiles %}
+
+
+    <!-- Material Design Bootstrap table -->
+    <link rel="stylesheet" href="{% static 'project/css/addons/datatables.min.css' %}"><!-- MDBootstrap Datatables  -->
+    <!-- Material Design Bootstrap table -->
+    <link rel="stylesheet" href="{% static 'project/css/addons/datatables-select.min.css' %}"><!-- MDBootstrap Datatables  -->
+
+    <div class="alert alert-primary" role="alert">
+        اموال شرکت
+    </div>
+
+    <!-- new/delete/edit buttons -->
+    <div class="text-center">
+      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelEqmNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
+      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelEqmEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
+      <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-eqm-delete"
+      onclick="showTaskDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
+    </div>
+
+
+    <!-- PAGE SIZE/ search -->
+    <div class="container">
+        <div class="row ">
+            <div class="col-1 mb-2">
+                <p>تعداد صفحات</p>
+            </div>
+            <div class="col-2 mb-2">
+                <select id="eqm-selector-page-size" class="browser-default custom-select" onchange="eqmPageSizeChanged(this.options[this.selectedIndex].value)">
+                    <option value="10">10</option>
+                    <option value="20" >20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <a id="eqm-tag-a-page-size" class="d-none" href="?page-size=20">20</a>
+                <script>
+                    document.getElementById('eqm-selector-page-size').value={{ page_size }};
+                    function eqmPageSizeChanged(page_size) {
+                        {#alert(page_size)#}
+                        let tag_a = document.getElementById("eqm-tag-a-page-size");
+                        tag_a.href = "?page-size=" + page_size;
+                        tag_a.click();
+                    }
+                </script>
+            </div>
+            <div class="col-6"></div>
+
+            <!-- Search form -->
+            <div class="col-3 mb-2 ml-0 text-left">
+                <input id="search-eqm" class="form-control" type="text" placeholder="جست و جو" aria-label="Search" value="{{ search }}">
+            </div>
+        </div>
+    <div class="clearfix"></div>
+    </div>
+
+    <!-- body -->
+    <div >
+        <div class="container py-1">
+
+            <div class="row pagination-sm table-responsive" id="eqm-list">
+
+                <table class="table table-sm table-hover table-striped"  id="eqm-table">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">عنوان</th>
+                        <th scope="col">هزینه</th>
+                        <th scope="col">تاریخ خرید</th>
+                        <th scope="col">توضیحات</th>
+                        <th scope="col">تصویر</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for eqm in companyEquipments %}
+                        <tr>
+                            <input class="eqmId" type="hidden" dataId={{ eqm.id }}>
+                            <th scope="row" >{{ forloop.counter }}</th>
+                            <td class="title">{{ eqm.title }}</td>
+                            <td class="price">{{ eqm.price }}</td>
+                            <td class="buyDate">{{ eqm.buyDate|date:"Y-m-d" }}</td>
+                            <td class="description">{{ eqm.description }}</td>
+                            {% if eqm.pic %}
+                                <td ><a href="{{ eqm.pic.url }}"><i class="fa fa-image"></i></a></td>
+                            {% else %}
+                                <td ><a href="#"></a></td>
+
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- pagination -->
+    <div class="d-flex justify-content-center">
+        {% if salaries.has_other_pages %}
+            <nav aria-label="Page navigation example">
+                <ul class="pagination pagination-circle pg-blue">
+                    <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-eqm').value">First</a></li>
+                    {% if salaries.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" aria-label="Previous" href="?page={{ companyEquipments.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-eqm').value">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                        <a class="page-link" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- center page numbers -->
+                    {% for i in tasks.paginator.page_range %}
+                        {% if tasks.number == i %}
+                            <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+
+                        {% else %}
+                            <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-eqm').value">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- center page numbers -->
+                    {% if tasks.has_next %}
+                        <a class="page-link" aria-label="Next"  href="?page={{ companyEquipments.next_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-eqm').value">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item"><a class="page-link">Last</a></li>
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+
+    <!-- Modal new -->
+    <div class="modal fade" id="modelEqmNew" tabindex="-1" role="dialog" aria-labelledby="modelEqmNewLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- model header -->
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="modelEqmNewLabel">ایجاد تسک جدید</h5>
+            </div>
+            <div class="card-body pr-5">
+                <!-- form -->
+                <form name="FormEqm" action="{% url 'project:companyEquipment-create' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateEqmForm()">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    <!-- picture field is empty or not? -->
+                    <input type="hidden" id="eqm-picValidator" name="isEqmPicValid" value="true">
+                    <!-- model body -->
+                    <div class="modal-body">
+                        <div class="col-md-12 col-xl-12">
+
+                            <!-- Grid row (title) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" id="eqm-input-new-title" name="title" class="form-control">
+                                        <label for="contact-Subject" class="">عنوان</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (price) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" id="eqm-input-new-price" name="price" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (buyDate) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="date" value="2019-11-21" id="eqm-input-new-buyDate" name="buyDate" class="form-control">
+                                        <label for="contact-Subject" class="">تاریخ خرید</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (description) -->
+                            <div class="row mb-4">
+
+                                <!-- Grid column -->
+                                <div class="col-md-12">
+
+                                    <div class="md-form">
+                                        <textarea type="text" name="description" class="md-textarea form-control" rows="3"></textarea>
+                                        <label for="contact-message">توضیحات</label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Grid row (image) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="file-field">
+                                        <div class="btn btn-primary btn-sm float-left">
+                                          <span>انتخاب تصویر</span>
+                                          <input type="file"  name="pic" id="eqm-modal-new-upload-img">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                          <input class="file-path validate" type="text" placeholder="Upload your file">
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- model footer -->
+                    <div id="task-model-a-tag" class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+                        <a >
+                            <button type="submit" class="btn btn-secondary">تایید</button>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal edit -->
+    <div class="modal fade" id="modelEqmEdit" tabindex="-1" role="dialog" aria-labelledby="modelEqmEditLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- model header -->
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="modelTaskEditLabel">ایجاد اموال جدید</h5>
+            </div>
+            <div class="card-body pr-5">
+                <!-- form -->
+                <form name="FormEqmEdit" action="{% url 'project:companyEquipment-update' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateEqmEditForm()">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    <!-- picture field is empty or not? -->
+                    <input type="hidden" id="picValidatorEqm_edit" name="isEqmPicValid" value="true">
+                    <!-- selected Eqm id -->
+                    <input type="hidden" id="selected-eqm-id" name="eqmId">
+                    <!-- model body -->
+                    <div class="modal-body">
+                        <div class="col-md-12 col-xl-12">
+
+                            <!-- Grid row (title) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" id="eqm-input-edit-title" name="title" class="form-control">
+                                        <label for="contact-Subject" class="">عنوان</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (price) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" id="eqm-input-edit-price" name="price" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (buyDate) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="date" value="2019-11-21" id="eqm-input-edit-buyDate" name="buyDate" class="form-control">
+                                        <label for="contact-Subject" class="">تاریخ خرید</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (description) -->
+                            <div class="row mb-4">
+
+                                <!-- Grid column -->
+                                <div class="col-md-12">
+
+                                    <div class="md-form">
+                                        <textarea type="text" id="eqm-input-edit-description" name="description" class="md-textarea form-control" rows="3" ></textarea>
+                                        <label for="contact-message">توضیحات</label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Grid row (image) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="file-field">
+                                        <div class="btn btn-primary btn-sm float-left">
+                                          <span>انتخاب تصویر</span>
+                                          <input type="file"  name="pic" id="modal-eqm-edit-upload-img">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                          <input class="file-path validate" type="text" placeholder="Upload your file">
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- model footer -->
+                    <div id="model-a-tag" class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+                        <a >
+                            <button type="submit" class="btn btn-secondary">تایید</button>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal delete -->
+    <input type="hidden" id="selected-eqm-delete-id" selected-id="-1">
+    <div class="modal fade" id="modal-eqm-delete" tabindex="-1" role="dialog" aria-labelledby="exampleEqmModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleEqmModalLabel"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="model-eqm-delete-body">
+            آیا از حذف این فیلد مطمئن هستید؟
+          </div>
+          <div id="model-eqm-delete-a-tag" class="modal-footer">
+              <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+              <a >
+                  <button type="button" class="btn btn-secondary">تایید</button>
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- base url address -->
+    <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="{% static 'project/js/jquery.min.js' %}"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="{% static 'project/js/mdb.min.js' %}"></script>
+    <!-- MDB table core JavaScript -->
+    <script type="text/javascript" src="{% static 'project/js/addons/datatables.min.js' %}"></script><!-- MDBootstrap Datatables  -->
+    <!-- MDB table core JavaScript -->
+    <script type="text/javascript" src="{% static 'project/js/addons/datatables-select.min.js' %}"></script><!-- MDBootstrap Datatables  -->
+
+    <script>
+        //-- handle delete modal --//
+        function showEqmDeleteModal() {
+            let idd = $("#eqm").attr("selected-id");
+            let a_tag = $("#model-eqm-delete-a-tag");
+            let modal_body = $("#model-eqm-delete-body");
+            let base_url = $("#url-base").attr("data-url");
+            a_tag.empty();
+            modal_body.empty();
+            if(idd == "-1"){
+                modal_body.append(
+                    `ابتدا آیتمی را انتخاب کنید`
+                );
+                a_tag.append(
+                    `<button type="button" class="btn btn-info" data-dismiss="modal">خروج</button>`
+                );
+            }
+            else {
+                modal_body.append(
+                    'آیا از حذف شدن این آیتم اطمینان دارید؟'
+                );
+                a_tag.append(
+                    `<button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>` +
+                    `<a href='${base_url}${idd}/companyEquipment-delete/'">` +
+                    `<button type="button" class="btn btn-secondary">تایید</button>` +
+                    `</a>`
+                );
+            }
+        }
+    </script>
+
+    <script>
+
+        $("#eqm-table tr").click(function(){
+           $(this).addClass('table-primary').siblings().removeClass('table-primary');
+           var value=$(this).find('input.eqmId').attr("dataId");
+           alert(value)
+           $('#selected-eqm-delete-id').attr("selected-id", value);
+           $('#selected-eqm-id').attr("value", value); //edit
+
+            //-- fill edit fields --//
+            $('#eqm-input-edit-title').attr('value', $(this).find('td.title').html());
+            $('#eqm-input-edit-description').val( $(this).find('td.description').html());
+            $('#eqm-input-edit-buyDate').attr('value', $(this).find('td.buyDate').html());
+            $('#eqm-input-edit-price').attr('value', $(this).find('td.price').html());
+
+
+        });
+
+        $('.ok').on('click', function(e){
+            alert($("#eqm-table tr.selected td:first").html());
+        });
+
+        // Material Select Initialization
+        $(document).ready(function() {
+        $('.mdb-select').materialSelect();
+        });
+
+
+        //-- validate image field in new project form --//
+        function validateEqmForm() {
+            console.log("in validate")
+            let pic = document.forms["FormEqm"]["eqm-modal-new-upload-img"].value;
+            if (pic === null || pic === "") {
+                $('#eqm-picValidator').attr('value', false)
+            }
+            let dueDate = document.forms["FormEqm"]["eqm-input-new-price"].value;
+            if (dueDate === null || dueDate === "") {
+                $('#eqm-input-new-price').attr('value', 0)
+            }
+
+        }
+
+        //-- validate image field in edit salary form --//
+        function validateEqmEditForm() {
+            let pic = document.forms["FormEqmEdit"]["modal-eqm-edit-upload-img"].value;
+            if (pic === null || pic === "") {
+                $('#picValidatorEqm_edit').attr('value', false)
+            }
+        }
+
+    </script>
+
+    <!-- search -->
+    <script>
+        $("#search-eqm").on('keyup', function (e) {
+            if (e.keyCode === 13) {
+                let srchterm = $("#search-eqm").val();
+                let tag_a = document.getElementById("eqm-tag-a-page-size");
+                tag_a.href = "?page-size=" + {{ page_size }} + "&search=" + srchterm;
+                tag_a.click();
+            }
+        });
+    </script>
+{% endblock %}

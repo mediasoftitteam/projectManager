@@ -3,6 +3,12 @@ from . import views
 
 app_name = 'project'
 
+
+
+
+
+
+
 urlpatterns = [
     url(r'^$', views.index, name='index'),
 
@@ -44,4 +50,12 @@ urlpatterns = [
     url(r'^debt-new/$', views.debt_create, name='debt-create'),
     url(r'^debt-update/$', views.debt_update, name='debt-update'),
     url(r'^(?P<debt_id>[0-9]+)/debt-delete/$', views.debt_delete, name='debt-delete'),
+
+    # CompanyEquipment
+    url(r'^companyEquipment-list/$', views.company_equipment_list, name='companyEquipment-list'),
+    url(r'^companyEquipment-new/$', views.company_equipment_create, name='companyEquipment-create'),
+    url(r'^companyEquipment-update/$', views.company_equipment_update, name='companyEquipment-update'),
+    url(r'^(?P<companyEquipment_id>[0-9]+)/companyEquipment-delete/$', views.company_equipment_delete,
+        name='companyEquipment-delete'),
+
 ]
