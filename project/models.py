@@ -32,7 +32,7 @@ class Project(models.Model):
 
 
 class Employee(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, unique=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, unique=True)
     fullName = models.CharField(max_length=120, null=True, blank=True)
     pic = models.ImageField('uploaded image', null=True, blank=True, upload_to=scramble_uploaded_filename)
     startDate = models.DateField(default=timezone.now)
