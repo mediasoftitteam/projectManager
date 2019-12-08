@@ -7,6 +7,7 @@
 /__pycache__/
 /project/api/__pycache__/
 /media/
+/tmp/
 
 
 # ignore a file type
@@ -24,4 +25,5 @@
 stderr.log
 /project/__init__.py
 /project_manager/__init__.py
+/project_manager/settings.py
 /project/api/__init__.py
