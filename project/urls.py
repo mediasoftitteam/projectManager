@@ -58,4 +58,9 @@ urlpatterns = [
     url(r'^(?P<companyEquipment_id>[0-9]+)/companyEquipment-delete/$', views.company_equipment_delete,
         name='companyEquipment-delete'),
 
+    # employee work days urls
+    url(r'^workDay-list/$', views.workDay_list, name='workDay-list'),
+    url(r'^workDay-new/$', views.workDay_create, name='workDay-create'),
+    url(r'^workDay-update/$', views.workDay_update, name='workDay-update'),
+    url(r'^(?P<debt_id>[0-9]+)/workDay-delete/$', views.workDay_delete, name='workDay-delete'),
 ]
