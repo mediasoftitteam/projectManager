@@ -600,3 +600,86 @@ def company_equipment_delete(request, companyEquipment_id):
     eqm = get_object_or_404(models.CompanyEquipment, pk=companyEquipment_id)
     eqm.delete()
     return redirect('project:companyEquipment-list')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def workDay_list(request):
+    employees = models.Employee.objects.all()
+    page = request.GET.get('page', 1)
+    page_size = request.GET.get('page-size', 10)
+    search = request.GET.get('search', '')
+
+    workdays = models.WorkDay.objects.filter(Q(employee__fullName__icontains=search)
+                                       | Q(description__icontains=search)
+                                       | Q(workDate__icontains=search)
+                                       | Q(workHour__icontains=search)
+                                       )
+
+    paginator = Paginator(workdays, page_size)
+    try:
+        workdays = paginator.page(page)
+    except PageNotAnInteger:
+        workdays = paginator.page(1)
+    except EmptyPage:
+        workdays = paginator.page(paginator.num_pages)
+
+    return render(request, 'project/workDay_list.html', {'workdays': workdays,
+                                                      'employees': employees,
+                                                      'search': search,
+                                                      'page_size': page_size})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def workDay_create(request):
+    post_data = request.POST
+    m_user = User.objects.get(id=post_data['user'])
+    m_employee = models.Employee.objects.get(id=post_data['employee'])
+    m_description = post_data['description']
+    m_work_hour = (post_data['workHour'])
+
+    try:
+        m_work_date = (post_data['workDate'])
+    except ValueError:
+        m_work_date = str(timezone.now)
+
+    p = models.WorkDay(user=m_user
+                       , employee=m_employee
+                       , workDate=m_work_date
+                       , workHour=m_work_hour
+                       , description=m_description)
+    p.save()
+
+    return redirect('project:workDay-list')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def workDay_update(request):
+    post_data = request.POST
+    m_user = User.objects.get(id=post_data['user'])
+    m_employee = models.Employee.objects.get(id=post_data['employee'])
+    m_work_hour = (post_data['workHour'])
+
+    try:
+        m_work_date = (post_data['workDate'])
+    except ValueError:
+        m_work_date = str(timezone.now)
+
+    m_description = post_data['description']
+    m_id = post_data['workDayId']
+
+    workDay = get_object_or_404(models.WorkDay, pk=m_id)
+    workDay.user = m_user
+    workDay.employee = m_employee
+    workDay.workDate = m_work_date
+    workDay.workHour = m_work_hour
+    workDay.description = m_description
+    workDay.save()
+
+    return redirect('project:workDay-list')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def workDay_delete(request, workDay_id):
+    eqm = get_object_or_404(models.WorkDay, pk=workDay_id)
+    eqm.delete()
+    return redirect('project:workDay-list')

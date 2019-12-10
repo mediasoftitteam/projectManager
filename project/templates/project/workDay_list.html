@@ -1,7 +1,7 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
 {% block title %}
-    <title>مدیریت بدهی ها</title>
+    <title>مدیریت روزهای کاری</title>
 {% endblock %}
 <!-- begin of body block -->
 {% block body %}
@@ -16,15 +16,15 @@
     <link rel="stylesheet" href="{% static 'project/css/addons/datatables-select.min.css' %}"><!-- MDBootstrap Datatables  -->
 
     <div class="alert alert-primary" role="alert">
-        بدهی ها
+        روزهای ها کاری
     </div>
 
     <!-- new/delete/edit buttons -->
     <div class="text-center">
-      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelDebtNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
-      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelDebtEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
-      <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-debt-delete"
-      onclick="showDebtDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
+      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelWorkDayNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
+      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelWorkDayEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
+      <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-workDay-delete"
+      onclick="showWorkDayDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
     </div>
 
 
@@ -35,18 +35,18 @@
                 <p>تعداد صفحات</p>
             </div>
             <div class="col-2 mb-2">
-                <select id="debt-selector-page-size" class="browser-default custom-select" onchange="debtPageSizeChanged(this.options[this.selectedIndex].value)">
+                <select id="workDay-selector-page-size" class="browser-default custom-select" onchange="workDayPageSizeChanged(this.options[this.selectedIndex].value)">
                     <option value="10">10</option>
                     <option value="20" >20</option>
                     <option value="50">50</option>
                     <option value="100">100</option>
                 </select>
-                <a id="debt-tag-a-page-size" class="d-none" href="?page-size=20">20</a>
+                <a id="workDay-tag-a-page-size" class="d-none" href="?page-size=20">20</a>
                 <script>
-                    document.getElementById('debt-selector-page-size').value={{ page_size }};
-                    function debtPageSizeChanged(page_size) {
+                    document.getElementById('workDay-selector-page-size').value={{ page_size }};
+                    function workDayPageSizeChanged(page_size) {
                         {#alert(page_size)#}
-                        let tag_a = document.getElementById("debt-tag-a-page-size");
+                        let tag_a = document.getElementById("workDay-tag-a-page-size");
                         tag_a.href = "?page-size=" + page_size;
                         tag_a.click();
                     }
@@ -66,34 +66,28 @@
     <div >
         <div class="container py-1">
 
-            <div class="row pagination-sm table-responsive" id="debt-list">
+            <div class="row pagination-sm table-responsive" id="workDay-list">
 
-                <table class="table table-sm table-hover table-striped"  id="debt-table">
+                <table class="table table-sm table-hover table-striped"  id="workDay-table">
                     <thead class="thead-dark">
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">کارمند</th>
-                        <th scope="col">عنوان</th>
+                        <th scope="col">تاریخ کار</th>
+                        <th scope="col">ساعت کاری</th>
                         <th scope="col">توضیحات</th>
-                        <th scope="col">وضعیت</th>
-                        <th scope="col">تاریخ بدهی</th>
-                        <th scope="col">تاریخ پرداخت</th>
-                        <th scope="col">مبلغ</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for debt in debts %}
+                    {% for workDay in workdays %}
                         <tr>
-                            <input class="debtId" type="hidden" dataId={{ debt.id }}>
-                            <input class="employee" type="hidden" employeId={{ debt.employee.id }}>
+                            <input class="workDayId" type="hidden" dataId={{ workDay.id }}>
+                            <input class="employee" type="hidden" employeId={{ workDay.employee.id }}>
                             <th scope="row" >{{ forloop.counter }}</th>
-                            <td class="employee" >{{ debt.employee.fullName }}</td>
-                            <td class="title">{{ debt.title }}</td>
-                            <td class="description">{{ debt.description }}</td>
-                            <td class="status">{{ debt.status }}</td>
-                            <td class="debtDate">{{ debt.debtDate|date:"Y-m-d" }}</td>
-                            <td class="paymentDebtDate">{{ debt.paymentDebtDate|date:"Y-m-d" }}</td>
-                            <td class="price">{{ debt.price }}</td>
+                            <td class="employee" >{{ workDay.employee.fullName }}</td>
+                            <td class="workDate">{{ workDay.workDate|date:"Y-m-d" }}</td>
+                            <td class="workHour">{{ workDay.workHour }}</td>
+                            <td class="description">{{ workDay.description }}</td>
 
                         </tr>
                     {% endfor %}
@@ -109,10 +103,10 @@
         {% if debts.has_other_pages %}
             <nav aria-label="Page navigation example">
                 <ul class="pagination pagination-circle pg-blue">
-                    <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-debt').value">First</a></li>
-                    {% if debts.has_previous %}
+                    <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-workHour').value">First</a></li>
+                    {% if workdays.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" aria-label="Previous" href="?page={{ debts.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-debt').value">
+                            <a class="page-link" aria-label="Previous" href="?page={{ workdays.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-workHour').value">
                                 <span aria-hidden="true">&laquo;</span>
                                 <span class="sr-only">Previous</span>
                             </a>
@@ -127,18 +121,18 @@
                     {% endif %}
 
                     <!-- center page numbers -->
-                    {% for i in debts.paginator.page_range %}
+                    {% for i in workHours.paginator.page_range %}
                         {% if debts.number == i %}
                             <li class="page-item active"><a class="page-link">{{ i }}</a></li>
 
                         {% else %}
-                            <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-debt').value">{{ i }}</a></li>
+                            <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-workHour').value">{{ i }}</a></li>
                         {% endif %}
                     {% endfor %}
 
                     <!-- center page numbers -->
                     {% if debts.has_next %}
-                        <a class="page-link" aria-label="Next"  href="?page={{ debts.next_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-debt').value">
+                        <a class="page-link" aria-label="Next"  href="?page={{ workHours.next_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-workHour').value">
                             <span aria-hidden="true">&raquo;</span>
                             <span class="sr-only">Next</span>
                         </a>
@@ -158,7 +152,7 @@
     </div>
 
     <!-- Modal new -->
-    <div class="modal fade" id="modelDebtNew" tabindex="-1" role="dialog" aria-labelledby="modelDebtNewLabel"
+    <div class="modal fade" id="modelWorkDayNew" tabindex="-1" role="dialog" aria-labelledby="modelWorkHourNewLabel"
       aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -167,11 +161,11 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h5 class="modal-title" id="modelDebtNewLabel">ایجاد بدهی جدید</h5>
+                <h5 class="modal-title" id="modelWorkHourNewLabel">ایجاد ساعات کاری جدید</h5>
             </div>
             <div class="card-body pr-5">
                 <!-- form -->
-                <form name="FormSalary" action="{% url 'project:debt-create' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateDebtForm()">
+                <form name="FormWorkDay" action="{% url 'project:workDay-create' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateWorkDayForm()">
                     {% csrf_token %}
                     <input type="hidden" name="user" value="{{ user.id }}">
                     <!-- model body -->
@@ -182,70 +176,40 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="hidden" id="debt-selected-employee-id" name="employee" value="-1">
-                                        <select class="mdb-select md-form" id="debt-selectBox" searchable="جست و جو" onchange="changeDebtNewFunc()">
+                                        <input type="hidden" id="workDay-selected-employee-id" name="employee" value="-1">
+                                        <select class="mdb-select md-form" id="workHour-selectBox" searchable="جست و جو" onchange="changeWorkHourNewFunc()">
                                             <option value="" disabled selected >.    کارمند موردنظر را اتخاب کنید</option>
                                             {% for employee in employees %}
                                                 <option value="{{ employee.id }}" >.    {{ employee.fullName }}</option>
                                             {% endfor %}
                                         </select>
                                         <script>
-                                            function changeDebtNewFunc() {
-                                                let selectBox = document.getElementById("debt-selectBox");
+                                            function changeWorkHourNewFunc() {
+                                                let selectBox = document.getElementById("workHour-selectBox");
                                                 let selectedValue = selectBox.options[selectBox.selectedIndex].value;
-                                                document.getElementById('debt-selected-employee-id').value=selectedValue
+                                                document.getElementById('workDay-selected-employee-id').value=selectedValue
                                            }
                                         </script>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Grid row (title) -->
+                            <!-- Grid row (workHour) -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="text" id="debt-input-new-title" name="title" class="form-control">
-                                        <label for="contact-Subject" class="">عنوان</label>
+                                        <input type="text" id="workDay-input-new-workHour" name="workHour" class="form-control">
+                                        <label for="contact-Subject" class="">ساعت کاری</label>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Grid row (status) -->
+                            <!-- Grid row (workDate) -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="text" id="debt-input-new-status" name="status" class="form-control">
-                                        <label for="contact-Subject" class="">وضعیت</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (debtDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="debt-input-new-debtDate" name="debtDate" class="form-control">
+                                        <input type="date" value="2019-11-21" id="workDay-input-new-workDate" name="workDate" class="form-control">
                                         <label for="contact-Subject" class="">تاریخ بدهی</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (paymentDebtDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="debt-input-new-paymentDebtDate" name="paymentDebtDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ پرداخت</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (price) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="text" id="debt-input-new-price" name="price" class="form-control">
-                                        <label for="contact-Subject" class="">مبلغ</label>
                                     </div>
                                 </div>
                             </div>
@@ -280,7 +244,7 @@
     </div>
 
     <!-- Modal edit -->
-    <div class="modal fade" id="modelDebtEdit" tabindex="-1" role="dialog" aria-labelledby="modelDebtEditLabel"
+    <div class="modal fade" id="modelWorkDayEdit" tabindex="-1" role="dialog" aria-labelledby="modelWorkDayEditLabel"
       aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -289,15 +253,15 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h5 class="modal-title" id="modelDebtEditLabel">تغییر بدهی</h5>
+                <h5 class="modal-title" id="modelWorkDayEditLabel">تغییر ساعات کاری</h5>
             </div>
-            <div class="card-body pr-5">
                 <!-- form -->
-                <form name="FormDebtEdit" action="{% url 'project:debt-update' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateDebtEditForm()">
+            <div class="card-body pr-5">
+                <form name="FormWorkWorkDayEdit" action="{% url 'project:workDay-update' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateWorkDayEditForm()">
                     {% csrf_token %}
                     <input type="hidden" name="user" value="{{ user.id }}">
                     <!-- selected salary id -->
-                    <input type="hidden" id="selected-debt-id" name="debtId">
+                    <input type="hidden" id="selected-workDay-id" name="workDayId">
                     <!-- model body -->
                     <div class="modal-body">
                         <div class="col-md-12 col-xl-12">
@@ -306,75 +270,46 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="hidden" id="debt-selected-edit-employee-id" name="employee" value="-1">
-                                        <select class="mdb-select md-form" id="debt-selectBoxEdit" searchable="جست و جو" onchange="debtChangeFunc();">
+                                        <input type="hidden" id="workDay-selected-edit-employee-id" name="employee" value="-1">
+                                        <select class="mdb-select md-form" id="workDay-selectBoxEdit" searchable="جست و جو" onchange="workDayChangeFunc();">
                                             <option value="" disabled selected >.    کارمند موردنظر را اتخاب کنید</option>
                                             {% for employee in employees %}
                                                 <option value="{{ employee.id }}" >.    {{ employee.fullName }}</option>
                                                 {% if forloop.counter == 1 %}
                                                     <script>
-                                                        document.getElementById('debt-selected-edit-employee-id').value = {{ employee.id }}
+                                                        document.getElementById('workDay-selected-edit-employee-id').value = {{ employee.id }}
                                                     </script>
                                                 {% endif %}
                                             {% endfor %}
                                         </select>
                                         <script>
-                                            function debtChangeFunc() {
-                                                let selectBox = document.getElementById("debt-selectBoxEdit");
+                                            function workDayChangeFunc() {
+                                                let selectBox = document.getElementById("workDay-selectBoxEdit");
                                                 let selectedValue = selectBox.options[selectBox.selectedIndex].value;
-                                                document.getElementById('debt-selected-edit-employee-id').value=selectedValue
+                                                document.getElementById('workDay-selected-edit-employee-id').value=selectedValue
                                            }
                                         </script>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Grid row (title) -->
+
+                            <!-- Grid row (workHour) -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="text" id="debt-input-edit-title" name="title" class="form-control">
-                                        <label for="contact-Subject" class="">عنوان</label>
+                                        <input type="text" id="workDay-input-edit-workHour" name="workHour" class="form-control">
+                                        <label for="contact-Subject" class="">ساعت کاری</label>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Grid row (status) -->
+                            <!-- Grid row (workDate) -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="text" id="debt-input-edit-status" name="status" class="form-control">
-                                        <label for="contact-Subject" class="">وضعیت</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (debtDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="debt-input-edit-debtDate" name="debtDate" class="form-control">
+                                        <input type="date" value="2019-11-21" id="workDay-input-edit-workDate" name="workDate" class="form-control">
                                         <label for="contact-Subject" class="">تاریخ بدهی</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (paymentDebtDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="debt-input-edit-paymentDebtDate" name="paymentDebtDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ پرداخت</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (price) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="text" id="debt-input-edit-price" name="price" class="form-control">
-                                        <label for="contact-Subject" class="">مبلغ</label>
                                     </div>
                                 </div>
                             </div>
@@ -386,7 +321,7 @@
                                 <div class="col-md-12">
 
                                     <div class="md-form">
-                                        <textarea type="text" id="debt-input-edit-description" name="description" class="md-textarea form-control" rows="3" ></textarea>
+                                        <textarea type="text" id="workDay-input-edit-description" name="description" class="md-textarea form-control" rows="3" ></textarea>
                                         <label for="contact-message">توضیحات</label>
                                     </div>
 
@@ -396,7 +331,7 @@
                         </div>
                     </div>
                     <!-- model footer -->
-                    <div id="debt-model-a-tag" class="modal-footer">
+                    <div id="workDay-model-a-tag" class="modal-footer">
                         <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
                         <a >
                             <button type="submit" class="btn btn-secondary">تایید</button>
@@ -409,21 +344,21 @@
     </div>
 
     <!-- Modal delete -->
-    <input type="hidden" id="selected-debt-delete-id" selected-id="-1">
-    <div class="modal fade" id="modal-debt-delete" tabindex="-1" role="dialog" aria-labelledby="exampleSDebtModalLabel"
+    <input type="hidden" id="selected-workDay-delete-id" selected-id="-1">
+    <div class="modal fade" id="modal-workDay-delete" tabindex="-1" role="dialog" aria-labelledby="exampleWorkDayModalLabel"
       aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleDebtModalLabel"></h5>
+            <h5 class="modal-title" id="exampleWorkDayModalLabel"></h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body" id="model-debt-delete-body">
+          <div class="modal-body" id="model-workDay-delete-body">
             آیا از حذف این فیلد مطمئن هستید؟
           </div>
-          <div id="model-debt-delete-a-tag" class="modal-footer">
+          <div id="model-workDay-delete-a-tag" class="modal-footer">
               <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
               <a >
                   <button type="button" class="btn btn-secondary">تایید</button>
@@ -448,10 +383,10 @@
 
     <script>
         //-- handle delete modal --//
-        function showDebtDeleteModal() {
-            let idd = $("#selected-debt-delete-id").attr("selected-id");
-            let a_tag = $("#model-debt-delete-a-tag");
-            let modal_body = $("#model-debt-delete-body");
+        function showWorkDayDeleteModal() {
+            let idd = $("#selected-workDay-delete-id").attr("selected-id");
+            let a_tag = $("#model-workDay-delete-a-tag");
+            let modal_body = $("#model-workDay-delete-body");
             let base_url = $("#url-base").attr("data-url");
             a_tag.empty();
             modal_body.empty();
@@ -469,7 +404,7 @@
                 );
                 a_tag.append(
                     `<button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>` +
-                    `<a href='${base_url}${idd}/debt-delete/'">` +
+                    `<a href='${base_url}${idd}/workDay-delete/'">` +
                     `<button type="button" class="btn btn-secondary">تایید</button>` +
                     `</a>`
                 );
@@ -479,28 +414,25 @@
 
     <script>
 
-        $("#debt-table tr").click(function(){
+        $("#workDay-table tr").click(function(){
            $(this).addClass('table-primary').siblings().removeClass('table-primary');
-           var value=$(this).find('input.debtId').attr("dataId");
+           var value=$(this).find('input.workDayId').attr("dataId");
            {#alert(value)#}
-           $('#selected-debt-delete-id').attr("selected-id", value);
-           $('#selected-debt-id').attr("value", value); //edit
+           $('#selected-workDay-delete-id').attr("selected-id", value);
+           $('#selected-workDay-id').attr("value", value); //edit
 
             //-- fill edit fields --//
-            $('#debt-input-edit-debtDate').attr('value', $(this).find('td.debtDate').html());
-            $('#debt-input-edit-paymentDebtDate').attr('value', $(this).find('td.paymentDebtDate').html());
-            $('#debt-input-edit-description').val( $(this).find('td.description').html());
-            $('#debt-input-edit-title').attr('value', $(this).find('td.title').html());
-            $('#debt-input-edit-price').attr('value', $(this).find('td.price').html());
-            $('#debt-input-edit-status').attr('value', $(this).find('td.status').html());
+            $('#workDay-input-edit-workDate').attr('value', $(this).find('td.workDate').html());
+            $('#workDay-input-edit-workHour').attr('value', $(this).find('td.workHour').html());
+            $('#workDay-input-edit-description').val( $(this).find('td.description').html());
             let empId =$(this).find('input.employee').attr("employeId");
-            $('#selectBoxEdit').val(empId)
+            $('#workDay-selectBoxEdit').val(empId)
 
 
         });
 
         $('.ok').on('click', function(e){
-            alert($("#debt-table tr.selected td:first").html());
+            alert($("#workDay-table tr.selected td:first").html());
         });
 
         // Material Select Initialization
@@ -509,23 +441,23 @@
         });
 
 
-        //-- validate image field in new project form --//
-        function validateDebtForm() {
+        //-- validate image field in new workDay form --//
+        function validateWorkDayForm() {
 
-            let price = document.forms["FormSalary"]["debt-input-new-price"].value;
+            let price = document.forms["FormWorkDay"]["workDay-input-new-workHour"].value;
             if (price === null || price === "") {
-                $('#debt-input-new-price').attr('value', 0)
+                $('#workDay-input-new-workHour').attr('value', 0);
             }
-            let employeeId = document.forms["FormSalary"]["debt-selected-employee-id"].value;
+            let employeeId = document.forms["FormWorkDay"]["workDay-selected-employee-id"].value;
             if (employeeId === "-1") {
-                alert("کارمند مورد نظر را انتخاب کنید")
+                alert("کارمند مورد نظر را انتخاب کنید");
                 return false
             }
 
         }
 
         //-- validate image field in edit salary form --//
-        function validateSalaryEditForm() {
+        function validateWorkDayEditForm() {
 
         }
 
@@ -533,10 +465,10 @@
 
     <!-- search -->
     <script>
-        $("#search-debt").on('keyup', function (e) {
+        $("#search-workDay").on('keyup', function (e) {
             if (e.keyCode === 13) {
-                let srchterm = $("#search-debt").val();
-                let tag_a = document.getElementById("debt-tag-a-page-size");
+                let srchterm = $("#search-workDay").val();
+                let tag_a = document.getElementById("workDay-tag-a-page-size");
                 tag_a.href = "?page-size=" + {{ page_size }} + "&search=" + srchterm;
                 tag_a.click();
             }
