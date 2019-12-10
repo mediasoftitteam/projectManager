@@ -9,6 +9,11 @@ app_name = 'project'
 
 
 
+
+
+
+
+
 urlpatterns = [
     url(r'^$', views.index, name='index'),
 
@@ -28,10 +33,10 @@ urlpatterns = [
 
     # income urls
     url(r'^income-list/$', views.income_list, name='income-list'),
+    url(r'^income-new/$', views.income_create, name='income-create'),
+    url(r'^income-update/$', views.income_update, name='income-update'),
+    url(r'^(?P<income_id>[0-9]+)/income-delete/$', views.income_delete, name='income-delete'),
     url(r'^(?P<income_id>[0-9]+)/income-detail/$', views.income_view, name='income-detail'),
-    url(r'^income-new/', views.income_create, name='income-create'),
-    url(r'^(?P<income_id>[0-9]+)/employee-update/$', views.income_update, name='income-update'),
-    url(r'^(?P<income_id>[0-9]+)/employee-delete/$', views.income_delete, name='income-delete'),
 
     # tasks urls
     url(r'^task-list/$', views.task_list, name='task-list'),

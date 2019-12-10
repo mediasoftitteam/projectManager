@@ -1,158 +1,163 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
 {% block title %}
-    <title>مدیریت پروژه</title>
+    <title>مدیریت درآمد/هزینه ها</title>
 {% endblock %}
 <!-- begin of body block -->
 {% block body %}
+
     <!-- load static file in django -->
     {% load staticfiles %}
-    <link rel="stylesheet" href="{% static 'project/styles.css' %}">
+
+
+    <!-- Material Design Bootstrap table -->
+    <link rel="stylesheet" href="{% static 'project/css/addons/datatables.min.css' %}"><!-- MDBootstrap Datatables  -->
+    <!-- Material Design Bootstrap table -->
+    <link rel="stylesheet" href="{% static 'project/css/addons/datatables-select.min.css' %}"><!-- MDBootstrap Datatables  -->
 
     <div class="alert alert-primary" role="alert">
-        ورودی ها
+        تسک ها
     </div>
 
-    <div class="container-fluid mt-md-0" style="margin-top: 70px; ">
-        <div class="card">
-            <div class="card-header d-table pr-5">
-                <h5 class="card-title d-table-cell align-middle">اطلاعات هزینه ها</h5>
+    <!-- new/delete/edit buttons -->
+    <div class="text-center">
+      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelIncomeNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
+      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelIncomeEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
+      <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-income-delete"
+      onclick="showIncomeDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
+    </div>
+
+
+    <!-- PAGE SIZE/ search -->
+    <div class="container">
+        <div class="row ">
+            <div class="col-1 mb-2">
+                <p>تعداد صفحات</p>
             </div>
-            <div class="card-body pr-5">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>پروژه</th>
-                                <th>تصویر</th>
-                                <th>تاریخ</th>
-                                <th>هزینه</th>
-                                <th>هزینه/درآمد</th>
-                                <th>توضیحات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for income in incomes %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ income.project.title }}</td>
-                                    <td>-</td>
-                                    <td>{{ income.incomeDate.date }}</td>
-                                    <td>{{ income.money }}</td>
-                                    <td>{{ income.isOutcome }}</td>
-                                    <td>{{ income.description }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <div class="col-2 mb-2">
+                <select id="task-selector-page-size" class="browser-default custom-select" onchange="incomePageSizeChanged(this.options[this.selectedIndex].value)">
+                    <option value="10">10</option>
+                    <option value="20" >20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <a id="income-tag-a-page-size" class="d-none" href="?page-size=20">20</a>
+                <script>
+                    document.getElementById('income-selector-page-size').value={{ page_size }};
+                    function incomePageSizeChanged(page_size) {
+                        {#alert(page_size)#}
+                        let tag_a = document.getElementById("income-tag-a-page-size");
+                        tag_a.href = "?page-size=" + page_size;
+                        tag_a.click();
+                    }
+                </script>
+            </div>
+            <div class="col-6"></div>
+
+            <!-- Search form -->
+            <div class="col-3 mb-2 ml-0 text-left">
+                <input id="search-income" class="form-control" type="text" placeholder="جست و جو" aria-label="Search" value="{{ search }}">
             </div>
         </div>
-
+    <div class="clearfix"></div>
     </div>
 
-    <!-- add new income -->
-    <div class="mx-auto my-4">
-            <button type="button" class="btn-lg btn-default btn-floating"  data-toggle="modal" data-target="#modelIncomeNew"><i class="fa fa-plus"></i></button>
+    <!-- body -->
+    <div >
+        <div class="container py-1">
+
+            <div class="row pagination-sm table-responsive" id="income-list">
+
+                <table class="table table-sm table-hover table-striped"  id="income-table">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">پروژه</th>
+                        <th scope="col">هزینه</th>
+                        <th scope="col">درآمد/هزینه</th>
+                        <th scope="col">تاریخ</th>
+                        <th scope="col">توضیحات</th>
+                        <th scope="col">تصویر</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for income in incomes %}
+                        <tr>
+                            <input class="incomeId" type="hidden" dataId={{ income.id }}>
+                            <input class="project" type="hidden" projectId={{ income.project.id }}>
+                            <th scope="row" >{{ forloop.counter }}</th>
+                            <td class="project" >{{ income.project.title }}</td>
+                            <td class="money">{{ income.money }}</td>
+                            <td class="isOutcome">{{ income.isOutcome }}</td>
+                            <td class="incomeDate">{{ income.incomeDate|date:"Y-m-d" }}</td>
+                            <td class="description">{{ income.description }}</td>
+                            {% if income.pic %}
+                                <td ><a href="{{ income.pic.url }}"><i class="fa fa-image"></i></a></td>
+                            {% else %}
+                                <td ><a href="#"></a></td>
+
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
     </div>
 
-    <div class="row mx-auto d-none">
-        <div class="col-12 col-md-10">
-            <div class="row mx-auto" id="product-list">
-
-                {% for income in incomes %}
-                    <!-- Card -->
-                    <div class="card col-width m-1">
-
-                      <!-- Card image -->
-                      <div class="view overlay">
-                        {% if income.project.pic %}#}
-                            <img src={{ income.project.pic.url }} class="card-img-top"  alt="{{ income.project.title }}">
-                        {% else %}
-                            <img src={% static 'project/images/demo.PNG' %} class="align-self-end"  alt="{{ income.project.title }}">
-                        {%  endif %}
-                        <a>
-                          <div class="mask rgba-white-slight"></div>
+    <!-- pagination -->
+    <div class="d-flex justify-content-center">
+        {% if salaries.has_other_pages %}
+            <nav aria-label="Page navigation example">
+                <ul class="pagination pagination-circle pg-blue">
+                    <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-income').value">First</a></li>
+                    {% if salaries.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" aria-label="Previous" href="?page={{ tasks.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-income').value">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                        <a class="page-link" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
                         </a>
-                      </div>
+                    </li>
+                    {% endif %}
 
-                      <!-- Button -->
-                       <a href="{% url "project:income-update" income.id %}" >
-                           <button type="button" class="btn btn-floating btn-action ml-auto mr-4 mdb-color lighten-3"><i class="fa fa-edit pl-1" style="color: #e5e5e5; font-size: 20px"></i></button>
-                       </a>
+                    <!-- center page numbers -->
+                    {% for i in incomes.paginator.page_range %}
+                        {% if incomes.number == i %}
+                            <li class="page-item active"><a class="page-link">{{ i }}</a></li>
 
-                      <!-- Card content -->
-                      <div class="card-body">
+                        {% else %}
+                            <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-income').value">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
 
-                        <!-- Title -->
-                        <h4 class="card-title">{{ income.project.title }}</h4>
-                        <hr>
-                        <!-- Text -->
-                        <p class="card-text">
-                            {{ income.project.projectOwner }}
-                          <hr>
-                            {{ income.money }} تومان
-                        </p>
+                    <!-- center page numbers -->
+                    {% if incomes.has_next %}
+                        <a class="page-link" aria-label="Next"  href="?page={{ incomes.next_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-income').value">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                    {% endif %}
 
-                      </div>
-
-                      <!-- Card footer -->
-                      <div class="rounded-bottom mdb-color lighten-3 text-center pt-3">
-                        <ul class="list-unstyled list-inline font-small">
-{#                          <a href="{% url 'project:project-delete' project.id %}" data-toggle="modal" data-target="#basicExampleModal">#}
-                          <a href="#" onclick="showDeleteModalIncome({{ income.project.id }})" data-toggle="modal" data-target="#basicExampleModalIncome">
-                              <li class="list-inline-item pr-2 white-text float-left mb-3 ml-3 "><i class="far fa-trash"></i></li>
-                          </a>
-                          <li class="list-inline-item pr-2 white-text"><i class="far fa-calendar-alt"></i> {{ income.incomeDate.date }} </li>
-
-                        </ul>
-                      </div>
-
-                    </div>
-                    <!-- Card -->
-                {% endfor %}
-
-            </div>
-            <div class="mx-auto my-4" id="products-loading"></div>
-
-            <!-- add new income -->
-            <div class="mx-auto my-4">
-                <a href="{% url "project:income-create" %}" >
-                    <button type="button" class="btn-lg btn-default btn-floating"><i class="fa fa-plus"></i></button>
-                </a>
-            </div>
-
-        </div>
-
+                    <li class="page-item"><a class="page-link">Last</a></li>
+                </ul>
+            </nav>
+        {% endif %}
     </div>
-
-    <!-- Modal -->
-    <input type="hidden" id="selected-delet-id-income" selected-id="2">
-    <div class="modal fade" id="basicExampleModalIncome" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelIncome"
-      aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabelIncome"></h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            آیا از حذف این آیتم مطمئن هستید؟
-          </div>
-          <div id="model-a-tag-income" class="modal-footer">
-              <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
-              <a >
-                  <button type="button" class="btn btn-secondary">تایید</button>
-              </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
 
     <!-- Modal new -->
     <div class="modal fade" id="modelIncomeNew" tabindex="-1" role="dialog" aria-labelledby="modelIncomeNewLabel"
@@ -160,11 +165,11 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
             <!-- model header -->
-            <div class="modal-header">
+            <div class="modal-header ">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h5 class="modal-title" id="modelIncomeNewLabel">ایجاد پروژه جدید</h5>
+                <h5 class="modal-title" id="modelIncomeNewLabel">ایجاد درآمد/هزینه جدید</h5>
             </div>
             <div class="card-body pr-5">
                 <!-- form -->
@@ -172,42 +177,29 @@
                     {% csrf_token %}
                     <input type="hidden" name="user" value="{{ user.id }}">
                     <!-- picture field is empty or not? -->
-                    <input type="hidden" id="picValidator" name="isPicValid" value="true">
+                    <input type="hidden" id="income-picValidator" name="isIncomePicValid" value="true">
                     <!-- model body -->
                     <div class="modal-body">
                         <div class="col-md-12 col-xl-12">
-                            <!-- Grid row (title) -->
+
+                            <!--Dropdown project-->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="text" name="title" class="form-control">
-                                        <label for="contact-Subject" class="">عنوان پروژه</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (start/end date) -->
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="date" id="input-new-startDate" name="startDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ شروع</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="date" id="input-new-deadline" name="deadline" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ پایان</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (Owner) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="text" name="projectOwner" class="form-control">
-                                        <label for="contact-Subject" class="">کارفرما</label>
+                                        <input type="hidden" id="income-selected-project-id" name="project" value="-1">
+                                        <select class="mdb-select md-form" id="income-selectBox-project" searchable="جست و جو" onchange="changeIncomeProjectNewFunc()">
+                                            <option value="" disabled selected >.    پروژه موردنظر را اتخاب کنید</option>
+                                            {% for project in projects %}
+                                                <option value="{{ project.id }}" >.    {{ project.title }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <script>
+                                            function changeIncomeProjectNewFunc() {
+                                                let selectBox = document.getElementById("income-selectBox-project");
+                                                let selectedValue = selectBox.options[selectBox.selectedIndex].value;
+                                                document.getElementById('income-selected-project-id').value=selectedValue
+                                           }
+                                        </script>
                                     </div>
                                 </div>
                             </div>
@@ -216,18 +208,28 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="text" name="money" class="form-control">
-                                        <label for="contact-Subject" class="">هزینه کل</label>
+                                        <input type="text" id="income-input-new-money" name="money" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه</label>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Grid row (image) -->
+                            <!-- Grid row (isOutcome) -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input id="uploadeImgProject" type="file" name="pic" class="form-control">
-                                        <label for="contact-Subject" class="">تصویر</label>
+                                        <input type="text" id="income-input-new-isOutcome" name="isOutcome" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه/درآمد</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (incomeDate) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="date" value="2019-11-21" id="income-input-new-incomeDate" name="incomeDate" class="form-control">
+                                        <label for="contact-Subject" class="">تاریخ</label>
                                     </div>
                                 </div>
                             </div>
@@ -245,6 +247,146 @@
 
                                 </div>
                             </div>
+
+                            <!-- Grid row (image) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="file-field">
+                                        <div class="btn btn-primary btn-sm float-left">
+                                          <span>انتخاب تصویر</span>
+                                          <input type="file"  name="pic" id="income-modal-new-upload-img">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                          <input class="file-path validate" type="text" placeholder="Upload your file">
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- model footer -->
+                    <div id="task-model-a-tag" class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+                        <a >
+                            <button type="submit" class="btn btn-secondary">تایید</button>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal edit -->
+    <div class="modal fade" id="modelIncomeEdit" tabindex="-1" role="dialog" aria-labelledby="modelIncomeEditLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- model header -->
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="modelIncomeEditLabel">ایجاد تسک جدید</h5>
+            </div>
+            <div class="card-body pr-5">
+                <!-- form -->
+                <form name="FormIncomeEdit" action="{% url 'project:income-update' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateIncomeEditForm()">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    <!-- picture field is empty or not? -->
+                    <input type="hidden" id="picValidatorIncome_edit" name="isIncomePicValid" value="true">
+                    <!-- selected income id -->
+                    <input type="hidden" id="selected-income-id" name="incomeId">
+                    <!-- model body -->
+                    <div class="modal-body">
+                        <div class="col-md-12 col-xl-12">
+
+                            <!--Dropdown project-->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="hidden" id="income-selected-edit-project-id" name="project" value="-1">
+                                        <select class="mdb-select md-form" id="income-project-selectBoxEdit" searchable="جست و جو" onchange="incomeProjectChangeFunc();">
+                                            <option value="" disabled selected >.    کارمند موردنظر را اتخاب کنید</option>
+                                            {% for project in projects %}
+                                                <option value="{{ project.id }}" >.    {{ project.title }}</option>
+                                                {% if forloop.counter == 1 %}
+                                                    <script>
+                                                        document.getElementById('income-selected-edit-project-id').value = {{ project.id }}
+                                                    </script>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        <script>
+                                            function incomeProjectChangeFunc() {
+                                                let selectBox = document.getElementById("income-project-selectBoxEdit");
+                                                let selectedValue = selectBox.options[selectBox.selectedIndex].value;
+                                                document.getElementById('income-selected-edit-project-id').value=selectedValue
+                                           }
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (money) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" id="income-input-edit-money" name="money" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (isOutcome) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" id="income-input-edit-isOutcome" name="isOutcome" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه/درآمد</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (incomeDate) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="date" value="2019-11-21" id="income-input-edit-incomeDate" name="incomeDate" class="form-control">
+                                        <label for="contact-Subject" class="">تاریخ</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (description) -->
+                            <div class="row mb-4">
+
+                                <!-- Grid column -->
+                                <div class="col-md-12">
+
+                                    <div class="md-form">
+                                        <textarea type="text" id="income-input-edit-description" name="description" class="md-textarea form-control" rows="3" ></textarea>
+                                        <label for="contact-message">توضیحات</label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Grid row (image) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="file-field">
+                                        <div class="btn btn-primary btn-sm float-left">
+                                          <span>انتخاب تصویر</span>
+                                          <input type="file"  name="pic" id="modal-income-edit-upload-img">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                          <input class="file-path validate" type="text" placeholder="Upload your file">
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!-- model footer -->
@@ -260,48 +402,145 @@
       </div>
     </div>
 
-    <script type="text/javascript">
-        //-- validate image field in new Income form --//
-        function validateIncomeForm() {
-            let pic = document.forms["FormIncome"]["uploadeImgIncome"].value;
-            if (pic === null || pic === "") {
-                $('#picValidator').attr('value', false)
+    <!-- Modal delete -->
+    <input type="hidden" id="selected-income-delete-id" selected-id="-1">
+    <div class="modal fade" id="modal-income-delete" tabindex="-1" role="dialog" aria-labelledby="exampleIncomeModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleIncomeModalLabel"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="model-income-delete-body">
+            آیا از حذف این فیلد مطمئن هستید؟
+          </div>
+          <div id="model-income-delete-a-tag" class="modal-footer">
+              <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+              <a >
+                  <button type="button" class="btn btn-secondary">تایید</button>
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- base url address -->
+    <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="{% static 'project/js/jquery.min.js' %}"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="{% static 'project/js/mdb.min.js' %}"></script>
+    <!-- MDB table core JavaScript -->
+    <script type="text/javascript" src="{% static 'project/js/addons/datatables.min.js' %}"></script><!-- MDBootstrap Datatables  -->
+    <!-- MDB table core JavaScript -->
+    <script type="text/javascript" src="{% static 'project/js/addons/datatables-select.min.js' %}"></script><!-- MDBootstrap Datatables  -->
+
+    <script>
+        //-- handle delete modal --//
+        function showIncomeDeleteModal() {
+            let idd = $("#selected-income-delete-id").attr("selected-id");
+            let a_tag = $("#model-income-delete-a-tag");
+            let modal_body = $("#model-income-delete-body");
+            let base_url = $("#url-base").attr("data-url");
+            a_tag.empty();
+            modal_body.empty();
+            if(idd == "-1"){
+                modal_body.append(
+                    `ابتدا آیتمی را انتخاب کنید`
+                );
+                a_tag.append(
+                    `<button type="button" class="btn btn-info" data-dismiss="modal">خروج</button>`
+                );
             }
-            if (startDate === null || startDate === "") {
-                console.log("date = " + Date.now().toString())
-                $('#input-new-startDate').attr('value', Date.now().toString())
-            }
-            let deadline = document.forms["FormIncome"]["input-new-deadline"].value;
-            if (deadline === null || deadline === "") {
-                $('#deadline').attr('value', Date.now().toString())
-            }
-        }
-        //-- validate image field in edit Income form --//
-        function validateIncomeEditForm() {
-            let pic = document.forms["FormIncomeEdit"]["input-edit-pic"].value;
-            if (pic === null || pic === "") {
-                $('#picValidator_edit').attr('value', false)
+            else {
+                modal_body.append(
+                    'آیا از حذف شدن این آیتم اطمینان دارید؟'
+                );
+                a_tag.append(
+                    `<button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>` +
+                    `<a href='${base_url}${idd}/income-delete/'">` +
+                    `<button type="button" class="btn btn-secondary">تایید</button>` +
+                    `</a>`
+                );
             }
         }
     </script>
 
     <script>
-        function showDeleteModalIncome(prj_id) {
-            $("#selected-delet-id-income").attr("selected-id", prj_id);
-            let idd = $("#selected-delet-id-income").attr("selected-id");
-            let a_tag = $("#model-a-tag-income");
-            let base_url = $("#url-base").attr("data-url");
-            a_tag.empty();
-            a_tag.append(
-                `<button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>` +
-                `<a href='${base_url}${idd}/income-delete/'"> ${idd}` +
-                    `<button type="button" class="btn btn-secondary">تایید</button>` +
-                `</a>`
-            );
+
+        $("#income-table tr").click(function(){
+           $(this).addClass('table-primary').siblings().removeClass('table-primary');
+           var value=$(this).find('input.incomeId').attr("dataId");
+           $('#selected-income-delete-id').attr("selected-id", value);
+           $('#selected-income-id').attr("value", value); //edit
+
+            //-- fill edit fields --//
+            $('#income-input-edit-money').attr('value', $(this).find('td.money').html());
+            $('#income-input-edit-description').val( $(this).find('td.description').html());
+            $('#income-input-edit-incomeDate').attr('value', $(this).find('td.incomeDate').html());
+            $('#income-input-edit-isOutcome').attr('value', $(this).find('td.isOutcome').html());
+            let prjId =$(this).find('input.project').attr("projectId");
+            $('#income-project-selectBoxEdit').val(prjId)
+
+
+        });
+
+        $('.ok').on('click', function(e){
+            alert($("#income-table tr.selected td:first").html());
+        });
+
+        // Material Select Initialization
+        $(document).ready(function() {
+        $('.mdb-select').materialSelect();
+        });
+
+
+        //-- validate image field in new project form --//
+        function validateIncomeForm() {
+            let pic = document.forms["FormIncome"]["income-modal-new-upload-img"].value;
+            if (pic === null || pic === "") {
+                $('#income-picValidator').attr('value', false)
+            }
+            let incomeDate = document.forms["FormIncome"]["income-input-new-incomeDate"].value;
+            if (incomeDate === null || incomeDate === "") {
+                $('#income-input-new-incomeDate').attr('value', 0)
+            }
+            let taskDate = document.forms["FormIncome"]["income-input-new-money"].value;
+            if (taskDate === null || taskDate === "") {
+                $('#income-input-new-money').attr('value', 0)
+            }
+            let eprojectId = document.forms["FormIncome"]["income-selected-project-id"].value;
+            if (eprojectId === "-1") {
+                alert("پروژه مورد نظر را انتخاب کنید")
+                return false
+            }
+
         }
+
+        //-- validate image field in edit salary form --//
+        function validateIncomeEditForm() {
+            let pic = document.forms["FormIncomeEdit"]["modal-income-edit-upload-img"].value;
+            if (pic === null || pic === "") {
+                $('#picValidatorIncome_edit').attr('value', false)
+            }
+        }
+
     </script>
 
-<!-- end of body block -->
+    <!-- search -->
+    <script>
+        $("#search-income").on('keyup', function (e) {
+            if (e.keyCode === 13) {
+                let srchterm = $("#search-income").val();
+                let tag_a = document.getElementById("income-tag-a-page-size");
+                tag_a.href = "?page-size=" + {{ page_size }} + "&search=" + srchterm;
+                tag_a.click();
+            }
+        });
+    </script>
 {% endblock %}
-
-

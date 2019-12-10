@@ -1,37 +1,40 @@
 {% extends "project/base.html" %}
-
+{% load crispy_forms_tags %}
 {% block body %}
 
-  {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-  {% endif %}
-  
-  {% if next %}
-    {% if user.is_authenticated %}
-      <p>Your account doesn't have access to this page. To proceed,
-      please login with an account that has access.</p>
-    {% else %}
-      <p>Please login to see this page.</p>
+    {% load  staticfiles %}
+    {% if form.errors %}
+        <div class="alert alert-danger text-center">اطلاعات کاربری نادرست است</div>
     {% endif %}
-  {% endif %}
-  
-  <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <table>
-      <tr>
-        <td>{{ form.username.label_tag }}</td>
-        <td>{{ form.username }}</td>
-      </tr>
-      <tr>
-        <td>{{ form.password.label_tag }}</td>
-        <td>{{ form.password }}</td>
-      </tr>
-    </table>
-    <input type="submit" value="login" />
-    <input type="hidden" name="next" value="{{ next }}" />
-  </form>
-  
-  {# Assumes you setup the password_reset view in your URLconf #}
-  <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+    {% if next %}
+        {% if user.is_authenticated %}
+            <div class="alert alert-info text-center">دسترسی شما به این صفحه مجاز نیست</div>
+        {% else %}
+            <div class="alert alert-info text-center">لطفا برای دسترسی وارد شوید</div>
+        {% endif %}
+    {% endif %}
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <div class="border mx-auto rounded" style="width: 350px; height: 450px;">
+            <h5 class="text-center" style="height: fit-content; width: 100%; margin-top: 30px"><b>ورود به حساب کاربری</b></h5>
+            <div class="w-75 mx-auto text-center mt-4">{{ form.username|as_crispy_field }}</div>
+            <div class="w-75 mx-auto text-center mt-3">{{ form.password |as_crispy_field}}</div>
+
+{#            <input type="text" class="form-control mx-auto" placeholder="نام کاربری" style="width: 70%; margin-top: 80px">#}
+{#            <input type="password" class="form-control mx-auto" placeholder="رمز عبور" style="width: 70%; margin-top: 20px">#}
+            <div class="d-flex justify-content-between mx-auto" style="width: 70%; margin-top: 20px">
+                <a href="{% url 'password_reset' %}" style="color: #3399FF" class="pr-1">
+                    فراموشی رمز عبور؟
+                </a>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}" >
+            <div class="d-flex justify-content-center mt-5">
+                <button type="submit" value="login" style="width: 75%" class="btn btn-info">
+                    ورود
+                </button>
+            </div>
+        </div>
+    </form>
+
   
 {% endblock %}

@@ -23,7 +23,19 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # first page
 def index(request):
-    return render(request, 'project/index.html')
+    project = models.Project.objects.all()
+    cost = 0
+    for prj in project:
+        cost = cost + prj.money
+
+    employee = models.Employee.objects.all()
+
+    return render(request, 'project/index.html',{
+        'project_count': project.count(),
+        'project_total_money': cost,
+        'employee_count': employee.count(),
+        'employee_total_money': cost,
+    })
 
 
 #########################
@@ -184,9 +196,30 @@ class IncomeForm(ModelForm):
 # @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def income_list(request):
-    incomes = models.Income.objects.all()
-    data = {}
-    return render(request, 'project/income_list.html', {'incomes': incomes})
+    projects = models.Project.objects.all()
+    page = request.GET.get('page', 1)
+    page_size = request.GET.get('page-size', 10)
+    search = request.GET.get('search', '')
+
+    incomes = models.Income.objects.filter(Q(project__title__icontains=search)
+                                                 | Q(incomeDate__icontains=search)
+                                                 | Q(description__icontains=search)
+                                                 | Q(money__icontains=search)
+                                                 | Q(isOutcome__icontains=search)
+                                                 )
+
+    paginator = Paginator(incomes, page_size)
+    try:
+        incomes = paginator.page(page)
+    except PageNotAnInteger:
+        incomes = paginator.page(1)
+    except EmptyPage:
+        incomes = paginator.page(paginator.num_pages)
+
+    return render(request, 'project/income_list.html', {'incomes': incomes,
+                                                        'projects': projects,
+                                                        'search': search,
+                                                        'page_size': page_size})
 
 
 # @login_required
@@ -198,21 +231,59 @@ def income_view(request, income_id):
 
 @user_passes_test(lambda u: u.is_superuser)
 def income_create(request):
-    form = IncomeForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-        return redirect('project:income-list')
-    return render(request, 'project/income_form.html', {'form': form})
+    post_data = request.POST
+    m_user = User.objects.get(id=post_data['user'])
+    m_project = models.Project.objects.get(id=post_data['project'])
+    m_pic = None
+    if post_data['isIncomePicValid'] == 'true':
+        m_pic = request.FILES['pic']
+    try:
+        m_incomeDate = (post_data['incomeDate'])
+    except ValueError:
+        m_incomeDate = str(timezone.now)
+
+    m_money = int(post_data['money'])
+    m_isOutcome = post_data['isOutcome']
+    m_description = post_data['description']
+    p = models.Income(user=m_user
+                      , project=m_project
+                      , pic=m_pic
+                      , incomeDate=m_incomeDate
+                      , money=m_money
+                      , isOutcome=m_isOutcome
+                      , description=m_description)
+    p.save()
+
+    return redirect('project:income-list')
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def income_update(request, income_id):
-    income = get_object_or_404(models.Income, pk=income_id)
-    form = IncomeForm(request.POST or None, instance=income)
-    if form.is_valid():
-        form.save()
-        return redirect('project:income-list')
-    return render(request, 'project/income_form.html', {'form': form})
+def income_update(request):
+    post_data = request.POST
+    m_user = User.objects.get(id=post_data['user'])
+    m_project = models.Project.objects.get(id=post_data['project'])
+    try:
+        m_incomeDate = (post_data['incomeDate'])
+    except ValueError:
+        m_incomeDate = str(timezone.now)
+
+    m_money = int(post_data['money'])
+    m_isOutcome = post_data['isOutcome']
+    m_description = post_data['description']
+    m_id = post_data['incomeId']
+
+    income = get_object_or_404(models.Income, pk=m_id)
+    income.user = m_user
+    income.employee = m_project
+    if post_data['isIncomePicValid'] == 'true':
+        income.pic = request.FILES['pic']
+    income.money = m_money
+    income.isOutcome = m_isOutcome
+    income.incomeDate = m_incomeDate
+    income.description = m_description
+    income.save()
+
+    return redirect('project:income-list')
 
 
 @user_passes_test(lambda u: u.is_superuser)
