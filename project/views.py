@@ -28,12 +28,14 @@ def index(request):
     project = models.Project.objects.all()
     cost = 0
     for prj in project:
-        cost = cost + prj.money
+        if prj.money is not None:
+            cost = cost + prj.money
 
     employee = models.Employee.objects.all()
     salary_sum = 0
     for emp in employee:
-        salary_sum = salary_sum + emp.salary
+        if emp.salary is not None:
+            salary_sum = salary_sum + emp.salary
 
     tasks = models.Task.objects.all()
 
