@@ -20,6 +20,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from django.db.models import Sum
+
 
 # first page
 def index(request):
@@ -29,12 +31,42 @@ def index(request):
         cost = cost + prj.money
 
     employee = models.Employee.objects.all()
+    salary_sum = 0
+    for emp in employee:
+        salary_sum = salary_sum + emp.salary
+
+    tasks = models.Task.objects.all()
+
+    salaries = models.MonthSalary.objects.all()
+    salaries_sum = models.MonthSalary.objects.aggregate(Sum('money'))['money__sum']
+
+    incomes = models.Income.objects.all()
+    income_sum = incomes.filter(isOutcome='هزینه').aggregate(Sum('money'))['money__sum']
+    if income_sum is None:
+        income_sum = 0
+    outcome_sum = incomes.filter(isOutcome='درآمد').aggregate(Sum('money'))['money__sum']
+    if outcome_sum is None:
+        outcome_sum = 0
+    incomes_money = (income_sum) - (outcome_sum)
+
+    debts = models.Debt.objects.all()
+    debts_sum = models.Debt.objects.aggregate(Sum('price'))['price__sum']
 
     return render(request, 'project/index.html',{
         'project_count': project.count(),
         'project_total_money': cost,
         'employee_count': employee.count(),
         'employee_total_money': cost,
+        'salary_sum': salary_sum,
+        'task_count': tasks.count(),
+        'salaries_count': salaries.count(),
+        'salaries_sum': salaries_sum,
+        'incomes_count': incomes.count(),
+        'incomes_money': incomes_money,
+        'income_sum': income_sum,
+        'outcome_sum': outcome_sum,
+        'debts_count': debts.count(),
+        'debts_sum': debts_sum,
     })
 
 

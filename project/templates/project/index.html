@@ -35,7 +35,7 @@
                         <hr>
                         <div class="card-body pt-0">
                             <h6 class="font-weight-bold mb-1">مبلغ کل</h6>
-                            <p class="mb-0">{{ project_total_money|intcomma }}</p>
+                            <p class="mb-0">{{ project_total_money|intcomma }} تومان</p>
                         </div>
                     </div>
 
@@ -46,16 +46,16 @@
 
                     <div class="card orange lighten-3">
                         <div class="card-body pb-0">
-                            <i class="fas fa-sun fa-3x pb-4"></i>
+                            <i class="fas fa-user fa-3x pb-4"></i>
                             <div class="d-flex justify-content-between">
-                                <p class="mb-0 h5">23&deg;</p>
-                                <p class="mb-0 hour">3:25 PM</p>
+                                <p class="mb-0 h5">کارمندها</p>
+                                <p class="mb-0 hour">{{ employee_count }}</p>
                             </div>
                         </div>
                         <hr>
                         <div class="card-body pt-0">
-                            <h6 class="font-weight-bold mb-1">New York City</h6>
-                            <p class="mb-0">Sunny</p>
+                            <h6 class="font-weight-bold mb-1">جمع حقوق ماهانه کارمندان</h6>
+                            <p class="mb-0">{{ salary_sum|intcomma }} تومان</p>
                         </div>
                     </div>
 
@@ -66,95 +66,90 @@
             <!-- Grid row -->
             <div class="row">
 
-                <!-- Grid column -->
+                <!-- Tasks -->
                 <div class="col-6 p-1">
 
                     <div class="card indigo lighten-3">
                         <div class="card-body pb-0">
-                            <i class="fas fa-tint fa-3x pb-4"></i>
+                            <i class="fas fa-tasks fa-3x pb-4"></i>
                             <div class="d-flex justify-content-between">
-                                <p class="mb-0 h5">10&deg;</p>
-                                <p class="mb-0 hour">10:30 AM</p>
+                                <p class="mb-0 h5">تسک ها</p>
+                                <p class="mb-0 hour">{{ task_count }}</p>
                             </div>
                         </div>
                         <hr>
                         <div class="card-body pt-0">
-                            <h6 class="font-weight-bold mb-1">Seattle</h6>
-                            <p class="mb-0">Light rain</p>
+                            <h6 class="font-weight-bold mb-1">اطلاعات تسک ها</h6>
+                            <p class="mb-0">15</p>
                         </div>
                     </div>
 
                 </div>
-                <!-- Grid column -->
 
-                <!-- Grid column -->
+                <!-- salaries -->
                 <div class="col-6 p-1">
 
                     <div class="card grey lighten-2">
                         <div class="card-body pb-0">
-                            <i class="fas fa-cloud fa-3x pb-4"></i>
+                            <i class="fas fa-money-bill fa-3x pb-4"></i>
                             <div class="d-flex justify-content-between">
-                                <p class="mb-0 h5">14&deg;</p>
-                                <p class="mb-0 hour">8:10 PM</p>
+                                <p class="mb-0 h5">حقوق ها</p>
+                                <p class="mb-0 hour">{{ salaries_count }}</p>
                             </div>
                         </div>
                         <hr>
                         <div class="card-body pt-0">
-                            <h6 class="font-weight-bold mb-1">Milwaukee</h6>
-                            <p class="mb-0">Cloudy</p>
+                            <h6 class="font-weight-bold mb-1">جمع</h6>
+                            <p class="mb-0">{{ salaries_sum|intcomma }} تومان</p>
                         </div>
                     </div>
 
                 </div>
-                <!-- Grid column -->
 
             </div>
-            <!-- Grid row -->
 
             <!-- Grid row -->
             <div class="row">
 
-                <!-- Grid column -->
+                <!-- Income/Outcome -->
                 <div class="col-6 p-1">
 
                     <div class="card orange lighten-3">
                         <div class="card-body pb-0">
-                            <i class="fas fa-sun fa-3x pb-4"></i>
+                            <i class="fas fa-box-usd fa-3x pb-4"></i>
                             <div class="d-flex justify-content-between">
-                                <p class="mb-0 h5">25&deg;</p>
-                                <p class="mb-0 hour">1:35 PM</p>
+                                <p class="mb-0 h5">درآمد/هزینه</p>
+                                <p class="mb-0 hour">{{ incomes_sum }}</p>
                             </div>
                         </div>
                         <hr>
                         <div class="card-body pt-0">
-                            <h6 class="font-weight-bold mb-1">Honolulu</h6>
-                            <p class="mb-0">Sunny</p>
+                            <h6 class="font-weight-bold mb-1">درآمد/هزینه/سود</h6>
+                            <p class="mb-0">{{ income_sum|intcomma }}/{{ outcome_sum|intcomma }}/{{ incomes_money|intcomma }} تومان</p>
                         </div>
                     </div>
 
                 </div>
-                <!-- Grid column -->
 
-                <!-- Grid column -->
+                <!-- Debts -->
                 <div class="col-6 p-1">
 
                     <div class="card indigo white-text">
                         <div class="card-body pb-0">
-                            <i class="fas fa-umbrella fa-3x pb-4"></i>
+                            <i class="fas fa-money-check-alt fa-3x pb-4"></i>
                             <div class="d-flex justify-content-between">
-                                <p class="mb-0 h5">5&deg;</p>
-                                <p class="mb-0 hour">7:00 AM</p>
+                                <p class="mb-0 h5">بدهی ها</p>
+                                <p class="mb-0 hour">{{ debts_count }}</p>
                             </div>
                         </div>
                         <hr class="hr-light">
                         <div class="card-body pt-0">
-                            <h6 class="font-weight-bold mb-1">Anchorage</h6>
-                            <p class="mb-0">Heavy rain</p>
+                            <h6 class="font-weight-bold mb-1">جمع</h6>
+                            <p class="mb-0">{{ debts_sum|intcomma }} تومان</p>
                         </div>
                     </div>
 
                 </div>
-                <!-- Grid column -->
 
             </div>
             <!-- Grid row -->
