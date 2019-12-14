@@ -93,7 +93,19 @@ def project_list(request):
 @user_passes_test(lambda u: u.is_superuser)
 def project_view(request, project_id):
     project = get_object_or_404(models.Project, pk=project_id)
-    return render(request, 'project/project_detail.html', {'project': project})
+    employees = models.Employee.objects.filter(task__project=project.id)
+    tasks = models.Task.objects.filter(project=project.id)
+    incomes = models.Income.objects.filter(project=project.id)
+    incomes_sum = incomes.aggregate(Sum('money'))['money__sum']
+    money_res = project.money - incomes_sum
+    return render(request, 'project/project_detail.html', {
+        'project': project,
+        'employees': employees,
+        'tasks': tasks,
+        'incomes': incomes,
+        'incomes_sum': incomes_sum,
+        'money_res': money_res,
+    })
 
 
 from django.utils.dateparse import parse_date
