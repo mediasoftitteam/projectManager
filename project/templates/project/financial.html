@@ -1,0 +1,146 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% load humanize %}
+{% block title %}
+    <title>مشخصات کارمندی</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+    <!-- load static file in django -->
+    {% load staticfiles %}
+
+
+    <div class="container">
+        <!-- project -->
+        <h3>پروژه ها:</h3>
+         <div class="row pagination-sm table-responsive" id="project-list">
+             <table class="table table-sm table-hover table-striped"  id="table">
+                 <thead class="thead-dark">
+                 <tr>
+                     <th scope="col">#</th>
+                     <th scope="col">پروژه</th>
+                     <th scope="col">کارفرما</th>
+                     <th scope="col">مبلغ</th>
+                     <th scope="col">پرداخت شده</th>
+                     <th scope="col">مانده</th>
+                     <th scope="col">تاریخ شروع</th>
+                     <th scope="col">تاریخ اتمام</th>
+                     <th scope="col">توضیحات</th>
+                     <th scope="col">تصویر</th>
+                 </tr>
+                 </thead>
+                 <tbody>
+                 {% for project in projects %}
+                     <tr>
+                         <th scope="row" >{{ forloop.counter }}</th>
+                         <td class="title" >{{ project.title }}</td>
+                         <td class="projectOwner">{{ project.projectOwner }}</td>
+                         <td class="money">{{ project.money|intcomma }}</td>
+                         <td class="paied">{{ project.paied|intcomma }}</td>
+                         <td class="remin">{{ project.remin|intcomma }}</td>
+                         <td class="startDate">{{ project.startDate|date:"Y-m-d" }}</td>
+                         <td class="deadline">{{ project.deadline|date:"Y-m-d" }}</td>
+                         <td class="description">{{ project.description }}</td>
+                         {% if project.pic %}
+                             <td ><a href="{{ project.pic.url }}"><i class="fa fa-image"></i></a></td>
+                         {% else %}
+                             <td ><a href="#"></a></td>
+
+                         {% endif %}
+                     </tr>
+                 {% endfor %}
+                     <!-- total -->
+                     <tr class="bg-default">
+
+                         <th scope="row" ></th>
+                         <td class="title" ><strong>جمع </strong></td>
+                         <td class="projectOwner"></td>
+                         <td class="money"><strong>{{ income_total|intcomma }} </strong></td>
+                         <td class="paied"><strong>{{ paied_total|intcomma }} </strong></td>
+                         <td class="remin"><strong>{{ remin_total|intcomma }} </strong></td>
+                         <td class="startDate"></td>
+                         <td class="deadline"></td>
+                         <td class="description"></td>
+                         <td></td>
+
+                     </tr>
+                 </tbody>
+             </table>
+         </div>
+        <hr>
+
+        <!-- project -->
+        <h3>حقوق ها:</h3>
+         <div class="row pagination-sm table-responsive" id="project-list">
+             <table class="table table-sm table-hover table-striped"  id="table">
+                 <thead class="thead-dark">
+                 <tr>
+                     <th scope="col">#</th>
+                     <th scope="col">کارمند</th>
+                     <th scope="col">حقوق ماهانه</th>
+                     <th scope="col">تلفن</th>
+                     <th scope="col">دریافتی</th>
+                     <th scope="col">طلب</th>
+                     <th scope="col">بدهی</th>
+                     <th scope="col">تصویر</th>
+                 </tr>
+                 </thead>
+                 <tbody>
+                 {% for emp in employees %}
+                     <tr>
+                         <th scope="row" >{{ forloop.counter }}</th>
+                         <td class="fullName" >{{ emp.fullName }}</td>
+                         <td class="salary">{{ emp.salary|intcomma }}</td>
+                         <td class="phone">{{ emp.phone }}</td>
+                         <td class="total_salary">{{ emp.total_salary|intcomma }}</td>
+                         <td class="total_demand">{{ emp.total_demand|intcomma }}</td>
+                         <td class="total_debt">{{ emp.total_debt|intcomma }}</td>
+                         {% if emp.pic %}
+                             <td ><a href="{{ emp.pic.url }}"><i class="fa fa-image"></i></a></td>
+                         {% else %}
+                             <td ><a href="#"></a></td>
+                         {% endif %}
+                     </tr>
+                 {% endfor %}
+                     <!-- total -->
+                     <tr class="bg-default">
+                         <th scope="row" ></th>
+                         <td class="fullName" ><strong>جمع </strong></td>
+                         <td class="salary"><strong>{{ salary_total|intcomma }} </strong></td>
+                         <td class="phone"></td>
+                         <td class="total_salary"><strong>{{ month_salary_total|intcomma }} </strong></td>
+                         <td class="total_demand"><strong>{{ demand_total|intcomma }} </strong></td>
+                         <td class="total_debt"><strong>{{ debt_total|intcomma }} </strong></td>
+                         <td class="startDate"></td>
+                         <td></td>
+                     </tr>
+                 </tbody>
+             </table>
+         </div>
+        <hr>
+
+        <!-- financial report -->
+        <h3>گزارش مالی</h3>
+         <div class="row pagination-sm table-responsive" id="project-list">
+             <table class="table table-sm table-hover table-striped"  id="table">
+                 <thead class="thead-dark">
+                 <tr>
+                     <th scope="col">مبلغ کل پروژه ها</th>
+                     <th scope="col">دریافتی از پروژه ها</th>
+                     <th scope="col">تلفن</th>
+                     <th scope="col">دریافتی</th>
+                     <th scope="col">طلب</th>
+                     <th scope="col">بدهی</th>
+                     <th scope="col">تصویر</th>
+                 </tr>
+                 </thead>
+                 <tbody>
+             </table>
+         </div>
+        <hr>
+    </div>
+
+<!-- end of body block -->
+{% endblock %}
+
+

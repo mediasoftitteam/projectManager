@@ -1,5 +1,6 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
+{% load humanize %}
 {% block title %}
     <title>مشخصات کارمندی</title>
 {% endblock %}
@@ -8,9 +9,90 @@
     <!-- load static file in django -->
     {% load staticfiles %}
 
+    <!-- employee information-->
     <h1>مشخصات کارمند</h1>
-    <h2>Name: {{employee.fullName}}</h2>
-{#    Pages: {{ object.pages }}#}
+    {% if employee.pic %}
+        <img src="{{ employee.pic.url }}">
+    {% endif %}
+    <h5>نام: {{employee.fullName}}</h5>
+    <h5>تاریخ شروع فعالیت: {{ employee.startDate }}</h5>
+    <h5>حقوق ماهانه: {{ employee.salary|intcomma }} تومان</h5>
+    <h5>تماس: {{ employee.phone }}</h5>
+    <h5>آدرس: {{ employee.address }}</h5>
+    <h5>ایمیل: {{ employee.email }}</h5>
+    <div class="row">
+        <a href="#" class="btn btn-info"><i class="fa fa-edit"></i></a>
+        <a href="#" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+    </div>
+    <hr>
+
+    <!-- employee tasks -->
+    <h3>تسک ها:</h3>
+    {% for task in tasks %}
+        <div class="row">
+            <p1>{{ forloop.counter }} - {{ task.title }}</p1>
+            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
+            <a href="#" class=""><i class="fa fa-trash"></i></a>
+        </div>
+        <h6>{{ task.description }}</h6>
+        <br>
+    {% endfor %}
+    <h6>تعدا تسک های انجام شده: 5</h6>
+    <h6>تعدا کل: 5</h6>
+    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>
+    <hr>
+
+    <!-- employee work days -->
+    <h3>روزهای کاری:</h3>
+    {% for workDay in workDays %}
+        <div class="row">
+            <p1>{{ forloop.counter }} - {{ workDay.workDate }} - {{ workDay.workHour }}</p1>
+            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
+            <a href="#" class=""><i class="fa fa-trash"></i></a>
+        </div>
+        <h6>{{ workDay.description }}</h6>
+        <br>
+    {% endfor %}
+    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>
+    <hr>
+
+    <!-- employee salaries -->
+    <h3>حقوق ها:</h3>
+    {% for salary in salaries %}
+        <div class="row">
+            <p1>{{ forloop.counter }} - {{ salary.salaryDate }} - {{ salary.workHour }} - {{ salary.money|intcomma }}</p1>
+            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
+            <a href="#" class=""><i class="fa fa-trash"></i></a>
+        </div>
+        <h6>{{ salary.description }}</h6>
+        <br>
+    {% endfor %}
+    <h6>جمع : {{ salaries_sum|intcomma}} تومان</h6>
+    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>
+    <hr>
+
+    <!-- employee salaries -->
+    <h3>طلب ها - بدهی ها:</h3>
+    {% for debt in debts %}
+        <div class="row">
+            <p1>{{ forloop.counter }} - {{ debt.title }} - {{ debt.status }} - {{ debt.price|intcomma }} تومان - </p1>
+            <p>{{ debt.debtDate }} -> {{ debt.paymentDebtDate }}</p>
+            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
+            <a href="#" class=""><i class="fa fa-trash"></i></a>
+        </div>
+        <h6>{{ debt.description }}</h6>
+        <br>
+    {% endfor %}
+    <h6>جمع طلب ها: {{ demand_sum|intcomma }}</h6>
+    <h6>جمع بدهی ها: {{ debt_sum|intcomma }}</h6>
+    <h6> جمع: {{ debts_sum|intcomma }}</h6>
+    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>
+    <hr>
+
+
+
+
+
 <!-- end of body block -->
 {% endblock %}
 

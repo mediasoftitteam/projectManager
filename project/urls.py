@@ -3,17 +3,6 @@ from . import views
 
 app_name = 'project'
 
-
-
-
-
-
-
-
-
-
-
-
 urlpatterns = [
     url(r'^$', views.index, name='index'),
 
@@ -68,4 +57,7 @@ urlpatterns = [
     url(r'^workDay-new/$', views.workDay_create, name='workDay-create'),
     url(r'^workDay-update/$', views.workDay_update, name='workDay-update'),
     url(r'^(?P<workDay_id>[0-9]+)/workDay-delete/$', views.workDay_delete, name='workDay-delete'),
+
+    # financial urls
+    url(r'^financial/$', views.financial, name='financial'),
 ]

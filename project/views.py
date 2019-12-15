@@ -97,7 +97,13 @@ def project_view(request, project_id):
     tasks = models.Task.objects.filter(project=project.id)
     incomes = models.Income.objects.filter(project=project.id)
     incomes_sum = incomes.aggregate(Sum('money'))['money__sum']
-    money_res = project.money - incomes_sum
+    if incomes_sum is None:
+        incomes_sum = 0
+    if project.money is None:
+        prj_mony = 0
+    else:
+        prj_mony = project.money
+    money_res = prj_mony - incomes_sum
     return render(request, 'project/project_detail.html', {
         'project': project,
         'employees': employees,
@@ -199,7 +205,29 @@ def employee_list(request):
 @user_passes_test(lambda u: u.is_superuser)
 def employee_view(request, employee_id):
     employee = get_object_or_404(models.Employee, pk=employee_id)
-    return render(request, 'project/employee_detail.html', {'employee': employee})
+    tasks = models.Task.objects.filter(employees=employee.id)
+    workDays = models.WorkDay.objects.filter(employee=employee.id)
+    salaries = models.MonthSalary.objects.filter(employee=employee.id)
+    salaries_sum = salaries.aggregate(Sum('money'))['money__sum']
+    debts = models.Debt.objects.filter(employee=employee.id)
+    debt_sum = debts.filter(status__icontains='بدهی').aggregate(Sum('price'))['price__sum']
+    if debt_sum is None:
+        debt_sum = 0
+    demand_sum = debts.filter(status__icontains='طلب').aggregate(Sum('price'))['price__sum']
+    if demand_sum is None:
+        demand_sum = 0
+    debts_sum = demand_sum - debt_sum
+    return render(request, 'project/employee_detail.html', {
+        'employee': employee,
+        'tasks': tasks,
+        'workDays': workDays,
+        'salaries': salaries,
+        'salaries_sum': salaries_sum,
+        'debts': debts,
+        'debt_sum': debt_sum,
+        'demand_sum': demand_sum,
+        'debts_sum': debts_sum,
+    })
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -800,3 +828,51 @@ def workDay_delete(request, workDay_id):
     eqm = get_object_or_404(models.WorkDay, pk=workDay_id)
     eqm.delete()
     return redirect('project:workDay-list')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def financial(request):
+    projects = models.Project.objects.all()
+    for prj in projects:
+        prj.paied = models.Income.objects.filter(project=prj.id).aggregate(Sum('money'))['money__sum']
+        if prj.paied is None:
+            prj.paied = 0
+        prj.remin = prj.money - prj.paied
+        prj.save()
+    income_total = models.Project.objects.aggregate(Sum('money'))['money__sum']
+    paied_total = models.Income.objects.aggregate(Sum('money'))['money__sum']
+    remin_total = income_total - paied_total
+
+    employees = models.Employee.objects.all()
+    for emp in employees:
+        if emp.salary is None:
+            emp.salary = 0
+        if emp.phone is None:
+            emp.phone = "-"
+        emp.total_salary = models.MonthSalary.objects.filter(employee=emp.id).aggregate(Sum('money'))['money__sum']
+        if emp.total_salary is None:
+            emp.total_salary = 0
+        emp.total_debt = models.Debt.objects.filter(employee=emp.id).filter(status__icontains='بدهی').aggregate(Sum('price'))['price__sum']
+        if emp.total_debt is None:
+            emp.total_debt = 0
+        emp.total_demand = models.Debt.objects.filter(employee=emp.id).filter(status__icontains='طلب').aggregate(Sum('price'))['price__sum']
+        if emp.total_demand is None:
+            emp.total_demand = 0
+        emp.save()
+
+    salary_total = employees.aggregate(Sum('salary'))['salary__sum']
+    month_salary_total = models.MonthSalary.objects.aggregate(Sum('money'))['money__sum']
+    debt_total = models.Debt.objects.filter(status__icontains='بدهی').aggregate(Sum('price'))['price__sum']
+    demand_total = models.Debt.objects.filter(status__icontains='طلب').aggregate(Sum('price'))['price__sum']
+    return render(request, 'project/financial.html',
+                  {
+                      'projects': projects,
+                      'income_total': income_total,
+                      'paied_total': paied_total,
+                      'remin_total': remin_total,
+                      'employees': employees,
+                      'salary_total': salary_total,
+                      'month_salary_total': month_salary_total,
+                      'debt_total': debt_total,
+                      'demand_total': demand_total,
+                  })

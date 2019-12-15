@@ -13,40 +13,45 @@
         کارمندها
     </div>
 
+    <!-- body -->
     <div class="row mx-auto">
-        <div class="col-12 col-md-10">
-            <div class="row mx-auto" id="product-list">
+        <div class="col-12 col-md-12">
+            <div class="row mx-auto d-flex flex-center" id="product-list">
 
                 {% for employee in employees %}
                     <!-- Card -->
                     <div class="card testimonial-card col-width m-1">
 
-                      <!-- Background color -->
-                      <div class="card-up indigo lighten-1"></div>
+                        <!-- Background color -->
+                        <div class="card-up indigo lighten-1"></div>
 
-                      <!-- Avatar -->
-                      {% if employee.pic %}
-                          <div class="avatar mx-auto white">
-                              <img src="{{ employee.pic.url }}" class="rounded-circle" alt="{{ employee.fullName }}">
-                          </div>
-                      {% else %}
-                          <div class="avatar mx-auto white">
-                              <img src="{% static 'project/images/Blank-Placeholder.jpg' %}" class="rounded-circle" alt="{{ employee.fullName }}">
-                          </div>
-                      {%  endif %}
+                        <!-- Avatar -->
+                        <a href="{% url 'project:employee-detail' employee.id%}">
+                            {% if employee.pic %}
+                                <div class="avatar mx-auto white">
+                                    <img src="{{ employee.pic.url }}" class="rounded-circle" alt="{{ employee.fullName }}">
+                                </div>
+                            {% else %}
+                                <div class="avatar mx-auto white">
+                                    <img src="{% static 'project/images/Blank-Placeholder.jpg' %}" class="rounded-circle" alt="{{ employee.fullName }}">
+                                </div>
+                            {%  endif %}
+                        </a>
 
-                      <!-- Content -->
-                      <div class="card-body">
-                        <!-- Name -->
-                        <h4 class="card-title">{{ employee.fullName }}</h4>
-                        <hr>
-                        <!-- Quotation -->
-                        <p><i class="fas fa-money-bill"></i> {{ employee.salary }} <br>  <i class="fas fa-calendar-alt"></i> {{ employee.startDate }}</p>
-                        <p>
-                            <a href="{% url 'project:employee-update' employee.id %}"><i class="fas fa-edit" style="color: #0b51c5"></i></a>
-                            <a onclick="showDeleteModalEmployee({{ employee.id }})" data-toggle="modal" data-target="#basicExampleModalEmployee"><i class="fas fa-trash"></i></a>
-                        </p>
-                      </div>
+                        <!-- Content -->
+                        <div class="card-body">
+                            <!-- Name -->
+                            <a href="{% url 'project:employee-detail' employee.id%}">
+                                <h4 class="card-title">{{ employee.fullName }}</h4>
+                            </a>
+                            <hr>
+                            <!-- Quotation -->
+                            <p><i class="fas fa-money-bill"></i> {{ employee.salary }} <br>  <i class="fas fa-calendar-alt"></i> {{ employee.startDate }}</p>
+                            <p>
+                                <a href="{% url 'project:employee-update' employee.id %}"><i class="fas fa-edit" style="color: #0b51c5"></i></a>
+                                <a onclick="showDeleteModalEmployee({{ employee.id }})" data-toggle="modal" data-target="#basicExampleModalEmployee"><i class="fas fa-trash"></i></a>
+                            </p>
+                        </div>
 
                     </div>
                 {% endfor %}
