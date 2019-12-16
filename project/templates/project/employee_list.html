@@ -9,65 +9,47 @@
     {% load staticfiles %}
     <link rel="stylesheet" href="{% static 'project/styles.css' %}">
 
-    <div class="alert alert-primary" role="alert">
-        کارمندها
-    </div>
+    <div class="container pt-5 my-5 z-depth-1">
+        <section class="p-md-3 mx-md-5 text-lg-right">
+            <h2 class="text-center font-weight-bold mb-4 pb-1">تیم مدیاسافت</h2>
+            <p class="text-center lead mb-5 pb-2 text-muted">متشکل از گروه توسعه دهندگان، گرافیست ها و طراحان.</p>
+            <div class="row">
 
-    <!-- body -->
-    <div class="row mx-auto">
-        <div class="col-12 col-md-12">
-            <div class="row mx-auto d-flex flex-center" id="product-list">
-
-                {% for employee in employees %}
-                    <!-- Card -->
-                    <div class="card testimonial-card col-width m-1">
-
-                        <!-- Background color -->
-                        <div class="card-up indigo lighten-1"></div>
-
-                        <!-- Avatar -->
-                        <a href="{% url 'project:employee-detail' employee.id%}">
-                            {% if employee.pic %}
-                                <div class="avatar mx-auto white">
-                                    <img src="{{ employee.pic.url }}" class="rounded-circle" alt="{{ employee.fullName }}">
-                                </div>
-                            {% else %}
-                                <div class="avatar mx-auto white">
-                                    <img src="{% static 'project/images/Blank-Placeholder.jpg' %}" class="rounded-circle" alt="{{ employee.fullName }}">
-                                </div>
-                            {%  endif %}
-                        </a>
-
-                        <!-- Content -->
-                        <div class="card-body">
-                            <!-- Name -->
-                            <a href="{% url 'project:employee-detail' employee.id%}">
-                                <h4 class="card-title">{{ employee.fullName }}</h4>
-                            </a>
-                            <hr>
-                            <!-- Quotation -->
-                            <p><i class="fas fa-money-bill"></i> {{ employee.salary }} <br>  <i class="fas fa-calendar-alt"></i> {{ employee.startDate }}</p>
-                            <p>
-                                <a href="{% url 'project:employee-update' employee.id %}"><i class="fas fa-edit" style="color: #0b51c5"></i></a>
-                                <a onclick="showDeleteModalEmployee({{ employee.id }})" data-toggle="modal" data-target="#basicExampleModalEmployee"><i class="fas fa-trash"></i></a>
-                            </p>
+                 {% for employee in employees %}
+                    <div class="col-lg-4 col-sm-6 mb-5">
+                        <div class="row d-flex align-items-center">
+                            <div class="col-5 avatar w-100 white d-flex justify-content-center align-items-center">
+                                <a href="{% url 'project:employee-detail' employee.id%}">
+                                    {% if employee.pic %}
+                                        <div class="avatar mx-auto white">
+                                            <img src="{{ employee.pic.url }}" class="img-fluid rounded-circle z-depth-1" alt="{{ employee.fullName }}" />
+                                        </div>
+                                    {% else %}
+                                        <div class="avatar mx-auto white">
+                                            <img src="{% static 'project/images/Blank-Placeholder.jpg' %}" class="img-fluid rounded-circle z-depth-1" alt="{{ employee.fullName }} "/>
+                                        </div>
+                                    {%  endif %}
+                                </a>
+                            </div>
+                            <div class="col-7">
+                                <h6 class="font-weight-bold pt-2">{{ employee.fullName }}</h6>
+                                <p class="text-muted">{{ employee.position }}</p>
+                                <p>
+                                    <a href="{% url 'project:employee-update' employee.id %}"><i class="fas fa-edit" style="color: #0b51c5"></i></a>
+                                    <a onclick="showDeleteModalEmployee({{ employee.id }})" data-toggle="modal" data-target="#basicExampleModalEmployee"><i class="fas fa-trash"></i></a>
+                                    {% if employee.activation %}
+                                        <i class="fa fa-toggle-on" style="color: #0d5bdd"></i>
+                                    {% else %}
+                                        <i class="fa fa-toggle-off"></i>
+                                    {% endif %}
+                                </p>
+                            </div>
                         </div>
-
                     </div>
                 {% endfor %}
 
             </div>
-            <div class="mx-auto my-4" id="products-loading"></div>
-
-            <!-- add new employee -->
-            <div class="mx-auto my-4">
-                <a href="{% url "project:employee-create" %}" >
-                    <button type="button" class="btn-lg btn-default btn-floating"><i class="fa fa-plus"></i></button>
-                </a>
-            </div>
-
-        </div>
-
+        </section>
     </div>
 
     <!-- Modal -->
