@@ -23,6 +23,8 @@
     <!-- Material Design Bootstrap table -->
     <link rel="stylesheet" href="{% static 'project/css/addons/datatables.min.css' %}">
 
+    <link rel="stylesheet" href="{% static 'project/css/bootstrap-rtl.css' %}">
+
 
     <style>
 
@@ -37,22 +39,9 @@
 
 <body style="direction: rtl ; text-align: right ; font-family: IRANSans,serif !important; font-size: 14px" id="home">
 
-    {% if user.is_authenticated%}
-        <!-- nav bar -->
-        <header>
-            <div class="container-fluid d-flex align-items-center" style="height: 50px; background-color: #0071c5 ">
-                <a href="{% url 'project:index' %}" class="mr-4">
-                    <img class="imageSize img-responsive" src="#" style="padding-left: 10px; width: 110px" alt="">
-                    <span class="civilprime py-1 align-middle" style="font-size: 15px; color: white">مدیریت پروژه های شرکت مدیاسافت</span>
-                </a>
-
-
-                <a href="#" class="mr-auto d-none d-md-block" style="color: white; cursor: pointer">
-                    ارتباط با ما
-                </a>
-                <a href="https://mediasoft.ir" class="mx-4 d-none d-md-block" style="color: white; cursor: pointer">
-                    شرکت مدیاسافت
-                </a>
+    <nav class="navbar navbar-expand navbar-dark bg-primary"> <a id="menu-toggle" class="navbar-brand"><span class="navbar-toggler-icon"></span></a> <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+        <div class="collapse navbar-collapse" id="navbarsExample02">
+            <ul class="navbar-nav mr-auto">
                 <!-- auth component -->
                 {% if user.is_authenticated%}
                     <div class="dropdown d-none d-md-block">
@@ -87,103 +76,112 @@
                         <i class="fa fa-user align-middle ml-2"></i>
                         ورود</a>
                 {% endif %}
+                <li class="nav-item"> <a class="nav-link" href="#">ارتباط با ما</a> </li>
+                <li class="nav-item"> <a class="nav-link" href="http://mediasoft.ir/">شرکت مدیاسافت</a> </li>
 
-                <a class="d-block d-md-none border rounded d-flex mr-auto py-1 px-2" id="header-toggler" style="border-color: white !important; cursor: pointer">
-                    <i id="toggler-icon" class="fas fa-bars"></i>
-                </a>
-            </div>
-            <div id="inner-header" class="container-fluid">
-                <ul id="header-nav" class="list-unstyled">
-                    <li class="d-none d-md-flex">
-                        <a href="{% url 'project:index' %}">
-                            <i class="fas fa-home" style="cursor: pointer; font-size: 28px; color: rgb(102, 102, 102)"></i>
-                        </a>
-                    </li>
-                    <li >
-                        <a href="{% url 'project:project-list' %}">
-                                <span id="materials" style="font-size: 16px; cursor: pointer; color: rgb(102, 102, 102);">
-                                    <i id="materials-icon" class="fa fa-project-diagram align-middle mr-1" style="font-size: 12px; color: gray"></i>
+            </ul>
+            <form class="form-inline my-2 my-md-0"> </form>
+        </div>
+    </nav>
+
+    <div id="wrapper" class=" bg-info">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper" style="z-index: 1;position: absolute; width: 230px; right: 0px; background: #2C3E50; opacity: 0.9; transition-duration: 500ms;" >
+            <ul class="sidebar-nav mr-2" style="padding: 0; list-style: none;">
+                <li class="sidebar-brand">
+                    <a href="{% url 'project:index' %}">
+                        <i class="fas fa-home" style="cursor: pointer; font-size: 28px; color: rgb(102, 102, 102)"></i>
+                        داشبورد
+                    </a>
+
+                </li>
+                <li >
+                    <a href="{% url 'project:project-list' %}">
+                                <span id="materials" >
+                                    <i id="materials-icon" class="fa fa-project-diagram align-middle ml-2" ></i>
                                     پروژه ها
                                 </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'project:employee-list' %}">
-                                <span id="companies" style="font-size: 16px; cursor: pointer; color: rgb(102, 102, 102)">
-                                    <i id="companies-icon" class="fa fa-user align-middle mr-1" style="font-size: 12px; color: gray"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'project:employee-list' %}">
+                                <span id="companies">
+                                    <i id="companies-icon" class="fa fa-user align-middle ml-2"></i>
                                     کارمندها
                                 </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'project:income-list' %}">
-                                <span id="companies" style="font-size: 16px; cursor: pointer; color: rgb(102, 102, 102)">
-                                    <i id="companies-icon" class="fa fa-box-usd align-middle mr-1" style="font-size: 12px; color: gray"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'project:income-list' %}">
+                                <span id="companies">
+                                    <i id="companies-icon" class="fa fa-box-usd align-middle ml-2"></i>
                                     درآمد/هزینه ها
                                 </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'project:companyEquipment-list' %}">
-                                <span id="companies" style="font-size: 16px; cursor: pointer; color: rgb(102, 102, 102)">
-                                    <i id="companies-icon" class="fa fa-archive align-middle mr-1" style="font-size: 12px; color: gray"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'project:companyEquipment-list' %}">
+                                <span id="companies">
+                                    <i id="companies-icon" class="fa fa-archive align-middle ml-2" ></i>
                                     دارایی ها
                                 </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'project:workDay-list' %}">
-                                <span id="companies" style="font-size: 16px; cursor: pointer; color: rgb(102, 102, 102)">
-                                    <i id="companies-icon" class="fa fa-clock align-middle mr-1" style="font-size: 12px; color: gray"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'project:workDay-list' %}">
+                                <span id="companies">
+                                    <i id="companies-icon" class="fa fa-clock align-middle ml-2"></i>
                                     روزهای کاری کارمندان
                                 </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'project:task-list' %}">
-                                <span id="companies" style="font-size: 16px; cursor: pointer; color: rgb(102, 102, 102)">
-                                    <i id="companies-icon" class="fa fa-tasks-alt align-middle mr-1" style="font-size: 12px; color: gray"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'project:task-list' %}">
+                                <span id="companies">
+                                    <i id="companies-icon" class="fa fa-tasks-alt align-middle ml-2"></i>
                                     تسک ها
                                 </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'project:salary-list' %}">
-                                <span id="companies" style="font-size: 16px; cursor: pointer; color: rgb(102, 102, 102)">
-                                    <i id="companies-icon" class="fa fa-money-bill align-middle mr-1" style="font-size: 12px; color: gray"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'project:salary-list' %}">
+                                <span id="companies">
+                                    <i id="companies-icon" class="fa fa-money-bill align-middle ml-2"></i>
                                     حقوق ها
                                 </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'project:debt-list' %}">
-                                <span id="companies" style="font-size: 16px; cursor: pointer; color: rgb(102, 102, 102)">
-                                    <i id="companies-icon" class="fa fa-money-check-alt align-middle mr-1" style="font-size: 12px; color: gray"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'project:debt-list' %}">
+                                <span id="companies">
+                                    <i id="companies-icon" class="fa fa-money-check-alt align-middle ml-2"></i>
                                     بدهی ها
                                 </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'project:financial' %}">
-                                <span id="companies" style="font-size: 16px; cursor: pointer; color: rgb(102, 102, 102)">
-                                    <i id="companies-icon" class="fa fa-money-check-alt align-middle mr-1" style="font-size: 12px; color: gray"></i>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'project:financial' %}">
+                                <span id="companies">
+                                    <i id="companies-icon" class="fa fa-money-check-alt align-middle ml-2"></i>
                                     مالی
                                 </span>
-                        </a>
-                    </li>
+                    </a>
+                </li>
+            </ul>
+        </div> <!-- /#sidebar-wrapper -->
+        <!-- Page Content -->
+        <div id="page-content-wrapper" style="width: 100%; position: absolute; padding: 15px;">
+            <main class="container-fluid" style="max-width: calc(1800px + 2%); margin-top: 20px">
 
-                </ul>
-            </div>
-        </header>
-    {% endif %}
+            {% block body %}
+            {% endblock %}
+            {% block section %}
+            {% endblock %}
+        </main>
+        </div> <!-- /#page-content-wrapper -->
 
-    <main class="container-fluid" style="max-width: calc(1800px + 2%); margin-top: 20px">
+    </div> <!-- /#wrapper -->
 
-        {% block body %}
-        {% endblock %}
-        {% block section %}
-        {% endblock %}
-    </main>
 
 
     <!-- Footer -->
@@ -242,6 +240,27 @@
             }
         });
     </script>
+
+
+    <!-- sidbar -->
+    <script>
+        $(function(){
+            $("#menu-toggle").click(function() {
+
+
+                if($("#sidebar-wrapper").css('right') === '0px'){
+                    $("#sidebar-wrapper").css('right', '230px')
+                }
+                else if ($("#sidebar-wrapper").css('right') === '230px'){
+                    $("#sidebar-wrapper").css('right', '0px')
+                }
+            });
+
+
+        });
+
+    </script>
+
 </body>
 </html>
 {#"#}

@@ -9,59 +9,72 @@
     <!-- load static file in django -->
     {% load staticfiles %}
 
-    <!-- project information-->
-    {% if project.pic %}
-        <img src="{{ project.pic.url }}">
-    {% endif %}
-    <h1>{{project.title}}</h1>
-    <p>کارفرما: {{project.projectOwner}}</p>
-    <p>تاریخ شروع: {{ project.startDate }}</p>
-    <p>تاریخ شروع: {{ project.deadline }}</p>
-    <p>هزینه: {{ project.money|intcomma }}</p>
-    <p>توضیحات: {{ project.description }}</p>
-    <div class="row">
-        <a href="#" class="btn btn-info"><i class="fa fa-edit"></i></a>
-        <a href="#" class="btn btn-danger"><i class="fa fa-trash"></i></a>
-    </div>
-    <hr>
 
-    <!-- project employees-->
-    <h3>افراد:</h3>
-    {% for employee in employees %}
-        <p1>{{ forloop.counter }} - {{ employee.fullName }}</p1>
-        <br>
-    {% endfor %}
-    <hr>
+    <link rel="stylesheet" href="{% static 'project/css/bootstrap-rtl.css' %}">
+    <link rel="stylesheet" href="{% static 'project/css/project_detail.css' %}">
 
-    <!-- project tasks -->
-    <h3>تسک ها:</h3>
-    {% for task in tasks %}
-        <div class="row">
-            <p1>{{ forloop.counter }} - {{ task.title }}</p1>
-            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
-            <a href="#" class=""><i class="fa fa-trash"></i></a>
-        </div>
-        <h6>{{ task.description }}</h6>
-        <br>
-    {% endfor %}
-    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>
-    <hr>
 
-    <!-- project financial -->
-    <h3>پرداختی ها:</h3>
-    {% for income in incomes %}
-        <div class="row">
-            <p1>{{ forloop.counter }} - {{ income.incomeDate }} : {{ income.money }}</p1>
-            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
-            <a href="#" class=""><i class="fa fa-trash"></i></a>
-        </div>
-        <h6>{{ income.description }}</h6>
-        <br>
-    {% endfor %}
-    <a href="#" onclick="document.getElementById('income-modal-add-btn').click()" class="btn btn-info"><i class="fa fa-plus"></i></a>
-    <h6>کل دریافتی ها: {{ incomes_sum|intcomma  }} تومان</h6>
-    <h6> مانده دریافتی: {{ money_res|intcomma  }} تومان</h6>
-    <hr>
+
+{#    <!-- project information-->#}
+{#    {% if project.pic %}#}
+{#        <img src="{{ project.pic.url }}">#}
+{#    {% endif %}#}
+{#    <h1>{{project.title}}</h1>#}
+{#    <p>کارفرما: {{project.projectOwner}}</p>#}
+{#    <p>تاریخ شروع: {{ project.startDate }}</p>#}
+{#    <p>تاریخ شروع: {{ project.deadline }}</p>#}
+{#    <p>هزینه: {{ project.money|intcomma }}</p>#}
+{#    <p>توضیحات: {{ project.description }}</p>#}
+{#    <div class="row">#}
+{#        <a href="#" class="btn btn-info"><i class="fa fa-edit"></i></a>#}
+{#        <a href="#" class="btn btn-danger"><i class="fa fa-trash"></i></a>#}
+{#    </div>#}
+{#    <hr>#}
+{##}
+{#    <!-- project employees-->#}
+{#    <h3>افراد:</h3>#}
+{#    {% for employee in employees %}#}
+{#        <p1>{{ forloop.counter }} - {{ employee.fullName }}</p1>#}
+{#        <br>#}
+{#    {% endfor %}#}
+{#    <hr>#}
+{##}
+{#    <!-- project tasks -->#}
+{#    <h3>تسک ها:</h3>#}
+{#    {% for task in tasks %}#}
+{#        <div class="row">#}
+{#            <p1>{{ forloop.counter }} - {{ task.title }}</p1>#}
+{#            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>#}
+{#            <a href="#" class=""><i class="fa fa-trash"></i></a>#}
+{#        </div>#}
+{#        <h6>{{ task.description }}</h6>#}
+{#        <br>#}
+{#    {% endfor %}#}
+{#    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>#}
+{#    <hr>#}
+{##}
+{#    <!-- project financial -->#}
+{#    <h3>پرداختی ها:</h3>#}
+{#    {% for income in incomes %}#}
+{#        <div class="row">#}
+{#            <p1>{{ forloop.counter }} - {{ income.incomeDate }} : {{ income.money }}</p1>#}
+{#            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>#}
+{#            <a href="#" class=""><i class="fa fa-trash"></i></a>#}
+{#        </div>#}
+{#        <h6>{{ income.description }}</h6>#}
+{#        <br>#}
+{#    {% endfor %}#}
+{#    <a href="#" onclick="document.getElementById('income-modal-add-btn').click()" class="btn btn-info"><i class="fa fa-plus"></i></a>#}
+{#    <h6>کل دریافتی ها: {{ incomes_sum|intcomma  }} تومان</h6>#}
+{#    <h6> مانده دریافتی: {{ money_res|intcomma  }} تومان</h6>#}
+{#    <hr>#}
+
+
+    <script src="{% static 'project/js/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'project/js/wow.min.js' %}"></script>
+    <script src="{% static 'project/js/project_detail.js' %}"></script>
+
+
 
 <!-- end of body block -->
 {% endblock %}
