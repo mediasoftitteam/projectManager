@@ -41,6 +41,7 @@
 
 <body style="direction: rtl ; text-align: right ; font-family: IRANSans,serif !important; font-size: 14px" id="home">
 
+    <!-- nav bar -->
     <nav class="navbar navbar-expand navbar-dark bg-primary"> <a id="menu-toggle" class="navbar-brand"><span class="navbar-toggler-icon"></span></a> <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
         <div class="collapse navbar-collapse" id="navbarsExample02">
             <ul class="navbar-nav mr-auto">
@@ -86,6 +87,7 @@
         </div>
     </nav>
 
+    <!-- side bar -->
     <div id="wrapper" class=" bg-info">
         <!-- Sidebar -->
         <div id="sidebar-wrapper" style="z-index: 1;position: absolute; width: 230px; right: 0px; background: #2C3E50; opacity: 0.9; transition-duration: 500ms;" >
@@ -99,74 +101,74 @@
                 </li>
                 <li >
                     <a href="{% url 'project:project-list' %}">
-                                <span id="materials" >
-                                    <i id="materials-icon" class="fa fa-project-diagram align-middle ml-2" ></i>
-                                    پروژه ها
-                                </span>
+                        <span id="materials" >
+                            <i id="materials-icon" class="fa fa-project-diagram align-middle ml-2" ></i>
+                            پروژه ها
+                        </span>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'project:employee-list' %}">
-                                <span id="companies">
-                                    <i id="companies-icon" class="fa fa-user align-middle ml-2"></i>
-                                    کارمندها
-                                </span>
+                        <span id="companies">
+                            <i id="companies-icon" class="fa fa-user align-middle ml-2"></i>
+                            کارمندها
+                        </span>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'project:income-list' %}">
-                                <span id="companies">
-                                    <i id="companies-icon" class="fa fa-box-usd align-middle ml-2"></i>
-                                    درآمد/هزینه ها
-                                </span>
+                        <span id="companies">
+                            <i id="companies-icon" class="fa fa-box-usd align-middle ml-2"></i>
+                            درآمد/هزینه ها
+                        </span>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'project:companyEquipment-list' %}">
-                                <span id="companies">
-                                    <i id="companies-icon" class="fa fa-archive align-middle ml-2" ></i>
-                                    دارایی ها
-                                </span>
+                        <span id="companies">
+                            <i id="companies-icon" class="fa fa-archive align-middle ml-2" ></i>
+                            دارایی ها
+                        </span>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'project:workDay-list' %}">
-                                <span id="companies">
-                                    <i id="companies-icon" class="fa fa-clock align-middle ml-2"></i>
-                                    روزهای کاری کارمندان
-                                </span>
+                        <span id="companies">
+                            <i id="companies-icon" class="fa fa-clock align-middle ml-2"></i>
+                            روزهای کاری کارمندان
+                        </span>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'project:task-list' %}">
-                                <span id="companies">
-                                    <i id="companies-icon" class="fa fa-tasks-alt align-middle ml-2"></i>
-                                    تسک ها
-                                </span>
+                        <span id="companies">
+                            <i id="companies-icon" class="fa fa-tasks-alt align-middle ml-2"></i>
+                            تسک ها
+                        </span>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'project:salary-list' %}">
-                                <span id="companies">
-                                    <i id="companies-icon" class="fa fa-money-bill align-middle ml-2"></i>
-                                    حقوق ها
-                                </span>
+                        <span id="companies">
+                            <i id="companies-icon" class="fa fa-money-bill align-middle ml-2"></i>
+                            حقوق ها
+                        </span>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'project:debt-list' %}">
-                                <span id="companies">
-                                    <i id="companies-icon" class="fa fa-money-check-alt align-middle ml-2"></i>
-                                    بدهی ها
-                                </span>
+                        <span id="companies">
+                            <i id="companies-icon" class="fa fa-money-check-alt align-middle ml-2"></i>
+                            بدهی ها
+                        </span>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'project:financial' %}">
-                                <span id="companies">
-                                    <i id="companies-icon" class="fa fa-money-check-alt align-middle ml-2"></i>
-                                    مالی
-                                </span>
+                        <span id="companies">
+                            <i id="companies-icon" class="fa fa-money-check-alt align-middle ml-2"></i>
+                            مالی
+                        </span>
                     </a>
                 </li>
             </ul>

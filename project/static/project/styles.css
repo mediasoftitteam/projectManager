@@ -4,6 +4,11 @@
     src: url("./fonts/IRANSans.ttf");
 }
 
+@font-face {
+    font-family: 'IRANSansNum';
+    src: url("./fonts/IRANSans(FaNum).ttf");
+}
+
 @media (min-width: 768px) {
     .civil{
         display: none !important;

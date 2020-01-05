@@ -1,7 +1,6 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
-{#{% load jalali_tags %}#}
-{% load jformat %}
+{% load jalali_tags %}
 {% block title %}
     <title>مدیریت پروژه</title>
 {% endblock %}
@@ -10,9 +9,6 @@
     <!-- load static file in django -->
     {% load staticfiles %}
     <link rel="stylesheet" href="{% static 'project/styles.css' %}">
-
-    <input type="date"  name="startDate">
-
 
     <!-- body -->
     <div>
@@ -27,88 +23,48 @@
             <div class="row pagination-sm" id="project-list">
 
                 {% for project in projects %}
-                    <!-- Card -->
-{#                    <div class="card m-1">#}
-{#                        <!-- Card image -->#}
-{#                        <div class="view overlay">#}
-{#                            {% if project.pic %}#}
-{#                                <img src={{ project.pic.url }} class="card-img-top" alt="{{ project.title }}" style="width: 250px; height: 250px; object-fit: cover">#}
-{#                            {% else %}#}
-{#                                <img src={% static 'project/images/demo.PNG' %} class="align-self-end"  alt="{{ project.title }}" style="width: 250px; height: 250px; object-fit: cover">#}
-{#                            {%  endif %}#}
-{#                            <a href="{% url 'project:project-detail' project.id %}">#}
-{#                                <div class="mask rgba-white-slight"></div>#}
-{#                            </a>#}
-{#                        </div>#}
-{#                        <!-- Edit Button -->#}
-{#                        <button type="button" onclick="showEditModal({ 'm_id': {{ project.id }}#}
-{#                                ,'m_projectOwner': '{{ project.projectOwner }}'#}
-{#                                ,'m_startDate': '{{ project.startDate|date:"Y-m-d" }}'#}
-{#                                ,'m_deadline': '{{ project.deadline|date:"Y-m-d" }}'#}
-{#                                ,'m_money': '{{ project.money }}'#}
-{#                                ,'m_description': '{{ project.description }}'#}
-{#                                ,'m_title': '{{ project.title }}'})"#}
-{#                                class="btn btn-floating btn-action ml-auto mr-4 mdb-color lighten-3"  data-toggle="modal" data-target="#modelProjectEdit"><i class="fa fa-edit pl-1" style="color: #e5e5e5; font-size: 20px"></i></button>#}
-{##}
-{#                        <!-- Card content -->#}
-{#                        <div class="card-body">#}
-{##}
-{#                            <!-- Title -->#}
-{#                            <h4 class="card-title">{{ project.title }}</h4>#}
-{#                            <hr>#}
-{#                            <!-- Text -->#}
-{#                            <p class="card-text">#}
-{#                                {{ project.projectOwner }}#}
-{#                            <hr>#}
-{#                            {{ project.money }}#}
-{#                            </p>#}
-{##}
-{#                        </div>#}
-{#                        <!-- Card footer -->#}
-{#                        <div class="rounded-bottom mdb-color lighten-3 text-center pt-3">#}
-{#                            <ul class="list-unstyled list-inline font-small">#}
-{#                                                          <a href="{% url 'project:project-delete' project.id %}" data-toggle="modal" data-target="#basicExampleModal">#}
-{#                                <a href="#" onclick="showDeleteModal({{ project.id }})" data-toggle="modal" data-target="#basicExampleModal">#}
-{#                                    <li class="list-inline-item white-text float-left mb-3 ml-3 "><i class="far fa-trash" style="color: #3d799c"></i></li>#}
-{#                                </a>#}
-{#                                <li class="list-inline-item white-text"><i class="far fa-calendar-alt"></i> {{ project.startDate }} </li>#}
-{##}
-{#                            </ul>#}
-{#                        </div>#}
-{#                    </div>#}
 
                     <!--First column-->
-                        <div class="col-lg-4 col-md-12 mb-4">
-                            <!--Featured image-->
-                            <div class="view overlay zoom z-depth-2">
-                                <div class="view overlay">
-                                    {% if project.pic %}
-                                        <img src={{ project.pic.url }} class="img-fluid" alt="{{ project.title }}" >
-                                    {% else %}
-                                        <img src={% static 'project/images/project_placeholder.png' %} class="img-fluid" alt="{{ project.title }}" >
-                                    {%  endif %}
-                                    <a href="{% url 'project:project-detail' project.id %}">
-                                        <div class="mask rgba-white-slight"></div>
-                                    </a>
+                    <div class="col-lg-4 col-md-12 mb-4">
+                        <!--Featured image-->
+                        <div class="view overlay zoom z-depth-2">
+                            <div class="view overlay">
+                                {% if project.pic %}
+                                    <img src={{ project.pic.url }} class="img-fluid" alt="{{ project.title }}"  style="height: 250px; object-fit: cover" >
+                                {% else %}
+                                    <img src={% static 'project/images/project_placeholder.png' %} class="img-fluid" alt="{{ project.title }}" style="height: 250px" >
+                                {%  endif %}
+                                <a href="{% url 'project:project-detail' project.id %}">
+                                    <div class="mask rgba-white-slight"></div>
+                                </a>
+                                <div class="mask flex-center blue-gradient-rgba">
+                                    <a class="btn btn-outline-white btn-rounded"
+                                       onclick="showEditModal({ 'm_id': {{ project.id }}
+                                               ,'m_projectOwner': '{{ project.projectOwner }}'
+                                               ,'m_startDate': '{{ project.startDate|date:"Y-m-d" }}'
+                                               ,'m_startDate_jalali': '{{ project.startDate|to_jalali:'%y/%m/%d' }}'
+                                               ,'m_deadline': '{{ project.deadline|date:"Y-m-d" }}'
+                                               ,'m_deadline_jalali': '{{ project.deadline|to_jalali:'%y/%m/%d' }}'
+                                               ,'m_money': '{{ project.money }}'
+                                               ,'m_description': '{{ project.description }}'
+                                               ,'m_title': '{{ project.title }}'})"
+                                       data-toggle="modal" data-target="#modelProjectEdit"
+                                    ><i class="fa fa-edit ml-1"></i>ویرایش</a>
+
+                                    <a class="btn btn-outline-white btn-rounded"
+                                       onclick="showDeleteModal({{ project.id }})" data-toggle="modal" data-target="#basicExampleModal"
+                                    ><i class="fa fa-trash ml-1"></i>حذف</a>
+
                                 </div>
+
                             </div>
-                            <p class="text-uppercase text-center font-weight-bold text-muted my-4">{{ project.title }}</p>
-                            <a href="#" onclick="showDeleteModal({{ project.id }})" data-toggle="modal" data-target="#basicExampleModal">
-                                <li class="list-inline-item white-text mb-3 ml-3 "><i class="far fa-trash" style="color: #3d799c"></i></li>
-                            </a>
-                            <!-- Edit Button -->
-                            <a href="#" onclick="showEditModal({ 'm_id': {{ project.id }}
-                                    ,'m_projectOwner': '{{ project.projectOwner }}'
-                                    ,'m_startDate': '{{ project.startDate|date:"Y-m-d" }}'
-                                    ,'m_deadline': '{{ project.deadline|date:"Y-m-d" }}'
-                                    ,'m_money': '{{ project.money }}'
-                                    ,'m_description': '{{ project.description }}'
-                                    ,'m_title': '{{ project.title }}'})"
-                                      data-toggle="modal" data-target="#modelProjectEdit">
-                                <i class="fa fa-edit pl-1" style="color: #3d799c;"></i>
-                            </a>
                         </div>
-                        <!--First column-->
+                        <p class="text-uppercase text-center font-weight-bold text-muted my-4">
+                            {{ project.title }}
+                        </p>
+                    </div>
+                    <!--First column-->
+
                 {% endfor %}
 
             </div>
@@ -150,9 +106,10 @@
         </div>
       </div>
     </div>
+
     <!-- Modal new -->
-    <div class="modal fade" id="modelProjectNew" tabindex="-1" role="dialog" aria-labelledby="modelProjectNewLabel"
-      aria-hidden="true">
+    <div aria-hidden="true" aria-labelledby="modelProjectNewLabel" class="modal fade" id="modelProjectNew" role="dialog"
+         tabindex="-1">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
             <!-- model header -->
@@ -182,23 +139,30 @@
                                 </div>
                             </div>
 
-                            <!-- Grid row (start/end date) -->
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="input-new-startDate" name="startDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ شروع</label>
+                            <!-- Grid row (start date) -->
+                            <label for="contact-Subject" class="">تاریخ شروع</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_startDate"></span>
                                     </div>
+                                    <input type="text" id="input-new-startDate" name="startDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="input-new-deadline" name="deadline" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ پایان</label>
-{#                                        <input placeholder="Selected date" type="text" id="date-picker-deadline" class="form-control datepicker" data-value="[2019,6,1]">#}
-{#                                        <label for="date-picker-example">تاریخ پایان</label>#}
-                                    </div>
-                                </div>
+                                <label id="showDate_class_new_startDate"> </label>
                             </div>
+
+                            <!-- Grid row (deadline) -->
+                            <label for="contact-Subject" class="">تاریخ پایان</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_deadline"></span>
+                                    </div>
+                                    <input type="text" id="input-new-deadline" name="deadline" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_new_deadline"> </label>
+                            </div>
+
 
                             <!-- Grid row (Owner) -->
                             <div class="row">
@@ -262,9 +226,10 @@
         </div>
       </div>
     </div>
+
     <!-- Modal edit -->
     <div class="modal fade" id="modelProjectEdit" tabindex="-1" role="dialog" aria-labelledby="modelProjectEditLabel"
-      aria-hidden="true">
+      aria-hidden="true"  style="font-family: 'IRANSansNum';">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
             <!-- model header -->
@@ -297,20 +262,33 @@
                                 </div>
                             </div>
 
-                            <!-- Grid row (start/end date) -->
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input id="input-edit-startDate" type="date" name="startDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ شروع</label>
+
+                            <!-- Grid row (start date) -->
+                            <label for="contact-Subject" class="">تاریخ شروع
+                            : <span id="lbl-project-edit-startDate"></span>
+                            </label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_startDate"></span>
                                     </div>
+                                    <input type="text" id="input-edit-startDate" name="startDate" class="form-control">
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="md-form">
-                                        <input id="input-edit-deadline" type="date" name="deadline" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ پایان</label>
+                                <label id="showDate_class_edit_startDate"> </label>
+                            </div>
+
+                            <!-- Grid row (deadline) -->
+                            <label for="contact-Subject" class="">تاریخ پایان
+                            : <span id="lbl-project-edit-deadline"></span>
+                            </label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_deadline"></span>
                                     </div>
+                                    <input type="text" id="input-edit-deadline" name="deadline" class="form-control">
                                 </div>
+                                <label id="showDate_class_edit_deadline"> </label>
                             </div>
 
                             <!-- Grid row (Owner) -->
@@ -376,6 +354,7 @@
         </div>
       </div>
     </div>
+
     <!-- base url address -->
     <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
 
@@ -384,6 +363,8 @@
 {% endblock %}
 
 {% block javascript %}
+
+
 
     <!-- jQuery -->
 {#    <script type="text/javascript" src="{% static 'project/js/jquery.min.js' %}"></script>#}
@@ -447,21 +428,64 @@
     <script>
         //-- fill edit modal fields --//
         function showEditModal(project) {
-            console.log(project)
+            console.log(project);
 
-             $('#input-edit-title').attr('value', project.m_title)
-             $('#input-edit-deadline').attr('value', project.m_deadline)
-             $('#input-edit-description').attr('value', project.m_description)
-             $('#input-edit-money').attr('value', project.m_money)
-             $('#input-edit-projectOwner').attr('value', project.m_projectOwner)
-             $('#input-edit-startDate').attr('value', project.m_startDate)
-             $('#selcted-project-id').attr('value', project.m_id)
+             $('#input-edit-title').attr('value', project.m_title);
+             $('#input-edit-deadline').attr('value', project.m_deadline);
+             $('#lbl-project-edit-deadline').html(project.m_deadline_jalali);
+             $('#input-edit-description').attr('value', project.m_description);
+             $('#input-edit-money').attr('value', project.m_money);
+             $('#input-edit-projectOwner').attr('value', project.m_projectOwner);
+             $('#input-edit-startDate').attr('value', project.m_startDate);
+             $('#lbl-project-edit-startDate').html(project.m_startDate_jalali);
+             $('#selcted-project-id').attr('value', project.m_id);
         }
 
         // Data Picker Initialization
         $('.datepicker').pickadate({
             formatSubmit: 'yyyy/mm/dd'
         });
+    </script>
+
+    <!--jalali calender-->
+    <script>
+    // persian calender : https://github.com/Mds92/MD.BootstrapPersianDateTimePicker
+        $(document).ready(function () {
+            $("#dt_class_new_startDate").MdPersianDateTimePicker({
+                targetDateSelector: "#input-new-startDate",
+                targetTextSelector: "#showDate_class_new_startDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+                //rangeSelector: true
+            });
+            $("#dt_class_new_deadline").MdPersianDateTimePicker({
+                targetDateSelector: "#input-new-deadline",
+                targetTextSelector: "#showDate_class_new_deadline",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+            });
+            $("#dt_class_edit_startDate").MdPersianDateTimePicker({
+                targetDateSelector: "#input-edit-startDate",
+                targetTextSelector: "#showDate_class_edit_startDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+            });
+            $("#dt_class_edit_deadline").MdPersianDateTimePicker({
+                targetDateSelector: "#input-edit-deadline",
+                targetTextSelector: "#showDate_class_edit_deadline",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+            });
+        });
+
     </script>
 
     {{ form.media }}
