@@ -23,8 +23,10 @@
     <!-- Material Design Bootstrap table -->
     <link rel="stylesheet" href="{% static 'project/css/addons/datatables.min.css' %}">
 
-    <link rel="stylesheet" href="{% static 'project/css/bootstrap-rtl.css' %}">
 
+    <link rel="stylesheet" href="{% static 'project/css/jquery.md.bootstrap.datetimepicker.style.css' %}">
+
+    <link rel="stylesheet" href="{% static 'project/css/bootstrap-rtl.css' %}">
 
     <style>
 
@@ -216,9 +218,15 @@
 {#    <script src="{% static 'project/js/jquery-3.4.1.min.js' %}"></script>#}
 {#    <script src="{% static 'project/js/popper.min.js' %}"></script>#}
 {#    <script src="{% static 'project/js/bootstrap.min.js' %}"></script>#}
-    <script src="{% static 'project/js/wow.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'project/js/wow.min.js' %}"></script>
 
-    <script src="{% static 'project/js/pagination.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'project/js/pagination.min.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'project/js/jquery.md.bootstrap.datetimepicker.js' %}"></script>
+
+    {% block javascript %}
+    {% endblock %}
+
 {#    #}
 {#    <script src="{% static 'project/js/all.js' %}"></script>#}
     <script src="{% static 'project/js/header-navbar.js' %}"></script>
@@ -262,5 +270,6 @@
     </script>
 
 </body>
+
 </html>
 {#"#}

@@ -8,6 +8,7 @@
 /project/api/__pycache__/
 /media/
 /tmp/
+/project_manager/
 
 
 # ignore a file type

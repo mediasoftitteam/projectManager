@@ -1,5 +1,6 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
+{% load jalali_tags %}
 {% block title %}
     <title>مدیریت تسک ها</title>
 {% endblock %}
@@ -93,8 +94,8 @@
                             <td class="project" >{{ task.project.title }}</td>
                             <td class="title">{{ task.title }}</td>
                             <td class="status">{{ task.status }}</td>
-                            <td class="taskDate">{{ task.taskDate|date:"Y-m-d" }}</td>
-                            <td class="dueDate">{{ task.dueDate|date:"Y-m-d" }}</td>
+                            <td class="taskDate">{{ task.taskDate|to_jalali:'%y/%m/%d' }}</td>
+                            <td class="dueDate">{{ task.dueDate|to_jalali:'%y/%m/%d' }}</td>
                             <td class="description">{{ task.description }}</td>
                             {% if task.pic %}
                                 <td ><a href="{{ task.pic.url }}"><i class="fa fa-image"></i></a></td>
@@ -252,23 +253,28 @@
                             </div>
 
                             <!-- Grid row (taskDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="task-input-new-taskDate" name="taskDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ تسک</label>
+                            <label for="contact-Subject" class="">تاریخ تسک</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_taskDate"><i class="fa fa-calendar"></i></span>
                                     </div>
+                                    <input type="text" id="task-input-new-taskDate" name="taskDate" class="form-control" value="2019-11-22">
                                 </div>
+                                <label id="showDate_class_taskDate"> </label>
                             </div>
 
+
                             <!-- Grid row (dueDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="task-input-new-dueDate" name="dueDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ اتمام</label>
+                            <label for="contact-Subject" class="">تاریخ اتمام</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_dueDate"><i class="fa fa-calendar"></i></span>
                                     </div>
+                                    <input type="text" id="task-input-new-dueDate" name="dueDate" class="form-control" value="2019-11-22">
                                 </div>
+                                <label id="showDate_class_dueDate"> </label>
                             </div>
 
                             <!-- Grid row (description) -->
@@ -505,10 +511,10 @@
     <!-- base url address -->
     <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
 
-    <!-- jQuery -->
-    <script type="text/javascript" src="{% static 'project/js/jquery.min.js' %}"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/mdb.min.js' %}"></script>
+
+{% endblock %}
+
+{% block javascript %}
     <!-- MDB table core JavaScript -->
     <script type="text/javascript" src="{% static 'project/js/addons/datatables.min.js' %}"></script><!-- MDBootstrap Datatables  -->
     <!-- MDB table core JavaScript -->
@@ -626,5 +632,29 @@
                 tag_a.click();
             }
         });
+    </script>
+
+    <script>
+    // persian calender : https://github.com/Mds92/MD.BootstrapPersianDateTimePicker
+        $(document).ready(function () {
+            $("#dt_class_taskDate").MdPersianDateTimePicker({
+                targetDateSelector: "#task-input-new-taskDate",
+                targetTextSelector: "#showDate_class_taskDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+                //rangeSelector: true
+            });
+            $("#dt_class_dueDate").MdPersianDateTimePicker({
+                targetDateSelector: "#task-input-new-dueDate",
+                targetTextSelector: "#showDate_class_dueDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true
+            });
+        });
+
     </script>
 {% endblock %}
