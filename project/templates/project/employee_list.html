@@ -1,5 +1,6 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
+{% load jalali_tags %}
 {% block title %}
     <title>مدیریت کارمندان</title>
 {% endblock %}
@@ -21,12 +22,24 @@
                             <div class="col-5 avatar w-100 white d-flex justify-content-center align-items-center">
                                 <a href="{% url 'project:employee-detail' employee.id%}">
                                     {% if employee.pic %}
-                                        <div class="avatar mx-auto white">
+                                        <div class="avatar mx-auto view overlay white">
+{#                                        <div class="view overlay zoom z-depth-2">#}
                                             <img src="{{ employee.pic.url }}" class="img-fluid rounded-circle z-depth-1" alt="{{ employee.fullName }}" />
+{#                                        </div>#}
+
+                                            <!--overlay-->
+                                            <div class="mask flex-center blue-gradient-rgba rounded-circle">
+                                                <p class="btn btn-outline-white btn-rounded small">نمایش</p>
+                                            </div>
+
                                         </div>
                                     {% else %}
-                                        <div class="avatar mx-auto white">
+                                        <div class="avatar mx-auto view overlay white">
                                             <img src="{% static 'project/images/Blank-Placeholder.jpg' %}" class="img-fluid rounded-circle z-depth-1" alt="{{ employee.fullName }} "/>
+                                            <!--overlay-->
+                                            <div class="mask flex-center blue-gradient-rgba rounded-circle">
+                                                <p class="btn btn-outline-white btn-rounded small">نمایش</p>
+                                            </div>
                                         </div>
                                     {%  endif %}
                                 </a>

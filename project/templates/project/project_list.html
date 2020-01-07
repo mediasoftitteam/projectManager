@@ -28,36 +28,35 @@
                     <div class="col-lg-4 col-md-12 mb-4">
                         <!--Featured image-->
                         <div class="view overlay zoom z-depth-2">
-                            <div class="view overlay">
-                                {% if project.pic %}
-                                    <img src={{ project.pic.url }} class="img-fluid" alt="{{ project.title }}"  style="height: 250px; object-fit: cover" >
-                                {% else %}
-                                    <img src={% static 'project/images/project_placeholder.png' %} class="img-fluid" alt="{{ project.title }}" style="height: 250px" >
-                                {%  endif %}
-                                <a href="{% url 'project:project-detail' project.id %}">
-                                    <div class="mask rgba-white-slight"></div>
-                                </a>
-                                <div class="mask flex-center blue-gradient-rgba">
-                                    <a class="btn btn-outline-white btn-rounded"
-                                       onclick="showEditModal({ 'm_id': {{ project.id }}
-                                               ,'m_projectOwner': '{{ project.projectOwner }}'
-                                               ,'m_startDate': '{{ project.startDate|date:"Y-m-d" }}'
-                                               ,'m_startDate_jalali': '{{ project.startDate|to_jalali:'%y/%m/%d' }}'
-                                               ,'m_deadline': '{{ project.deadline|date:"Y-m-d" }}'
-                                               ,'m_deadline_jalali': '{{ project.deadline|to_jalali:'%y/%m/%d' }}'
-                                               ,'m_money': '{{ project.money }}'
-                                               ,'m_description': '{{ project.description }}'
-                                               ,'m_title': '{{ project.title }}'})"
-                                       data-toggle="modal" data-target="#modelProjectEdit"
-                                    ><i class="fa fa-edit ml-1"></i>ویرایش</a>
 
-                                    <a class="btn btn-outline-white btn-rounded"
-                                       onclick="showDeleteModal({{ project.id }})" data-toggle="modal" data-target="#basicExampleModal"
-                                    ><i class="fa fa-trash ml-1"></i>حذف</a>
+                            {% if project.pic %}
+                                <img src={{ project.pic.url }} class="img-fluid" alt="{{ project.title }}"  style="height: 250px; object-fit: cover" >
+                            {% else %}
+                                <img src={% static 'project/images/project_placeholder.png' %} class="img-fluid" alt="{{ project.title }}" style="height: 250px" >
+                            {%  endif %}
+                            <a href="{% url 'project:project-detail' project.id %}">
+                                <div class="mask rgba-white-slight"></div>
+                            </a>
+                            <div class="mask flex-center blue-gradient-rgba">
+                                <a class="btn btn-outline-white btn-rounded"
+                                   onclick="showEditModal({ 'm_id': {{ project.id }}
+                                           ,'m_projectOwner': '{{ project.projectOwner }}'
+                                           ,'m_startDate': '{{ project.startDate|date:"Y-m-d" }}'
+                                           ,'m_startDate_jalali': '{{ project.startDate|to_jalali:'%y/%m/%d' }}'
+                                           ,'m_deadline': '{{ project.deadline|date:"Y-m-d" }}'
+                                           ,'m_deadline_jalali': '{{ project.deadline|to_jalali:'%y/%m/%d' }}'
+                                           ,'m_money': '{{ project.money }}'
+                                           ,'m_description': '{{ project.description }}'
+                                           ,'m_title': '{{ project.title }}'})"
+                                   data-toggle="modal" data-target="#modelProjectEdit"
+                                ><i class="fa fa-edit ml-1"></i>ویرایش</a>
 
-                                </div>
+                                <a class="btn btn-outline-white btn-rounded"
+                                   onclick="showDeleteModal({{ project.id }})" data-toggle="modal" data-target="#basicExampleModal"
+                                ><i class="fa fa-trash ml-1"></i>حذف</a>
 
                             </div>
+
                         </div>
                         <p class="text-uppercase text-center font-weight-bold text-muted my-4">
                             {{ project.title }}
