@@ -1,5 +1,7 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
+{% load jalali_tags %}
+{% load humanize %}
 {% block title %}
     <title>مدیریت درآمد/هزینه ها</title>
 {% endblock %}
@@ -63,7 +65,7 @@
     </div>
 
     <!-- body -->
-    <div >
+    <div>
         <div class="container py-1">
 
             <div class="row pagination-sm table-responsive" id="income-list">
@@ -87,9 +89,14 @@
                             <input class="project" type="hidden" projectId={{ income.project.id }}>
                             <th scope="row" >{{ forloop.counter }}</th>
                             <td class="project" >{{ income.project.title }}</td>
-                            <td class="money">{{ income.money }}</td>
-                            <td class="isOutcome">{{ income.isOutcome }}</td>
-                            <td class="incomeDate">{{ income.incomeDate|date:"Y-m-d" }}</td>
+                            <td class="money" data-money="{{ income.money }}">{{ income.money|intcomma }} تومان</td>
+                            {% if income.isOutcome == False %}
+                                <td class="isOutcome" data-isOutcome="{{ income.isOutcome }}">درآمد</td>
+                            {% else %}
+                                <td class="isOutcome" data-isOutcome="{{ income.isOutcome }}">هزینه</td>
+                            {% endif %}
+
+                            <td class="incomeDate" data-incomeDate="{{ income.incomeDate|date:"Y-m-d" }}">{{ income.incomeDate|to_jalali:'%y/%m/%d' }}</td>
                             <td class="description">{{ income.description }}</td>
                             {% if income.pic %}
                                 <td ><a href="{{ income.pic.url }}"><i class="fa fa-image"></i></a></td>
@@ -215,23 +222,39 @@
                             </div>
 
                             <!-- Grid row (isOutcome) -->
+                            <input id="isOutcome-input" type="hidden" name="isOutcome">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="text" id="income-input-new-isOutcome" name="isOutcome" class="form-control">
-                                        <label for="contact-Subject" class="">هزینه/درآمد</label>
+                                    <div class="md-form"><!-- Material unchecked -->
+                                        <div class="row">
+                                            <!-- Group of material radios - option 1 -->
+                                            <div class="form-check">
+                                                <input type="radio" class="form-check-input" id="income-input-new-isOutcome-false" name="groupOfNewIsOutcomeRadio">
+                                                <label class="form-check-label" for="income-input-new-isOutcome-false">درآمد</label>
+                                            </div>
+
+                                            <!-- Group of material radios - option 2 -->
+                                            <div class="form-check">
+                                                <input type="radio" class="form-check-input" id="income-input-new-isOutcome-true" name="groupOfNewIsOutcomeRadio" checked>
+                                                <label class="form-check-label" for="income-input-new-isOutcome-true">هزینه</label>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
+                            <hr>
 
                             <!-- Grid row (incomeDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="income-input-new-incomeDate" name="incomeDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ</label>
+                            <label for="contact-Subject" class="">تاریخ</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_incomeDate"></span>
                                     </div>
+                                    <input type="text" id="income-input-new-incomeDate" name="incomeDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
+                                <label id="showDate_class_new_incomeDate"> </label>
                             </div>
 
                             <!-- Grid row (description) -->
@@ -340,23 +363,40 @@
                             </div>
 
                             <!-- Grid row (isOutcome) -->
+                            <input id="isOutcome-edit-input" type="hidden" name="isOutcome">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="text" id="income-input-edit-isOutcome" name="isOutcome" class="form-control">
-                                        <label for="contact-Subject" class="">هزینه/درآمد</label>
+                                    <div class="md-form"><!-- Material unchecked -->
+                                        <div class="row">
+                                            <!-- Group of material radios - option 1 -->
+                                            <div class="form-check">
+                                                <input type="radio" class="form-check-input" id="income-input-edit-isOutcome-false" name="groupOfEditIsOutcomeRadio">
+                                                <label class="form-check-label" for="income-input-edit-isOutcome-false">درآمد</label>
+                                            </div>
+
+                                            <!-- Group of material radios - option 2 -->
+                                            <div class="form-check">
+                                                <input type="radio" class="form-check-input" id="income-input-edit-isOutcome-true" name="groupOfEditIsOutcomeRadio" checked>
+                                                <label class="form-check-label" for="income-input-edit-isOutcome-true">هزینه</label>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
+                            <hr>
+
 
                             <!-- Grid row (incomeDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="income-input-edit-incomeDate" name="incomeDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ</label>
+                            <label for="contact-Subject" class="">تاریخ</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_incomeDate"></span>
                                     </div>
+                                    <input type="text" id="income-input-edit-incomeDate" name="incomeDate" class="form-control">
                                 </div>
+                                <label id="showDate_class_edit_incomeDate"> </label>
                             </div>
 
                             <!-- Grid row (description) -->
@@ -431,14 +471,9 @@
     <!-- base url address -->
     <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
 
-    <!-- jQuery -->
-    <script type="text/javascript" src="{% static 'project/js/jquery.min.js' %}"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/mdb.min.js' %}"></script>
-    <!-- MDB table core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/addons/datatables.min.js' %}"></script><!-- MDBootstrap Datatables  -->
-    <!-- MDB table core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/addons/datatables-select.min.js' %}"></script><!-- MDBootstrap Datatables  -->
+{% endblock %}
+
+{% block javascript %}
 
     <script>
         //-- handle delete modal --//
@@ -480,10 +515,23 @@
            $('#selected-income-id').attr("value", value); //edit
 
             //-- fill edit fields --//
-            $('#income-input-edit-money').attr('value', $(this).find('td.money').html());
+            $('#income-input-edit-money').attr('value', $(this).find('td.money').attr("data-money"));
             $('#income-input-edit-description').val( $(this).find('td.description').html());
-            $('#income-input-edit-incomeDate').attr('value', $(this).find('td.incomeDate').html());
+            $('#income-input-edit-incomeDate').attr('value', $(this).find('td.incomeDate').attr('data-incomeDate'));
             $('#income-input-edit-isOutcome').attr('value', $(this).find('td.isOutcome').html());
+
+            if($(this).find('td.isOutcome').attr('data-isOutcome') == 'True'){
+                $('#income-input-edit-isOutcome-true').attr('checked', true);
+                $('#income-input-edit-isOutcome-false').attr('checked', false);
+                $('#isOutcome-edit-input').val('True')
+            }
+            else{
+                $('#income-input-edit-isOutcome-true').attr('checked', false);
+                $('#income-input-edit-isOutcome-false').attr('checked', true);
+                $('#isOutcome-edit-input').val('False')
+            }
+            {#alert($('#isOutcome-edit-input').val())#}
+
             let prjId =$(this).find('input.project').attr("projectId");
             $('#income-project-selectBoxEdit').val(prjId)
 
@@ -502,6 +550,16 @@
 
         //-- validate image field in new project form --//
         function validateIncomeForm() {
+
+            let isOutcome = $('#income-input-new-isOutcome-false').is(':checked');
+            if(isOutcome == true){
+                $('#isOutcome-input').val('False');
+            }
+            else{
+                $('#isOutcome-input').val('True');
+            }
+
+
             let pic = document.forms["FormIncome"]["income-modal-new-upload-img"].value;
             if (pic === null || pic === "") {
                 $('#income-picValidator').attr('value', false)
@@ -528,6 +586,14 @@
             if (pic === null || pic === "") {
                 $('#picValidatorIncome_edit').attr('value', false)
             }
+
+            let isOutcome = $('#income-input-edit-isOutcome-false').is(':checked');
+            if(isOutcome == true){
+                $('#isOutcome-edit-input').val('False');
+            }
+            else{
+                $('#isOutcome-edit-input').val('True');
+            }
         }
 
     </script>
@@ -543,4 +609,30 @@
             }
         });
     </script>
+
+    <!--jalali calender-->
+    <script>
+    // persian calender : https://github.com/Mds92/MD.BootstrapPersianDateTimePicker
+        $(document).ready(function () {
+            $("#dt_class_new_incomeDate").MdPersianDateTimePicker({
+                targetDateSelector: "#income-input-new-incomeDate",
+                targetTextSelector: "#showDate_class_new_incomeDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+                //rangeSelector: true
+            });
+            $("#dt_class_edit_incomeDate").MdPersianDateTimePicker({
+                targetDateSelector: "#income-input-edit-incomeDate",
+                targetTextSelector: "#showDate_class_edit_incomeDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+            });
+        });
+
+    </script>
 {% endblock %}
+

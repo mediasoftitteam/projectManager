@@ -63,7 +63,7 @@ class Income(models.Model):
     incomeDate = models.DateField(default=timezone.now)
     money = models.BigIntegerField(null=True, blank=True)
     description = models.CharField(max_length=120, null=True, blank=True, help_text='توضیحات')
-    isOutcome = models.CharField(max_length=50, null=True, blank=True, help_text='هزینه-درآمد')
+    isOutcome = models.BooleanField(default=True, help_text='هزینه-درآمد')
 
     class Meta:
         ordering = ["incomeDate"]

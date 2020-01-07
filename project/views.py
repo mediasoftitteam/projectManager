@@ -343,6 +343,8 @@ def income_update(request):
 
     m_money = int(post_data['money'])
     m_isOutcome = post_data['isOutcome']
+    print('----')
+    print(m_isOutcome)
     m_description = post_data['description']
     m_id = post_data['incomeId']
 
