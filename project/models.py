@@ -10,6 +10,15 @@ def scramble_uploaded_filename(instance, filename):
     return "{}.{}".format(uuid.uuid4(), extention)
 
 
+PROJECT_STATUS_CHOICES = (
+    ("0", "انجام شده"),
+    ("1", "متوقف"),
+    ("2", "تعلیق"),
+    ("3", "در حال انجام"),
+    ("4", "طرح ریزی"),
+)
+
+
 class Project(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, help_text='کاربر')
     title = models.CharField(max_length=120, null=True, blank=True, help_text='عنوان پروژه')
@@ -18,6 +27,7 @@ class Project(models.Model):
     startDate = models.DateField(default=timezone.now, help_text='شروع پروژه')
     deadline = models.DateField(default=timezone.now, help_text='تاریخ اتمام پروژه')
     money = models.BigIntegerField(null=True, blank=True, help_text='هزینه پروژه')
+    status = models.CharField(max_length=120, null=True, blank=True, help_text='وضعیت پروژه', choices=PROJECT_STATUS_CHOICES, default='4')
     description = models.CharField(max_length=120, null=True, blank=True, help_text='توضیحات')
 
     class Meta:

@@ -43,10 +43,10 @@ def index(request):
     salaries_sum = models.MonthSalary.objects.aggregate(Sum('money'))['money__sum']
 
     incomes = models.Income.objects.all()
-    income_sum = incomes.filter(isOutcome='هزینه').aggregate(Sum('money'))['money__sum']
+    income_sum = incomes.filter(isOutcome=True).aggregate(Sum('money'))['money__sum']
     if income_sum is None:
         income_sum = 0
-    outcome_sum = incomes.filter(isOutcome='درآمد').aggregate(Sum('money'))['money__sum']
+    outcome_sum = incomes.filter(isOutcome=False).aggregate(Sum('money'))['money__sum']
     if outcome_sum is None:
         outcome_sum = 0
     incomes_money = (income_sum) - (outcome_sum)
@@ -127,6 +127,7 @@ def project_create(request):
     m_user = User.objects.get(id=post_data['user'])
     m_title = post_data['title']
     m_projectOwner = post_data['projectOwner']
+    m_status = post_data['status']
     m_pic = None
     if post_data['isPicValid'] == 'true':
         m_pic = request.FILES['pic']
@@ -137,14 +138,10 @@ def project_create(request):
         m_startDate = str(timezone.now)
         m_deadline = str(timezone.now)
 
-
-    print("-----------")
-    print(m_startDate)
-    print(m_deadline)
     m_money = int(post_data['money'])
     m_description = post_data['description']
     p = models.Project(user=m_user, title=m_title, projectOwner=m_projectOwner
-                       , pic=m_pic
+                       , pic=m_pic, status=m_status
                        , startDate=m_startDate, deadline=m_deadline
                        , money=m_money, description=m_description)
     p.save()
@@ -160,6 +157,7 @@ def project_update(request):
     m_projectOwner = post_data['projectOwner']
     m_startDate = timezone.now #post_data['startDate']
     m_deadline = timezone.now #post_data['deadline']
+    m_status = post_data['status']
     m_money = int(post_data['money'])
     m_description = post_data['description']
     m_id = post_data['projectId']
@@ -171,6 +169,7 @@ def project_update(request):
         project.pic = request.FILES['pic']
     project.money = m_money
     project.description = m_description
+    project.status = m_status
     project.save()
 
     return redirect('project:project-list')

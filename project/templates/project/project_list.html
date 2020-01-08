@@ -58,9 +58,11 @@
                             </div>
 
                         </div>
+                    <a href="{% url 'project:project-detail' project.id %}">
                         <p class="text-uppercase text-center font-weight-bold text-muted my-4">
-                            {{ project.title }}
+                            {{ project.title }} - {{ project.get_status_display  }}
                         </p>
+                    </a>
                     </div>
                     <!--First column-->
 
@@ -179,6 +181,32 @@
                                     <div class="md-form">
                                         <input type="text" id="input-new-money" name="money" class="form-control">
                                         <label for="contact-Subject" class="">هزینه کل</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dropdown (status) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="hidden" id="selected-project-status-id" name="status" value="">
+                                        <select class="mdb-select md-form" id="selectBox-project-status1" searchable="جست و جو" onchange="changeProjectStatusNewFunc()">
+                                            <option value="" disabled selected >.    وضعیت موردنظر را اتخاب کنید</option>
+                                            <option value="0" >.    انجام شده</option>
+                                            <option value="1" >.    متوقف</option>
+                                            <option value="2" >.    تعلیق</option>
+                                            <option value="3" >.    در حال انجام</option>
+                                            <option value="4" >.    طرح ریزی</option>
+                                        </select>
+                                        <label class="mdb-main-label">وضعیت پروژه</label>
+                                        <script>
+                                            function changeProjectStatusNewFunc() {
+                                                let selectBox = document.getElementById("selectBox-project-status1");
+                                                let selectedValue = selectBox.options[selectBox.selectedIndex].value;
+                                                document.getElementById('selected-project-status-id').value=selectedValue;
+                                                {#alert(selectedValue)#}
+                                           }
+                                        </script>
                                     </div>
                                 </div>
                             </div>
@@ -306,6 +334,32 @@
                                     <div class="md-form">
                                         <input id="input-edit-money" type="text" name="money" class="form-control">
                                         <label for="contact-Subject" class="">هزینه کل</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dropdown (status) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="hidden" id="selected-project-edit-status-id" name="status" value="-1">
+                                        <select class="mdb-select md-form" id="selectBox-edit-project-status" searchable="جست و جو" onchange="changeProjectStatusEditFunc()">
+                                            <option value="" disabled selected >.    وضعیت موردنظر را اتخاب کنید</option>
+                                            <option value="0" >.    انجام شده</option>
+                                            <option value="1" >.    متوقف</option>
+                                            <option value="2" >.    تعلیق</option>
+                                            <option value="3" >.    در حال انجام</option>
+                                            <option value="4" >.    طرح ریزی</option>
+                                        </select>
+                                        <label class="mdb-main-label">وضعیت پروژه</label>
+                                        <script>
+                                            function changeProjectStatusEditFunc() {
+                                                let selectBox = document.getElementById("selectBox-edit-project-status");
+                                                let selectedValue = selectBox.options[selectBox.selectedIndex].value;
+                                                document.getElementById('selected-project-edit-status-id').value=selectedValue;
+                                                {#alert(selectedValue)#}
+                                           }
+                                        </script>
                                     </div>
                                 </div>
                             </div>
@@ -443,6 +497,11 @@
         // Data Picker Initialization
         $('.datepicker').pickadate({
             formatSubmit: 'yyyy/mm/dd'
+        });
+
+        // Material Select Initialization
+        $(document).ready(function() {
+            $('.mdb-select').materialSelect();
         });
     </script>
 
