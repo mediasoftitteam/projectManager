@@ -1,5 +1,7 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
+{% load jalali_tags %}
+{% load humanize %}
 {% block title %}
     <title>مدیریت تسک ها</title>
 {% endblock %}
@@ -24,7 +26,7 @@
       <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelEqmNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
       <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelEqmEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
       <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-eqm-delete"
-      onclick="showTaskDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
+      onclick="showEqmDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
     </div>
 
 
@@ -73,7 +75,7 @@
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">عنوان</th>
-                        <th scope="col">هزینه</th>
+                        <th scope="col">بودجه</th>
                         <th scope="col">تاریخ خرید</th>
                         <th scope="col">توضیحات</th>
                         <th scope="col">تصویر</th>
@@ -85,8 +87,8 @@
                             <input class="eqmId" type="hidden" dataId={{ eqm.id }}>
                             <th scope="row" >{{ forloop.counter }}</th>
                             <td class="title">{{ eqm.title }}</td>
-                            <td class="price">{{ eqm.price }}</td>
-                            <td class="buyDate">{{ eqm.buyDate|date:"Y-m-d" }}</td>
+                            <td class="price" data-price="{{ eqm.price }}">{{ eqm.price|intcomma }} تومان</td>
+                            <td class="buyDate" data-buyDate="{{ eqm.buyDate|date:"Y-m-d" }}">{{ eqm.buyDate|to_jalali:'%y/%m/%d' }}</td>
                             <td class="description">{{ eqm.description }}</td>
                             {% if eqm.pic %}
                                 <td ><a href="{{ eqm.pic.url }}"><i class="fa fa-image"></i></a></td>
@@ -200,13 +202,15 @@
                             </div>
 
                             <!-- Grid row (buyDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="eqm-input-new-buyDate" name="buyDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ خرید</label>
+                            <label for="contact-Subject" class="">تاریخ خرید</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_buyDate"></span>
                                     </div>
+                                    <input type="text" id="eqm-input-new-buyDate" name="buyDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
+                                <label id="showDate_class_new_buyDate"> </label>
                             </div>
 
                             <!-- Grid row (description) -->
@@ -298,13 +302,15 @@
                             </div>
 
                             <!-- Grid row (buyDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="eqm-input-edit-buyDate" name="buyDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ خرید</label>
+                            <label for="contact-Subject" class="">تاریخ خرید</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_buyDate"></span>
                                     </div>
+                                    <input type="text" id="eqm-input-edit-buyDate" name="buyDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
+                                <label id="showDate_class_edit_buyDate"> </label>
                             </div>
 
                             <!-- Grid row (description) -->
@@ -391,7 +397,7 @@
     <script>
         //-- handle delete modal --//
         function showEqmDeleteModal() {
-            let idd = $("#eqm").attr("selected-id");
+            let idd = $("#selected-eqm-delete-id").attr("selected-id");
             let a_tag = $("#model-eqm-delete-a-tag");
             let modal_body = $("#model-eqm-delete-body");
             let base_url = $("#url-base").attr("data-url");
@@ -424,15 +430,16 @@
         $("#eqm-table tr").click(function(){
            $(this).addClass('table-primary').siblings().removeClass('table-primary');
            var value=$(this).find('input.eqmId').attr("dataId");
-           alert(value)
+           {#alert(value)#}
            $('#selected-eqm-delete-id').attr("selected-id", value);
            $('#selected-eqm-id').attr("value", value); //edit
 
             //-- fill edit fields --//
             $('#eqm-input-edit-title').attr('value', $(this).find('td.title').html());
             $('#eqm-input-edit-description').val( $(this).find('td.description').html());
-            $('#eqm-input-edit-buyDate').attr('value', $(this).find('td.buyDate').html());
-            $('#eqm-input-edit-price').attr('value', $(this).find('td.price').html());
+            //$('#eqm-input-edit-buyDate').attr('value', $(this).find('td.buyDate').html());
+            $('#eqm-input-edit-buyDate').attr('value', $(this).find('td.buyDate').attr('data-buyDate'));
+            $('#eqm-input-edit-price').attr('value', $(this).find('td.price').attr("data-price"));
 
 
         });
@@ -482,4 +489,30 @@
             }
         });
     </script>
+
+    <!--jalali calender-->
+    <script>
+    // persian calender : https://github.com/Mds92/MD.BootstrapPersianDateTimePicker
+        $(document).ready(function () {
+            $("#dt_class_new_buyDate").MdPersianDateTimePicker({
+                targetDateSelector: "#income-input-new-buyDate",
+                targetTextSelector: "#showDate_class_new_buyDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+                //rangeSelector: true
+            });
+            $("#dt_class_edit_buyDate").MdPersianDateTimePicker({
+                targetDateSelector: "#income-input-edit-buyDate",
+                targetTextSelector: "#showDate_class_edit_buyDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+            });
+        });
+
+    </script>
+
 {% endblock %}
