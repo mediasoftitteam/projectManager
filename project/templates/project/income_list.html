@@ -2,6 +2,7 @@
 {% extends 'project/base.html' %}
 {% load jalali_tags %}
 {% load humanize %}
+{% load auth_extras %}
 {% block title %}
     <title>مدیریت درآمد/هزینه ها</title>
 {% endblock %}
@@ -21,35 +22,80 @@
         تسک ها
     </div>
 
-    <input type="text" id="filter-income-project-startDate" value="{% now "yy-m-d" %}">
-    <input type="text" id="filter-income-project-endDate" value="{% now "yy-m-d" %}">
 
+    <!-- filter -->
+    <div class="row container-fluid border mr-1 mb-3">
 
-    <label for="filter-income-startDate" class="">تاریخ شروع</label>
-    <div class="row" dir="ltr" style="width: 200px">
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text cursor-pointer" id="dt_class_filter_startDate"></span>
+        <!-- start date -->
+        <div class="mr-1">
+            <label for="filter-income-startDate" class="">تاریخ شروع</label>
+            <div class="row" dir="ltr" style="width: 200px">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text cursor-pointer" id="dt_class_filter_startDate"><i class="fa fa-calendar-alt"></i></span>
+                    </div>
+                    <input type="text" id="filter-income-startDate" class="form-control" value="{{ filter_param.start_date|default_if_none:"" }}">
+                </div>
+                <label id="showDate_class_filter_startDate"> </label>
             </div>
-            <input type="text" id="filter-income-startDate" class="form-control" value="{% now "yy-m-d" %}">
         </div>
-        <label id="showDate_class_filter_startDate"> </label>
+
+        <!-- end date -->
+        <div style="margin-right: 50px">
+
+            <label for="filter-income-endDate" class="">تاریخ پایان</label>
+            <div class="row" dir="ltr" style="width: 200px">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text cursor-pointer" id="dt_class_filter_endDate"><i class="fa fa-calendar-alt"></i></span>
+                    </div>
+                    <input type="text" id="filter-income-endDate" class="form-control" value="{{ filter_param.end_date|default_if_none:"" }}">
+                </div>
+                <label id="showDate_class_filter_endDate"> </label>
+            </div>
+        </div>
+
+
+        <!-- income money -->
+        <div class="form-check mr-4" style="margin-top: 26px">
+            <input type="checkbox" class="form-check-input" id="filter-income-inmoney" {{ filter_param.is_income|is_true:filter_param.is_income }}>
+            <label class="form-check-label" for="filter-income-inmoney">هزینه ها</label>
+        </div>
+        <!-- outcome money -->
+        <div class="form-check" style="margin-top: 26px">
+            <input type="checkbox" class="form-check-input" id="filter-income-outmoney" {{ filter_param.is_outcome|is_true:filter_param.is_outcome }}>
+            <label class="form-check-label" for="filter-income-outmoney">درآمدها</label>
+        </div>
+
+        <!-- filter button -->
+        <div class="d-flex" style="margin-right: 40px">
+            <a onclick="incomeFilterChanged()" class="btn btn-rounded btn-outline-primary" style=" height: 40px; margin-top: 26%">فیلتر</a>
+        </div>
+
+        <a id="income-tag-a-filter" class="d-none" href="?page-size=20">20</a>
+        <script>
+            {#document.getElementById('income-selector-page-size').value={{ page_size }};#}
+            function incomeFilterChanged() {
+                let date_start = document.getElementById("filter-income-startDate").value;
+                let date_end = document.getElementById("filter-income-endDate").value;
+                let tag_a = document.getElementById("income-tag-a-filter");
+
+                let isIncome = document.getElementById("filter-income-inmoney").checked;
+                let isOutcome = document.getElementById("filter-income-outmoney").checked;
+
+                document.getElementById("query-filter").setAttribute("value", "&start_date=" + date_start
+                    + "&end_date=" + date_end + "&isIncome=" + isIncome + "&isOutcome=" + isOutcome);
+
+                let query_search = document.getElementById("query-search").value;
+                let query_filter = document.getElementById("query-filter").value;
+
+                tag_a.href = "?page-size=" + {{page_size}} + query_search + query_filter;
+                tag_a.click();
+            }
+        </script>
     </div>
 
-    <a id="income-tag-a-filter" class="d-none" href="?page-size=20">20</a>
-    <button onclick="incomeFilterChanged()"> filter</button>
-    <script>
-        {#document.getElementById('income-selector-page-size').value={{ page_size }};#}
-        function incomeFilterChanged() {
-            let date_start = document.getElementById("filter-income-project-startDate").value;
-            let date_end = document.getElementById("filter-income-project-endDate").value;
-            let tag_a = document.getElementById("income-tag-a-filter");
-            alert('tag_a')
-            tag_a.href = "?page-size=" + {{page_size}} + "&start_date=" + date_start + "&end_date=" + date_end;
-            alert(tag_a.href)
-            tag_a.click();
-        }
-    </script>
+
 
     <!-- new/delete/edit buttons -->
     <div class="text-center">
@@ -66,7 +112,7 @@
             <div class="col-1 mb-2">
                 <p>تعداد صفحات</p>
             </div>
-            <div class="col-2 mb-2">
+            <div class="col-3 mb-2">
                 <select id="task-selector-page-size" class="browser-default custom-select" onchange="incomePageSizeChanged(this.options[this.selectedIndex].value)">
                     <option value="10">10</option>
                     <option value="20" >20</option>
@@ -84,10 +130,9 @@
                     }
                 </script>
             </div>
-            <div class="col-6"></div>
 
             <!-- Search form -->
-            <div class="col-3 mb-2 ml-0 text-left">
+            <div class="col-8 mb-2 ml-0 text-left">
                 <input id="search-income" class="form-control" type="text" placeholder="جست و جو" aria-label="Search" value="{{ search }}">
             </div>
         </div>
@@ -148,10 +193,10 @@
         {% if salaries.has_other_pages %}
             <nav aria-label="Page navigation example">
                 <ul class="pagination pagination-circle pg-blue">
-                    <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-income').value">First</a></li>
+                    <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">First</a></li>
                     {% if salaries.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" aria-label="Previous" href="?page={{ tasks.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-income').value">
+                            <a class="page-link" aria-label="Previous" href="?page={{ tasks.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">
                                 <span aria-hidden="true">&laquo;</span>
                                 <span class="sr-only">Previous</span>
                             </a>
@@ -171,13 +216,13 @@
                             <li class="page-item active"><a class="page-link">{{ i }}</a></li>
 
                         {% else %}
-                            <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-income').value">{{ i }}</a></li>
+                            <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">{{ i }}</a></li>
                         {% endif %}
                     {% endfor %}
 
                     <!-- center page numbers -->
                     {% if incomes.has_next %}
-                        <a class="page-link" aria-label="Next"  href="?page={{ incomes.next_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-income').value">
+                        <a class="page-link" aria-label="Next"  href="?page={{ incomes.next_page_number }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">
                             <span aria-hidden="true">&raquo;</span>
                             <span class="sr-only">Next</span>
                         </a>
@@ -503,12 +548,15 @@
     <!-- base url address -->
     <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
 
+    <!-- filter queries -->
+    <input type="hidden" id="query-filter" value="&start_date={{filter_param.start_date}}&end_date={{filter_param.end_date}}&isIncome={{filter_param.is_income}}&isOutcome={{isOutcome.is_outcome}}">
+    <!-- search queries -->
+    <input type="hidden" id="query-search" value="&search={{search}}">
+
 {% endblock %}
 
 {% block javascript %}
 
-    <!-- income list -->
-    <script type="text/javascript" src="{% static 'project/js/income_list.js' %}"></script>
 
     <script>
         //-- handle delete modal --//
@@ -639,8 +687,14 @@
         $("#search-income").on('keyup', function (e) {
             if (e.keyCode === 13) {
                 let srchterm = $("#search-income").val();
+
+                document.getElementById("query-search").setAttribute("value", "&search=" + srchterm);
+
+                let query_search = document.getElementById("query-search").value;
+                let query_filter = document.getElementById("query-filter").value;
+
                 let tag_a = document.getElementById("income-tag-a-page-size");
-                tag_a.href = "?page-size=" + {{ page_size }} + "&search=" + srchterm;
+                tag_a.href = "?page-size=" + {{ page_size }} + query_search + query_filter;
                 tag_a.click();
             }
         });
@@ -675,8 +729,22 @@
                 dateFormat: "yyyy-MM-dd",
                 {#inLine: true,#}
             });
+            $("#dt_class_filter_endDate").MdPersianDateTimePicker({
+                targetDateSelector: "#filter-income-endDate",
+                targetTextSelector: "#showDate_class_filter_endDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                {#inLine: true,#}
+            });
+
         });
 
+
+    //-- filter initial --//
+        $(document).ready(function() {
+            $('.mdb-select').materialSelect();
+        });
     </script>
 
 {% endblock %}

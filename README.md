@@ -32,9 +32,8 @@
 - [ ] 
 
 #####_income list page:_
-- [ ] filter section **h : 4** 2:45
-- [ ] date filter
-- [ ] project filter
+- [ ] date filter **h : 4, d : 4**
+- [ ] project filter **h : 1, **8:30
 - [ ] status filter
 - [ ] 
 - [ ] 

@@ -267,16 +267,20 @@ class IncomeForm(ModelForm):
 
 import datetime
 import dateutil.parser
+from django.utils import timezone
+from datetime import datetime
 # @login_required
 @user_passes_test(lambda u: u.is_superuser)
-def income_list(request):
+def income_list(request, isOutcome=None):
     projects = models.Project.objects.all()
     page = request.GET.get('page', 1)
     page_size = request.GET.get('page-size', 10)
     search = request.GET.get('search', '')
 
-    start_date = request.GET.get('start_date')
+    start_date = request.GET.get('start_date') #datetime.now().strftime('%Y-%m-%d')
     end_date = request.GET.get('end_date')
+    is_income = request.GET.get('isIncome')
+    is_outcome = request.GET.get('isOutcome')
 
     incomes = models.Income.objects.filter(Q(project__title__icontains=search)
                                                  | Q(incomeDate__icontains=search)
@@ -285,8 +289,23 @@ def income_list(request):
                                                  | Q(isOutcome__icontains=search)
                                                  )
 
-    if start_date is not None and end_date is not None:
+    if start_date is not None and end_date is not None and  start_date is not "" and end_date is not "":
         incomes = incomes.filter(incomeDate__range=[start_date, end_date])
+
+    if is_income is not None and is_outcome is not None and is_income is not "" and is_outcome is not "":
+        if is_income == 'true' and is_outcome == 'true':
+            pass
+        elif is_income == 'true':
+            incomes = incomes.filter(isOutcome=True)
+        elif is_outcome == 'true':
+            incomes = incomes.filter(isOutcome=False)
+
+    filter_param = {
+        'start_date': start_date,
+        'end_date': end_date,
+        'is_income': is_income,
+        'is_outcome': is_outcome,
+    }
 
     paginator = Paginator(incomes, page_size)
     try:
@@ -299,7 +318,9 @@ def income_list(request):
     return render(request, 'project/income_list.html', {'incomes': incomes,
                                                         'projects': projects,
                                                         'search': search,
-                                                        'page_size': page_size})
+                                                        'page_size': page_size,
+                                                        'filter_param': filter_param,
+                                                        })
 
 
 # @login_required
