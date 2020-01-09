@@ -1,5 +1,7 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
+{% load jalali_tags %}
+{% load humanize %}
 {% block title %}
     <title>مدیریت حقوق ها</title>
 {% endblock %}
@@ -87,8 +89,8 @@
                             <input class="employee" type="hidden" employeId={{ salary.employee.id }}>
                             <th scope="row" >{{ forloop.counter }}</th>
                             <td class="employee" >{{ salary.employee.fullName }}</td>
-                            <td class="mony">{{ salary.money }}</td>
-                            <td class="salaryDate">{{ salary.salaryDate|date:"Y-m-d" }}</td>
+                            <td class="mony" data-mony="{{ salary.mony }}">{{ salary.mony|intcomma }} تومان</td>
+                            <td class="salaryDate" data-salaryDate="{{ salary.salaryDate|date:"Y-m-d" }}">{{ salary.salaryDate|to_jalali:'%y/%m/%d' }}</td>
                             <td class="description">{{ salary.description }}</td>
                             <td class="workHour">{{ salary.workHour }}</td>
                             {% if salary.pic %}
@@ -204,16 +206,6 @@
                                 </div>
                             </div>
 
-                            <!-- Grid row (start/end date) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="input-new-salaryDate" name="salaryDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ پرداخت</label>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Grid row (work hour) -->
                             <div class="row">
                                 <div class="col-md-12">
@@ -262,6 +254,19 @@
                                       </div>
                                 </div>
                             </div>
+
+                            <!-- Grid row (start/end date) -->
+                            <label for="input-new-salaryDate" class="">تاریخ پرداخت</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_salaryDate"></span>
+                                    </div>
+                                    <input type="text" id="input-new-salaryDate" name="salaryDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_new_salaryDate"> </label>
+                            </div>
+
                         </div>
                     </div>
                     <!-- model footer -->
@@ -329,16 +334,6 @@
                                 </div>
                             </div>
 
-                            <!-- Grid row (start/end date) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="input-salary-edit-salaryDate" name="salaryDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ پرداخت</label>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Grid row (work hour) -->
                             <div class="row">
                                 <div class="col-md-12">
@@ -387,6 +382,21 @@
                                       </div>
                                 </div>
                             </div>
+
+                            <!-- Grid row (salaryDate) -->
+                            <label for="input-edit-salaryDate" class="">تاریخ پرداخت
+                            : <span id="lbl-salary-edit-salaryDate"></span>
+                            </label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_salaryDate"></span>
+                                    </div>
+                                    <input type="text" id="input-edit-salaryDate" name="salaryDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_edit_salaryDate"> </label>
+                            </div>
+
                         </div>
                     </div>
                     <!-- model footer -->
@@ -431,15 +441,11 @@
     <!-- base url address -->
     <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
 
-    <!-- jQuery -->
-    <script type="text/javascript" src="{% static 'project/js/jquery.min.js' %}"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/mdb.min.js' %}"></script>
-    <!-- MDB table core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/addons/datatables.min.js' %}"></script><!-- MDBootstrap Datatables  -->
-    <!-- MDB table core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/addons/datatables-select.min.js' %}"></script><!-- MDBootstrap Datatables  -->
+{% endblock %}
 
+{% block javascript %}
+
+    <!-- delete -->
     <script>
         //-- handle delete modal --//
         function showSalaryDeleteModal() {
@@ -471,6 +477,7 @@
         }
     </script>
 
+    <!-- table select -->
     <script>
 
         $("#table tr").click(function(){
@@ -481,13 +488,13 @@
            $('#selected-salary-id').attr("value", value); //edit
 
             //-- fill edit fields --//
-            $('#input-salary-edit-money').attr('value', $(this).find('td.mony').html())
-            $('#input-salary-edit-description').val( $(this).find('td.description').html())
-            $('#input-salary-edit-salaryDate').attr('value', $(this).find('td.salaryDate').html())
-            $('#input-salary-edit-workHour').attr('value', $(this).find('td.workHour').html())
-            $('#input-salary-edit-salaryDate').attr('value', $(this).find('td.salaryDate').html());
+            $('#input-salary-edit-money').attr('value', $(this).find('td.mony').attr("data-mony"));
+            $('#input-salary-edit-description').val( $(this).find('td.description').html());
+            $('#input-salary-edit-salaryDate').attr('value', $(this).find('td.salaryDate').attr('data-salaryDate'));
+            $('#lbl-salary-edit-salaryDate').html($(this).find('td.salaryDate').html());
+            $('#input-salary-edit-workHour').attr('value', $(this).find('td.workHour').html());
             let empId =$(this).find('input.employee').attr("employeId");
-            $('#selectBoxEdit').val(empId)
+            $('#selectBoxEdit').val(empId);
 
 
         });
@@ -546,4 +553,30 @@
             }
         });
     </script>
+
+    <!--jalali calender-->
+    <script>
+    // persian calender : https://github.com/Mds92/MD.BootstrapPersianDateTimePicker
+        $(document).ready(function () {
+            $("#dt_class_new_salaryDate").MdPersianDateTimePicker({
+                targetDateSelector: "#input-new-salaryDate",
+                targetTextSelector: "#showDate_class_new_salaryDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+                //rangeSelector: true
+            });
+            $("#dt_class_edit_salaryDate").MdPersianDateTimePicker({
+                targetDateSelector: "#input-edit-salaryDate",
+                targetTextSelector: "#showDate_class_edit_salaryDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+            });
+        });
+
+    </script>
+
 {% endblock %}

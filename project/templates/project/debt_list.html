@@ -1,5 +1,7 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
+{% load jalali_tags %}
+{% load humanize %}
 {% block title %}
     <title>مدیریت بدهی ها</title>
 {% endblock %}
@@ -91,9 +93,9 @@
                             <td class="title">{{ debt.title }}</td>
                             <td class="description">{{ debt.description }}</td>
                             <td class="status">{{ debt.status }}</td>
-                            <td class="debtDate">{{ debt.debtDate|date:"Y-m-d" }}</td>
-                            <td class="paymentDebtDate">{{ debt.paymentDebtDate|date:"Y-m-d" }}</td>
-                            <td class="price">{{ debt.price }}</td>
+                            <td class="debtDate" data-debtDate="{{ debt.debtDate|date:"Y-m-d" }}">{{ debt.debtDate|to_jalali:'%y/%m/%d' }}</td>
+                            <td class="paymentDebtDate" data-paymentDebtDate="{{ debt.paymentDebtDate|date:"Y-m-d" }}">{{ debt.paymentDebtDate|to_jalali:'%y/%m/%d' }}</td>
+                            <td class="price" data-price="{{ debt.price }}">{{ debt.price|intcomma }} تومان</td>
 
                         </tr>
                     {% endfor %}
@@ -171,7 +173,7 @@
             </div>
             <div class="card-body pr-5">
                 <!-- form -->
-                <form name="FormSalary" action="{% url 'project:debt-create' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateDebtForm()">
+                <form name="FormNewDebt" action="{% url 'project:debt-create' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateDebtForm()">
                     {% csrf_token %}
                     <input type="hidden" name="user" value="{{ user.id }}">
                     <!-- model body -->
@@ -220,26 +222,6 @@
                                 </div>
                             </div>
 
-                            <!-- Grid row (debtDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="debt-input-new-debtDate" name="debtDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ بدهی</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (paymentDebtDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="debt-input-new-paymentDebtDate" name="paymentDebtDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ پرداخت</label>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Grid row (price) -->
                             <div class="row">
                                 <div class="col-md-12">
@@ -263,6 +245,31 @@
 
                                 </div>
                             </div>
+
+                            <!-- Grid row (debtDate) -->
+                            <label for="debt-input-new-debtDate" class="">تاریخ بدهی</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_debtDate"></span>
+                                    </div>
+                                    <input type="text" id="debt-input-new-debtDate" name="debtDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_new_debtDate"> </label>
+                            </div>
+
+                            <!-- Grid row (paymentDebtDate) -->
+                            <label for="debt-input-new-paymentDebtDate" class="">تاریخ پرداخت</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_paymentDebtDate"></span>
+                                    </div>
+                                    <input type="text" id="debt-input-new-paymentDebtDate" name="paymentDebtDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_new_paymentDebtDate"> </label>
+                            </div>
+
 
                         </div>
                     </div>
@@ -349,26 +356,6 @@
                                 </div>
                             </div>
 
-                            <!-- Grid row (debtDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="debt-input-edit-debtDate" name="debtDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ بدهی</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (paymentDebtDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="debt-input-edit-paymentDebtDate" name="paymentDebtDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ پرداخت</label>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Grid row (price) -->
                             <div class="row">
                                 <div class="col-md-12">
@@ -391,6 +378,30 @@
                                     </div>
 
                                 </div>
+                            </div>
+
+                            <!-- Grid row (debtDate) -->
+                            <label for="debt-input-edit-debtDate" class="">تاریخ بدهی</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_debtDate"></span>
+                                    </div>
+                                    <input type="text" id="debt-input-edit-debtDate" name="debtDate" class="form-control">
+                                </div>
+                                <label id="showDate_class_edit_debtDate"> </label>
+                            </div>
+
+                            <!-- Grid row (paymentDebtDate) -->
+                            <label for="debt-input-edit-paymentDebtDate" class="">تاریخ پرداخت</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_paymentDebtDate"></span>
+                                    </div>
+                                    <input type="text" id="debt-input-edit-paymentDebtDate" name="paymentDebtDate" class="form-control">
+                                </div>
+                                <label id="showDate_class_edit_paymentDebtDate"> </label>
                             </div>
 
                         </div>
@@ -437,15 +448,12 @@
     <!-- base url address -->
     <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
 
-    <!-- jQuery -->
-    <script type="text/javascript" src="{% static 'project/js/jquery.min.js' %}"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/mdb.min.js' %}"></script>
-    <!-- MDB table core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/addons/datatables.min.js' %}"></script><!-- MDBootstrap Datatables  -->
-    <!-- MDB table core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/addons/datatables-select.min.js' %}"></script><!-- MDBootstrap Datatables  -->
+{% endblock %}
 
+
+{% block javascript %}
+
+    <!-- delete -->
     <script>
         //-- handle delete modal --//
         function showDebtDeleteModal() {
@@ -477,6 +485,7 @@
         }
     </script>
 
+    <!-- table select -->
     <script>
 
         $("#debt-table tr").click(function(){
@@ -487,14 +496,14 @@
            $('#selected-debt-id').attr("value", value); //edit
 
             //-- fill edit fields --//
-            $('#debt-input-edit-debtDate').attr('value', $(this).find('td.debtDate').html());
-            $('#debt-input-edit-paymentDebtDate').attr('value', $(this).find('td.paymentDebtDate').html());
+            $('#debt-input-edit-debtDate').attr('value', $(this).find('td.debtDate').attr('data-debtDate'));
+            $('#debt-input-edit-paymentDebtDate').attr('value', $(this).find('td.paymentDebtDate').attr('data-paymentDebtDate'));
             $('#debt-input-edit-description').val( $(this).find('td.description').html());
             $('#debt-input-edit-title').attr('value', $(this).find('td.title').html());
-            $('#debt-input-edit-price').attr('value', $(this).find('td.price').html());
+            $('#debt-input-edit-price').attr('value', $(this).find('td.price').attr("data-price"));
             $('#debt-input-edit-status').attr('value', $(this).find('td.status').html());
             let empId =$(this).find('input.employee').attr("employeId");
-            $('#selectBoxEdit').val(empId)
+            $('#selectBoxEdit').val(empId);
 
 
         });
@@ -512,11 +521,11 @@
         //-- validate image field in new project form --//
         function validateDebtForm() {
 
-            let price = document.forms["FormSalary"]["debt-input-new-price"].value;
+            let price = document.forms["FormNewDebt"]["debt-input-new-price"].value;
             if (price === null || price === "") {
                 $('#debt-input-new-price').attr('value', 0)
             }
-            let employeeId = document.forms["FormSalary"]["debt-selected-employee-id"].value;
+            let employeeId = document.forms["FormNewDebt"]["debt-selected-employee-id"].value;
             if (employeeId === "-1") {
                 alert("کارمند مورد نظر را انتخاب کنید")
                 return false
@@ -542,4 +551,46 @@
             }
         });
     </script>
+
+    <!--jalali calender-->
+    <script>
+    // persian calender : https://github.com/Mds92/MD.BootstrapPersianDateTimePicker
+        $(document).ready(function () {
+            $("#dt_class_new_debtDate").MdPersianDateTimePicker({
+                targetDateSelector: "#debt-input-new-debtDate",
+                targetTextSelector: "#showDate_class_new_debtDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+                //rangeSelector: true
+            });
+            $("#dt_class_new_paymentDebtDate").MdPersianDateTimePicker({
+                targetDateSelector: "#debt-input-new-paymentDebtDate",
+                targetTextSelector: "#showDate_class_new_paymentDebtDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+            });
+            $("#dt_class_edit_debtDate").MdPersianDateTimePicker({
+                targetDateSelector: "#debt-input-edit-debtDate",
+                targetTextSelector: "#showDate_class_edit_debtDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+            });
+            $("#dt_class_edit_paymentDebtDate").MdPersianDateTimePicker({
+                targetDateSelector: "#debt-input-edit-paymentDebtDate",
+                targetTextSelector: "#showDate_class_edit_paymentDebtDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+            });
+        });
+
+    </script>
+
 {% endblock %}

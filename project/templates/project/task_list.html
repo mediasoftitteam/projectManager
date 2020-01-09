@@ -252,31 +252,6 @@
                                 </div>
                             </div>
 
-                            <!-- Grid row (taskDate) -->
-                            <label for="contact-Subject" class="">تاریخ تسک</label>
-                            <div class="row" dir="ltr">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_taskDate"></span>
-                                    </div>
-                                    <input type="text" id="task-input-new-taskDate" name="taskDate" class="form-control" value="{% now "yy-m-d" %}">
-                                </div>
-                                <label id="showDate_class_taskDate"> </label>
-                            </div>
-
-
-                            <!-- Grid row (dueDate) -->
-                            <label for="contact-Subject" class="">تاریخ اتمام</label>
-                            <div class="row" dir="ltr">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_dueDate"></span>
-                                    </div>
-                                    <input type="text" id="task-input-new-dueDate" name="dueDate" class="form-control" value="{% now "yy-m-d" %}">
-                                </div>
-                                <label id="showDate_class_dueDate"> </label>
-                            </div>
-
                             <!-- Grid row (description) -->
                             <div class="row mb-4">
 
@@ -305,6 +280,31 @@
                                       </div>
                                 </div>
                             </div>
+
+                            <!-- Grid row (taskDate) -->
+                            <label for="contact-Subject" class="">تاریخ تسک</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_taskDate"></span>
+                                    </div>
+                                    <input type="text" id="task-input-new-taskDate" name="taskDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_taskDate"> </label>
+                            </div>
+
+                            <!-- Grid row (dueDate) -->
+                            <label for="contact-Subject" class="">تاریخ اتمام</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_dueDate"></span>
+                                    </div>
+                                    <input type="text" id="task-input-new-dueDate" name="dueDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_dueDate"> </label>
+                            </div>
+
                         </div>
                     </div>
                     <!-- model footer -->
@@ -419,32 +419,6 @@
                                 </div>
                             </div>
 
-                            <!-- Grid row (taskDate) -->
-                            <label for="contact-Subject" class="">تاریخ تسک
-                            <p id="lbl-taskDate"></p>
-                            </label>
-                            <div class="row" dir="ltr">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_taskDate"></span>
-                                    </div>
-                                    <input type="text" id="task-input-edit-taskDate" name="taskDate" class="form-control">
-                                </div>
-                                <label id="showDate_class_edit_taskDate"> </label>
-                            </div>
-
-                            <!-- Grid row (dueDate) -->
-                            <label for="contact-Subject" class="">تاریخ اتمام</label>
-                            <div class="row" dir="ltr">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_dueDate"></span>
-                                    </div>
-                                    <input type="text" id="task-input-edit-dueDate" name="dueDate" class="form-control">
-                                </div>
-                                <label id="showDate_class_edit_dueDate"> </label>
-                            </div>
-
                             <!-- Grid row (description) -->
                             <div class="row mb-4">
 
@@ -473,6 +447,34 @@
                                       </div>
                                 </div>
                             </div>
+
+                            <!-- Grid row (taskDate) -->
+                            <label for="contact-Subject" class="">تاریخ تسک
+                            : <span id="lbl-task-edit-taskDate"></span>
+                            </label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_taskDate"></span>
+                                    </div>
+                                    <input type="text" id="task-input-edit-taskDate" name="taskDate" class="form-control">
+                                </div>
+                                <label id="showDate_class_edit_taskDate"> </label>
+                            </div>
+
+                            <!-- Grid row (dueDate) -->
+                            <label for="contact-Subject" class="">تاریخ اتمام
+                            : <span id="lbl-task-edit-dueDate"></span></label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_dueDate"></span>
+                                    </div>
+                                    <input type="text" id="task-input-edit-dueDate" name="dueDate" class="form-control">
+                                </div>
+                                <label id="showDate_class_edit_dueDate"> </label>
+                            </div>
+
                         </div>
                     </div>
                     <!-- model footer -->
@@ -572,10 +574,12 @@
             var strDate = $(this).find('td.taskDate').attr("data-taskDate");
             var dList = strDate.split("/");
             $('#task-input-edit-taskDate').attr('value', dList.join("-"));
+            $('#lbl-task-edit-taskDate').html($(this).find('td.taskDate').html());
             $('#lbl-taskDate').attr('html', dList.join("-"));
             strDate = $(this).find('td.dueDate').attr("data-dueDate");
             dList = strDate.split("/");
             $('#task-input-edit-dueDate').attr('value', dList.join("-"));
+            $('#lbl-task-edit-dueDate').html($(this).find('td.dueDate').html());
             $('#task-input-edit-status').attr('value', $(this).find('td.status').html());
             let empId =$(this).find('input.employee').attr("employeId");
             $('#task-employee-selectBoxEdit').val(empId);

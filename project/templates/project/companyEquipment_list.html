@@ -302,7 +302,8 @@
                             </div>
 
                             <!-- Grid row (buyDate) -->
-                            <label for="contact-Subject" class="">تاریخ خرید</label>
+                            <label for="contact-Subject" class="">تاریخ خرید
+                            : <span id="lbl-eqm-edit-buyDate"></span></label>
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -439,6 +440,7 @@
             $('#eqm-input-edit-description').val( $(this).find('td.description').html());
             //$('#eqm-input-edit-buyDate').attr('value', $(this).find('td.buyDate').html());
             $('#eqm-input-edit-buyDate').attr('value', $(this).find('td.buyDate').attr('data-buyDate'));
+            $('#lbl-eqm-edit-buyDate').html($(this).find('td.buyDate').html());
             $('#eqm-input-edit-price').attr('value', $(this).find('td.price').attr("data-price"));
 
 

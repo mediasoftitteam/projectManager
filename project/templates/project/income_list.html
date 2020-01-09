@@ -245,18 +245,6 @@
                             </div>
                             <hr>
 
-                            <!-- Grid row (incomeDate) -->
-                            <label for="contact-Subject" class="">تاریخ</label>
-                            <div class="row" dir="ltr">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_new_incomeDate"></span>
-                                    </div>
-                                    <input type="text" id="income-input-new-incomeDate" name="incomeDate" class="form-control" value="{% now "yy-m-d" %}">
-                                </div>
-                                <label id="showDate_class_new_incomeDate"> </label>
-                            </div>
-
                             <!-- Grid row (description) -->
                             <div class="row mb-4">
 
@@ -285,6 +273,19 @@
                                       </div>
                                 </div>
                             </div>
+
+                            <!-- Grid row (incomeDate) -->
+                            <label for="contact-Subject" class="">تاریخ</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_incomeDate"></span>
+                                    </div>
+                                    <input type="text" id="income-input-new-incomeDate" name="incomeDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_new_incomeDate"> </label>
+                            </div>
+
                         </div>
                     </div>
                     <!-- model footer -->
@@ -386,19 +387,6 @@
                             </div>
                             <hr>
 
-
-                            <!-- Grid row (incomeDate) -->
-                            <label for="contact-Subject" class="">تاریخ</label>
-                            <div class="row" dir="ltr">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_incomeDate"></span>
-                                    </div>
-                                    <input type="text" id="income-input-edit-incomeDate" name="incomeDate" class="form-control">
-                                </div>
-                                <label id="showDate_class_edit_incomeDate"> </label>
-                            </div>
-
                             <!-- Grid row (description) -->
                             <div class="row mb-4">
 
@@ -427,6 +415,20 @@
                                       </div>
                                 </div>
                             </div>
+
+                            <!-- Grid row (incomeDate) -->
+                            <label for="contact-Subject" class="">تاریخ
+                            : <span id="lbl-income-edit-incomeDate"></span></label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_incomeDate"></span>
+                                    </div>
+                                    <input type="text" id="income-input-edit-incomeDate" name="incomeDate" class="form-control">
+                                </div>
+                                <label id="showDate_class_edit_incomeDate"> </label>
+                            </div>
+
                         </div>
                     </div>
                     <!-- model footer -->
@@ -518,6 +520,7 @@
             $('#income-input-edit-money').attr('value', $(this).find('td.money').attr("data-money"));
             $('#income-input-edit-description').val( $(this).find('td.description').html());
             $('#income-input-edit-incomeDate').attr('value', $(this).find('td.incomeDate').attr('data-incomeDate'));
+            $('#lbl-income-edit-incomeDate').html($(this).find('td.incomeDate').html());
             $('#income-input-edit-isOutcome').attr('value', $(this).find('td.isOutcome').html());
 
             if($(this).find('td.isOutcome').attr('data-isOutcome') == 'True'){
@@ -634,5 +637,6 @@
         });
 
     </script>
+
 {% endblock %}
 

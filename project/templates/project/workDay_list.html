@@ -1,5 +1,7 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
+{% load jalali_tags %}
+{% load humanize %}
 {% block title %}
     <title>مدیریت روزهای کاری</title>
 {% endblock %}
@@ -85,7 +87,7 @@
                             <input class="employee" type="hidden" employeId={{ workDay.employee.id }}>
                             <th scope="row" >{{ forloop.counter }}</th>
                             <td class="employee" >{{ workDay.employee.fullName }}</td>
-                            <td class="workDate">{{ workDay.workDate|date:"Y-m-d" }}</td>
+                            <td class="workDate" data-workDate="{{ workDay.workDate|date:"Y-m-d" }}">{{ workDay.workDate|to_jalali:'%y/%m/%d' }}</td>
                             <td class="workHour">{{ workDay.workHour }}</td>
                             <td class="description">{{ workDay.description }}</td>
 
@@ -204,16 +206,6 @@
                                 </div>
                             </div>
 
-                            <!-- Grid row (workDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="workDay-input-new-workDate" name="workDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ بدهی</label>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Grid row (description) -->
                             <div class="row mb-4">
 
@@ -226,6 +218,18 @@
                                     </div>
 
                                 </div>
+                            </div>
+
+                            <!-- Grid row (workDate) -->
+                            <label for="workDay-input-new-workDate" class="">تاریخ</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_workDate"></span>
+                                    </div>
+                                    <input type="text" id="workDay-input-new-workDate" name="workDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_new_workDate"> </label>
                             </div>
 
                         </div>
@@ -293,23 +297,12 @@
                                 </div>
                             </div>
 
-
                             <!-- Grid row (workHour) -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
                                         <input type="text" id="workDay-input-edit-workHour" name="workHour" class="form-control">
                                         <label for="contact-Subject" class="">ساعت کاری</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Grid row (workDate) -->
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form">
-                                        <input type="date" value="2019-11-21" id="workDay-input-edit-workDate" name="workDate" class="form-control">
-                                        <label for="contact-Subject" class="">تاریخ بدهی</label>
                                     </div>
                                 </div>
                             </div>
@@ -321,11 +314,25 @@
                                 <div class="col-md-12">
 
                                     <div class="md-form">
-                                        <textarea type="text" id="workDay-input-edit-description" name="description" class="md-textarea form-control" rows="3" ></textarea>
+                                        <textarea type="text" id="workDay-input-edit-description" name="description" class="md-textarea form-control" rows="4" ></textarea>
                                         <label for="contact-message">توضیحات</label>
                                     </div>
 
                                 </div>
+                            </div>
+
+                            <!-- Grid row (workDate) -->
+                            <label for="workDay-input-edit-workDate" class="">تاریخ
+                            : <span id="lbl-workDay-edit-workDate"></span>
+                            </label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_workDate"></span>
+                                    </div>
+                                    <input type="text" id="workDay-input-edit-workDate" name="workDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_edit_workDate"> </label>
                             </div>
 
                         </div>
@@ -372,14 +379,9 @@
     <!-- base url address -->
     <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
 
-    <!-- jQuery -->
-    <script type="text/javascript" src="{% static 'project/js/jquery.min.js' %}"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/mdb.min.js' %}"></script>
-    <!-- MDB table core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/addons/datatables.min.js' %}"></script><!-- MDBootstrap Datatables  -->
-    <!-- MDB table core JavaScript -->
-    <script type="text/javascript" src="{% static 'project/js/addons/datatables-select.min.js' %}"></script><!-- MDBootstrap Datatables  -->
+{% endblock %}
+
+{% block javascript %}
 
     <script>
         //-- handle delete modal --//
@@ -422,7 +424,8 @@
            $('#selected-workDay-id').attr("value", value); //edit
 
             //-- fill edit fields --//
-            $('#workDay-input-edit-workDate').attr('value', $(this).find('td.workDate').html());
+            $('#workDay-input-edit-workDate').attr('value', $(this).find('td.workDate').attr('data-workDate'));
+            $('#lbl-workDay-edit-workDate').html($(this).find('td.workDate').html());
             $('#workDay-input-edit-workHour').attr('value', $(this).find('td.workHour').html());
             $('#workDay-input-edit-description').val( $(this).find('td.description').html());
             let empId =$(this).find('input.employee').attr("employeId");
@@ -461,6 +464,7 @@
 
         }
 
+    <!-- table select -->
     </script>
 
     <!-- search -->
@@ -474,4 +478,30 @@
             }
         });
     </script>
+
+    <!--jalali calender-->
+    <script>
+    // persian calender : https://github.com/Mds92/MD.BootstrapPersianDateTimePicker
+        $(document).ready(function () {
+            $("#dt_class_new_workDate").MdPersianDateTimePicker({
+                targetDateSelector: "#workDay-input-new-workDate",
+                targetTextSelector: "#showDate_class_new_workDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+                //rangeSelector: true
+            });
+            $("#dt_class_edit_workDate").MdPersianDateTimePicker({
+                targetDateSelector: "#workDay-input-edit-workDate",
+                targetTextSelector: "#showDate_class_edit_workDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                inLine: true,
+            });
+        });
+
+    </script>
+
 {% endblock %}
