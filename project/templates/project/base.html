@@ -88,9 +88,9 @@
     </nav>
 
     <!-- side bar -->
-    <div id="wrapper" class=" bg-info">
+    <div id="container-fluid wrapper">
         <!-- Sidebar -->
-        <div id="sidebar-wrapper" class="view overlay" style="z-index: 1;position: absolute; width: 230px; right: -230px; background: #2C3E50; opacity: 0.98; transition-duration: 500ms;" >
+        <div id="sidebar-wrapper" class="view overlay" style="z-index: 1;position: absolute; width: 230px; height: 100%; right: -230px; background: #2C3E50; opacity: 0.98; transition-duration: 500ms;" >
             <ul class="list-group  list-group-flush sidebar-nav" style="padding: 0; list-style: none; margin: 0px 1px">
                 <li class="sidebar-brand list-group-item waves-light"  style="background-color: #2C3E50">
                     <a href="{% url 'project:index' %}"  class="text-white">
@@ -184,32 +184,32 @@
             </ul>
         </div> <!-- /#sidebar-wrapper -->
 
-        <!-- Page Content -->
-        <div id="page-content-wrapper" style="width: 100%; position: absolute; padding: 15px; font-family: 'IRANSansNum';" >
-            <main class="container-fluid" style="max-width: calc(1800px + 2%); margin-top: 20px">
-
-            {% block body %}
-            {% endblock %}
-            {% block section %}
-            {% endblock %}
-        </main>
-        </div> <!-- /#page-content-wrapper -->
-
     </div> <!-- /#wrapper -->
 
 
+    <main class="container-fluid" style="max-width: calc(1800px + 2%); margin-top: 20px">
 
-    <!-- Footer -->
-
-
-    <footer>
-    </footer>
-
+        {% block body %}
+        {% endblock %}
+        {% block section %}
+        {% endblock %}
+    </main>
 
     <a href="#home" id="go-to-top">
         <i class="fa fa-chevron-up align-middle"></i>
     </a>
 
+    <!-- Footer -->
+    <footer class="page-footer font-small blue">
+
+        <!-- Copyright -->
+        <div class="footer-copyright text-center py-3">© 2020 Copyright:
+            <a href="http://mediasoft.ir" target="_blank"> Mediasoft.ir</a>
+        </div>
+        <!-- Copyright -->
+
+    </footer>
+    <!-- Footer -->
 
     <!-- hidden url params to send to js -->
     <input type="hidden" id="url-home" data-url="{% url 'project:index' %}" />
