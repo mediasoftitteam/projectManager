@@ -21,6 +21,36 @@
         تسک ها
     </div>
 
+    <input type="text" id="filter-income-project-startDate" value="{% now "yy-m-d" %}">
+    <input type="text" id="filter-income-project-endDate" value="{% now "yy-m-d" %}">
+
+
+    <label for="filter-income-startDate" class="">تاریخ شروع</label>
+    <div class="row" dir="ltr" style="width: 200px">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text cursor-pointer" id="dt_class_filter_startDate"></span>
+            </div>
+            <input type="text" id="filter-income-startDate" class="form-control" value="{% now "yy-m-d" %}">
+        </div>
+        <label id="showDate_class_filter_startDate"> </label>
+    </div>
+
+    <a id="income-tag-a-filter" class="d-none" href="?page-size=20">20</a>
+    <button onclick="incomeFilterChanged()"> filter</button>
+    <script>
+        {#document.getElementById('income-selector-page-size').value={{ page_size }};#}
+        function incomeFilterChanged() {
+            let date_start = document.getElementById("filter-income-project-startDate").value;
+            let date_end = document.getElementById("filter-income-project-endDate").value;
+            let tag_a = document.getElementById("income-tag-a-filter");
+            alert('tag_a')
+            tag_a.href = "?page-size=" + {{page_size}} + "&start_date=" + date_start + "&end_date=" + date_end;
+            alert(tag_a.href)
+            tag_a.click();
+        }
+    </script>
+
     <!-- new/delete/edit buttons -->
     <div class="text-center">
       <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" id="income-modal-add-btn" data-target="#modelIncomeNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
@@ -243,7 +273,19 @@
                                     </div>
                                 </div>
                             </div>
-                            <hr>
+{#                            <hr>#}
+
+                            <!-- Grid row (incomeDate) -->
+                            <label for="contact-Subject" class="mt-2">تاریخ</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_incomeDate"><i class="fa fa-calendar-alt"></i></span>
+                                    </div>
+                                    <input type="text" id="income-input-new-incomeDate" name="incomeDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_new_incomeDate"> </label>
+                            </div>
 
                             <!-- Grid row (description) -->
                             <div class="row mb-4">
@@ -272,18 +314,6 @@
                                         </div>
                                       </div>
                                 </div>
-                            </div>
-
-                            <!-- Grid row (incomeDate) -->
-                            <label for="contact-Subject" class="">تاریخ</label>
-                            <div class="row" dir="ltr">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_new_incomeDate"></span>
-                                    </div>
-                                    <input type="text" id="income-input-new-incomeDate" name="incomeDate" class="form-control" value="{% now "yy-m-d" %}">
-                                </div>
-                                <label id="showDate_class_new_incomeDate"> </label>
                             </div>
 
                         </div>
@@ -387,6 +417,19 @@
                             </div>
                             <hr>
 
+                            <!-- Grid row (incomeDate) -->
+                            <label for="contact-Subject" class="">تاریخ
+                            : <span id="lbl-income-edit-incomeDate"></span></label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_incomeDate"><i class="fa fa-calendar-alt"></i></span>
+                                    </div>
+                                    <input type="text" id="income-input-edit-incomeDate" name="incomeDate" class="form-control">
+                                </div>
+                                <label id="showDate_class_edit_incomeDate"> </label>
+                            </div>
+
                             <!-- Grid row (description) -->
                             <div class="row mb-4">
 
@@ -414,19 +457,6 @@
                                         </div>
                                       </div>
                                 </div>
-                            </div>
-
-                            <!-- Grid row (incomeDate) -->
-                            <label for="contact-Subject" class="">تاریخ
-                            : <span id="lbl-income-edit-incomeDate"></span></label>
-                            <div class="row" dir="ltr">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_incomeDate"></span>
-                                    </div>
-                                    <input type="text" id="income-input-edit-incomeDate" name="incomeDate" class="form-control">
-                                </div>
-                                <label id="showDate_class_edit_incomeDate"> </label>
                             </div>
 
                         </div>
@@ -476,6 +506,9 @@
 {% endblock %}
 
 {% block javascript %}
+
+    <!-- income list -->
+    <script type="text/javascript" src="{% static 'project/js/income_list.js' %}"></script>
 
     <script>
         //-- handle delete modal --//
@@ -623,7 +656,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
+                //inLine: true,
                 //rangeSelector: true
             });
             $("#dt_class_edit_incomeDate").MdPersianDateTimePicker({
@@ -632,7 +665,15 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
+                //inLine: true,
+            });
+            $("#dt_class_filter_startDate").MdPersianDateTimePicker({
+                targetDateSelector: "#filter-income-startDate",
+                targetTextSelector: "#showDate_class_filter_startDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                {#inLine: true,#}
             });
         });
 

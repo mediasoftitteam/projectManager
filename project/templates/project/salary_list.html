@@ -260,7 +260,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_new_salaryDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_salaryDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="input-new-salaryDate" name="salaryDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
@@ -390,7 +390,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_salaryDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_salaryDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="input-edit-salaryDate" name="salaryDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
@@ -564,7 +564,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
+                //inLine: true,
                 //rangeSelector: true
             });
             $("#dt_class_edit_salaryDate").MdPersianDateTimePicker({
@@ -573,7 +573,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
+                //inLine: true,
             });
         });
 

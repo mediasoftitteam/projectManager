@@ -286,7 +286,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_taskDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_taskDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="task-input-new-taskDate" name="taskDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
@@ -298,7 +298,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_dueDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_dueDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="task-input-new-dueDate" name="dueDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
@@ -455,7 +455,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_taskDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_taskDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="task-input-edit-taskDate" name="taskDate" class="form-control">
                                 </div>
@@ -468,7 +468,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_dueDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_dueDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="task-input-edit-dueDate" name="dueDate" class="form-control">
                                 </div>
@@ -658,7 +658,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
+                //inLine: true,
                 //rangeSelector: true
             });
             $("#dt_class_dueDate").MdPersianDateTimePicker({
@@ -667,7 +667,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true
+                //inLine: true
             });
             $("#dt_class_edit_taskDate").MdPersianDateTimePicker({
                 targetDateSelector: "#task-input-edit-taskDate",
@@ -675,7 +675,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true
+                //inLine: true
             });
             $("#dt_class_edit_dueDate").MdPersianDateTimePicker({
                 targetDateSelector: "#task-input-edit-dueDate",
@@ -683,7 +683,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true
+                //inLine: true
             });
         });
 

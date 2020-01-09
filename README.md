@@ -32,7 +32,11 @@
 - [ ] 
 
 #####_income list page:_
-- [ ] filter section **h : 4**
+- [ ] filter section **h : 4** 2:45
+- [ ] date filter
+- [ ] project filter
+- [ ] status filter
+- [ ] 
 - [ ] 
 
 #####_eqm list page:_

@@ -79,7 +79,7 @@ class Income(models.Model):
         ordering = ["incomeDate"]
 
     def __str__(self):
-        return str(self.user.username) + " - " + self.project.title
+        return str(self.user.username) + " - " + self.project.title + " - " + str(self.incomeDate)
 
     @property
     def owner(self):

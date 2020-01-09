@@ -265,7 +265,8 @@ class IncomeForm(ModelForm):
         model = models.Income
         fields = ['project', 'pic', 'incomeDate', 'money', 'user']
 
-
+import datetime
+import dateutil.parser
 # @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def income_list(request):
@@ -274,12 +275,18 @@ def income_list(request):
     page_size = request.GET.get('page-size', 10)
     search = request.GET.get('search', '')
 
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
     incomes = models.Income.objects.filter(Q(project__title__icontains=search)
                                                  | Q(incomeDate__icontains=search)
                                                  | Q(description__icontains=search)
                                                  | Q(money__icontains=search)
                                                  | Q(isOutcome__icontains=search)
                                                  )
+
+    if start_date is not None and end_date is not None:
+        incomes = incomes.filter(incomeDate__range=[start_date, end_date])
 
     paginator = Paginator(incomes, page_size)
     try:

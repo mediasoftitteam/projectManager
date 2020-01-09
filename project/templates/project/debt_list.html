@@ -251,7 +251,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_new_debtDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_debtDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="debt-input-new-debtDate" name="debtDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
@@ -263,7 +263,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_new_paymentDebtDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_paymentDebtDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="debt-input-new-paymentDebtDate" name="paymentDebtDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
@@ -385,7 +385,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_debtDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_debtDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="debt-input-edit-debtDate" name="debtDate" class="form-control">
                                 </div>
@@ -397,7 +397,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_paymentDebtDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_paymentDebtDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="debt-input-edit-paymentDebtDate" name="paymentDebtDate" class="form-control">
                                 </div>
@@ -562,7 +562,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
+                //inLine: true,
                 //rangeSelector: true
             });
             $("#dt_class_new_paymentDebtDate").MdPersianDateTimePicker({
@@ -571,7 +571,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
+                //inLine: true,
             });
             $("#dt_class_edit_debtDate").MdPersianDateTimePicker({
                 targetDateSelector: "#debt-input-edit-debtDate",
@@ -579,7 +579,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
+                //inLine: true,
             });
             $("#dt_class_edit_paymentDebtDate").MdPersianDateTimePicker({
                 targetDateSelector: "#debt-input-edit-paymentDebtDate",
@@ -587,7 +587,7 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
+                //inLine: true,
             });
         });
 

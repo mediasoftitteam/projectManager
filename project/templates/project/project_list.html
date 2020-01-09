@@ -145,7 +145,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_new_startDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_startDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="input-new-startDate" name="startDate" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
@@ -157,7 +157,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_new_deadline"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_deadline"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="input-new-deadline" name="deadline" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
@@ -297,7 +297,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_startDate"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_startDate"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="input-edit-startDate" name="startDate" class="form-control">
                                 </div>
@@ -311,7 +311,7 @@
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_deadline"></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_deadline"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
                                     <input type="text" id="input-edit-deadline" name="deadline" class="form-control">
                                 </div>
@@ -515,7 +515,6 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
                 //rangeSelector: true
             });
             $("#dt_class_new_deadline").MdPersianDateTimePicker({
@@ -524,7 +523,6 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
             });
             $("#dt_class_edit_startDate").MdPersianDateTimePicker({
                 targetDateSelector: "#input-edit-startDate",
@@ -532,7 +530,6 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
             });
             $("#dt_class_edit_deadline").MdPersianDateTimePicker({
                 targetDateSelector: "#input-edit-deadline",
@@ -540,7 +537,6 @@
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
-                inLine: true,
             });
         });
 
