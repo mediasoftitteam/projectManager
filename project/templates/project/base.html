@@ -43,6 +43,19 @@
 
     <!-- nav bar -->
     <nav class="navbar navbar-expand navbar-dark bg-primary"> <a id="menu-toggle" class="navbar-brand"><span class="navbar-toggler-icon"></span></a> <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+
+        <!-- Breadcrumb-->
+        <div class="mr-4" dir="ltr">
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb d-inline-flex pl-0 pt-0">
+                    <li class="breadcrumb-item"><a class="white-text" id="bc-label">خانه</a></li>
+{#                    <li class="breadcrumb-item active">Grid Usage</li>#}
+                </ol>
+            </nav>
+
+        </div>
+
         <div class="collapse navbar-collapse" id="navbarsExample02">
             <ul class="navbar-nav mr-auto">
                 <!-- auth component -->
@@ -85,6 +98,9 @@
             </ul>
             <form class="form-inline my-2 my-md-0"> </form>
         </div>
+
+
+
     </nav>
 
     <!-- side bar -->
@@ -279,31 +295,58 @@
 
             //-- check current page and active navbar item --//
             var pathname = window.location.pathname;
-            if(pathname.indexOf("project-list") > -1) $('#projects').parent().parent().addClass('active');
+            if(pathname.indexOf("project-list") > -1){
+                $('#bc-label').html('پروژه ها');
+                $('#projects').parent().parent().addClass('active');
+            }
             else $('#projects').parent().parent().removeClass('active');
 
-            if(pathname.indexOf("employee-list") > -1) $('#employees').parent().parent().addClass('active');
+            if(pathname.indexOf("employee-list") > -1){
+                $('#bc-label').html('کارمندها');
+                $('#employees').parent().parent().addClass('active');
+            }
             else $('#employees').parent().parent().removeClass('active');
 
-            if(pathname.indexOf("income-list") > -1) $('#incomes').parent().parent().addClass('active');
+            if(pathname.indexOf("income-list") > -1) {
+                $('#bc-label').html('تراکنش ها');
+                $('#incomes').parent().parent().addClass('active');
+            }
             else $('#incomes').parent().parent().removeClass('active');
 
-            if(pathname.indexOf("companyEquipment-list") > -1) $('#eqms').parent().parent().addClass('active');
+            if(pathname.indexOf("companyEquipment-list") > -1) {
+                $('#bc-label').html('دارایی ها');
+                $('#eqms').parent().parent().addClass('active');
+            }
             else $('#eqms').parent().parent().removeClass('active');
 
-            if(pathname.indexOf("workDay-list") > -1) $('#workDays').parent().parent().addClass('active');
+            if(pathname.indexOf("workDay-list") > -1) {
+                $('#bc-label').html('تقویم کاری');
+                $('#workDays').parent().parent().addClass('active');
+            }
             else $('#workDays').parent().parent().removeClass('active');
 
-            if(pathname.indexOf("task-list") > -1) $('#tasks').parent().parent().addClass('active');
+            if(pathname.indexOf("task-list") > -1) {
+                $('#bc-label').html('وظایف');
+                $('#tasks').parent().parent().addClass('active');
+            }
             else $('#tasks').parent().parent().removeClass('active');
 
-            if(pathname.indexOf("salary-list") > -1) $('#salaries').parent().parent().addClass('active');
+            if(pathname.indexOf("salary-list") > -1) {
+                $('#bc-label').html('حقوق ها');
+                $('#salaries').parent().parent().addClass('active');
+            }
             else $('#salaries').parent().parent().removeClass('active');
 
-            if(pathname.indexOf("debt-list") > -1) $('#debts').parent().parent().addClass('active');
+            if(pathname.indexOf("debt-list") > -1) {
+                $('#bc-label').html('قرض ها');
+                $('#debts').parent().parent().addClass('active');
+            }
             else $('#debts').parent().parent().removeClass('active');
 
-            if(pathname.indexOf("financial") > -1) $('#financial').parent().parent().addClass('active');
+            if(pathname.indexOf("financial") > -1) {
+                $('#bc-label').html('مالی');
+                $('#financial').parent().parent().addClass('active');
+            }
             else $('#financial').parent().parent().removeClass('active');
 
         });

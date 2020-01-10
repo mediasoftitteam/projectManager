@@ -17,10 +17,6 @@
     <!-- Material Design Bootstrap table -->
     <link rel="stylesheet" href="{% static 'project/css/addons/datatables-select.min.css' %}"><!-- MDBootstrap Datatables  -->
 
-    <div class="alert alert-primary" role="alert">
-        اموال شرکت
-    </div>
-
     <!-- new/delete/edit buttons -->
     <div class="text-center">
       <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelEqmNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
@@ -107,11 +103,11 @@
 
     <!-- pagination -->
     <div class="d-flex justify-content-center">
-        {% if salaries.has_other_pages %}
+        {% if companyEquipments.has_other_pages %}
             <nav aria-label="Page navigation example">
                 <ul class="pagination pagination-circle pg-blue">
                     <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-eqm').value">First</a></li>
-                    {% if salaries.has_previous %}
+                    {% if companyEquipments.has_previous %}
                         <li class="page-item">
                             <a class="page-link" aria-label="Previous" href="?page={{ companyEquipments.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-eqm').value">
                                 <span aria-hidden="true">&laquo;</span>
@@ -128,8 +124,8 @@
                     {% endif %}
 
                     <!-- center page numbers -->
-                    {% for i in tasks.paginator.page_range %}
-                        {% if tasks.number == i %}
+                    {% for i in companyEquipments.paginator.page_range %}
+                        {% if companyEquipments.number == i %}
                             <li class="page-item active"><a class="page-link">{{ i }}</a></li>
 
                         {% else %}
@@ -138,7 +134,7 @@
                     {% endfor %}
 
                     <!-- center page numbers -->
-                    {% if tasks.has_next %}
+                    {% if companyEquipments.has_next %}
                         <a class="page-link" aria-label="Next"  href="?page={{ companyEquipments.next_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-eqm').value">
                             <span aria-hidden="true">&raquo;</span>
                             <span class="sr-only">Next</span>

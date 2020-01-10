@@ -18,227 +18,328 @@
     <!-- Material Design Bootstrap table -->
     <link rel="stylesheet" href="{% static 'project/css/addons/datatables-select.min.css' %}"><!-- MDBootstrap Datatables  -->
 
-    <div class="alert alert-primary" role="alert">
-        تسک ها
-    </div>
-
-
-    <!-- filter -->
-    <div class="row container-fluid border mr-1 mb-3">
-
-        <!-- start date -->
-        <div class="mr-1">
-            <label for="filter-income-startDate" class="">تاریخ شروع</label>
-            <div class="row" dir="ltr" style="width: 200px">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text cursor-pointer" id="dt_class_filter_startDate"><i class="fa fa-calendar-alt"></i></span>
-                    </div>
-                    <input type="text" id="filter-income-startDate" class="form-control" value="{{ filter_param.start_date|default_if_none:"" }}">
-                </div>
-                <label id="showDate_class_filter_startDate"> </label>
-            </div>
-        </div>
-
-        <!-- end date -->
-        <div style="margin-right: 50px">
-
-            <label for="filter-income-endDate" class="">تاریخ پایان</label>
-            <div class="row" dir="ltr" style="width: 200px">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text cursor-pointer" id="dt_class_filter_endDate"><i class="fa fa-calendar-alt"></i></span>
-                    </div>
-                    <input type="text" id="filter-income-endDate" class="form-control" value="{{ filter_param.end_date|default_if_none:"" }}">
-                </div>
-                <label id="showDate_class_filter_endDate"> </label>
-            </div>
-        </div>
-
-
-        <!-- income money -->
-        <div class="form-check mr-4" style="margin-top: 26px">
-            <input type="checkbox" class="form-check-input" id="filter-income-inmoney" {{ filter_param.is_income|is_true:filter_param.is_income }}>
-            <label class="form-check-label" for="filter-income-inmoney">هزینه ها</label>
-        </div>
-        <!-- outcome money -->
-        <div class="form-check" style="margin-top: 26px">
-            <input type="checkbox" class="form-check-input" id="filter-income-outmoney" {{ filter_param.is_outcome|is_true:filter_param.is_outcome }}>
-            <label class="form-check-label" for="filter-income-outmoney">درآمدها</label>
-        </div>
-
-        <!-- filter button -->
-        <div class="d-flex" style="margin-right: 40px">
-            <a onclick="incomeFilterChanged()" class="btn btn-rounded btn-outline-primary" style=" height: 40px; margin-top: 26%">فیلتر</a>
-        </div>
-
-        <a id="income-tag-a-filter" class="d-none" href="?page-size=20">20</a>
-        <script>
-            {#document.getElementById('income-selector-page-size').value={{ page_size }};#}
-            function incomeFilterChanged() {
-                let date_start = document.getElementById("filter-income-startDate").value;
-                let date_end = document.getElementById("filter-income-endDate").value;
-                let tag_a = document.getElementById("income-tag-a-filter");
-
-                let isIncome = document.getElementById("filter-income-inmoney").checked;
-                let isOutcome = document.getElementById("filter-income-outmoney").checked;
-
-                document.getElementById("query-filter").setAttribute("value", "&start_date=" + date_start
-                    + "&end_date=" + date_end + "&isIncome=" + isIncome + "&isOutcome=" + isOutcome);
-
-                let query_search = document.getElementById("query-search").value;
-                let query_filter = document.getElementById("query-filter").value;
-
-                tag_a.href = "?page-size=" + {{page_size}} + query_search + query_filter;
-                tag_a.click();
-            }
-        </script>
-    </div>
-
-
-
-    <!-- new/delete/edit buttons -->
-    <div class="text-center">
-      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" id="income-modal-add-btn" data-target="#modelIncomeNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
-      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelIncomeEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
-      <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-income-delete"
-      onclick="showIncomeDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
-    </div>
-
-
-    <!-- PAGE SIZE/ search -->
-    <div class="container">
-        <div class="row ">
-            <div class="col-1 mb-2">
-                <p>تعداد صفحات</p>
-            </div>
-            <div class="col-3 mb-2">
-                <select id="task-selector-page-size" class="browser-default custom-select" onchange="incomePageSizeChanged(this.options[this.selectedIndex].value)">
-                    <option value="10">10</option>
-                    <option value="20" >20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-                <a id="income-tag-a-page-size" class="d-none" href="?page-size=20">20</a>
-                <script>
-                    document.getElementById('income-selector-page-size').value={{ page_size }};
-                    function incomePageSizeChanged(page_size) {
-                        {#alert(page_size)#}
-                        let tag_a = document.getElementById("income-tag-a-page-size");
-                        tag_a.href = "?page-size=" + page_size;
-                        tag_a.click();
-                    }
-                </script>
-            </div>
-
-            <!-- Search form -->
-            <div class="col-8 mb-2 ml-0 text-left">
-                <input id="search-income" class="form-control" type="text" placeholder="جست و جو" aria-label="Search" value="{{ search }}">
-            </div>
-        </div>
-    <div class="clearfix"></div>
-    </div>
-
     <!-- body -->
-    <div>
-        <div class="container py-1">
+    <div class="container-fluid row">
 
-            <div class="row pagination-sm table-responsive" id="income-list">
+        <!-- table and tools -->
+        <div class="col-sm-9 mb-2">
 
-                <table class="table table-sm table-hover table-striped"  id="income-table">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">پروژه</th>
-                        <th scope="col">بودجه</th>
-                        <th scope="col">وضعیت</th>
-                        <th scope="col">تاریخ</th>
-                        <th scope="col">توضیحات</th>
-                        <th scope="col">تصویر</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for income in incomes %}
-                        <tr>
-                            <input class="incomeId" type="hidden" dataId={{ income.id }}>
-                            <input class="project" type="hidden" projectId={{ income.project.id }}>
-                            <th scope="row" >{{ forloop.counter }}</th>
-                            <td class="project" >{{ income.project.title }}</td>
-                            <td class="money" data-money="{{ income.money }}">{{ income.money|intcomma }} تومان</td>
-                            {% if income.isOutcome == False %}
-                                <td class="isOutcome" data-isOutcome="{{ income.isOutcome }}">درآمد</td>
-                            {% else %}
-                                <td class="isOutcome" data-isOutcome="{{ income.isOutcome }}">هزینه</td>
-                            {% endif %}
+            <!-- body -->
+            <section class="">
 
-                            <td class="incomeDate" data-incomeDate="{{ income.incomeDate|date:"Y-m-d" }}">{{ income.incomeDate|to_jalali:'%y/%m/%d' }}</td>
-                            <td class="description">{{ income.description }}</td>
-                            {% if income.pic %}
-                                <td ><a href="{{ income.pic.url }}"><i class="fa fa-image"></i></a></td>
-                            {% else %}
-                                <td ><a href="#"></a></td>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-list">
 
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                            <!-- header -->
+                            <div class="card-header white d-flex justify-content-between align-items-center py-3 bg-transparent mx-1 mt-1">
+
+                                <div class="container-fluid">
+                                    <!-- new/delete/edit buttons -->
+                                    <div class="text-center mb-4 pt-1 pb-1 border border-info rounded">
+                                        <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" id="income-modal-add-btn" data-target="#modelIncomeNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
+                                        <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelIncomeEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
+                                        <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-income-delete"
+                                                onclick="showIncomeDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
+                                    </div>
+
+                                    <!-- PAGE SIZE/ search -->
+                                    <div class="container">
+                                        <div class="row ">
+
+                                            <div class="col-5 mb-2">
+                                                <div class="row">
+                                                    <p>تعداد صفحات</p>
+                                                    <select id="income-selector-page-size" class="browser-default custom-select" onchange="incomePageSizeChanged(this.options[this.selectedIndex].value)">
+                                                        <option value="10">10</option>
+                                                        <option value="20" >20</option>
+                                                        <option value="50">50</option>
+                                                        <option value="100">100</option>
+                                                    </select>
+                                                    <a id="income-tag-a-page-size" class="d-none" href="?page-size=20">20</a>
+                                                    <script>
+                                                        document.getElementById('income-selector-page-size').value={{ page_size }};
+                                                        function incomePageSizeChanged(page_size) {
+                                                            {#alert(page_size)#}
+                                                            let tag_a = document.getElementById("income-tag-a-page-size");
+                                                            tag_a.href = "?page-size=" + page_size;
+                                                            tag_a.click();
+                                                        }
+                                                    </script>
+                                                </div>
+                                            </div>
+
+                                            <!-- Search form -->
+                                            <div class="col-6 mb-2 mr-4">
+                                                <div class="row">
+                                                    <p>جست و جو</p>
+                                                    <input id="search-income" class="form-control small" type="text" placeholder="جست و جو" aria-label="Search" value="{{ search }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- table -->
+                            <div class="card-body table-responsive">
+
+                                <table class="table table-sm table-hover"  id="income-table">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">پروژه</th>
+                                        <th scope="col">بودجه</th>
+                                        <th scope="col">وضعیت</th>
+                                        <th scope="col">تاریخ</th>
+                                        <th scope="col">توضیحات</th>
+                                        <th scope="col">تصویر</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for income in incomes %}
+                                        <tr>
+                                            <input class="incomeId" type="hidden" dataId={{ income.id }}>
+                                            <input class="project" type="hidden" projectId={{ income.project.id }}>
+                                            <th scope="row" >{{ forloop.counter }}</th>
+                                            <td class="project" >{{ income.project.title }}</td>
+                                            <td class="money" data-money="{{ income.money }}">{{ income.money|intcomma }} <span class="small text-black-50">تومان</span> </td>
+                                            {% if income.isOutcome == False %}
+                                                <td class="isOutcome" data-isOutcome="{{ income.isOutcome }}"><span class="badge badge-success">درآمد</span></td>
+                                            {% else %}
+                                                <td class="isOutcome" data-isOutcome="{{ income.isOutcome }}"><span class="badge badge-danger">هزینه</span></td>
+                                            {% endif %}
+
+                                            <td class="incomeDate" data-incomeDate="{{ income.incomeDate|date:"Y-m-d" }}">{{ income.incomeDate|to_jalali:'%y/%m/%d' }}</td>
+                                            <td class="description">{{ income.description|truncatechars:100 }}</td>
+                                            {% if income.pic %}
+                                                <td ><a href="{{ income.pic.url }}"><i class="fa fa-image"></i></a></td>
+                                            {% else %}
+                                                <td ><a href="#"></a></td>
+
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                            <!-- pagination -->
+                            <div class="card-footer white py-3 d-flex justify-content-between">
+
+                                <div class="d-flex justify-content-center w-100">
+                                    {% if incomes.has_other_pages %}
+                                        <nav aria-label="Page navigation example">
+                                            <ul class="pagination pagination-circle pg-blue">
+                                                <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">First</a></li>
+                                                {% if incomes.has_previous %}
+                                                    <li class="page-item">
+                                                        <a class="page-link" aria-label="Previous" href="?page={{ tasks.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">
+                                                            <span aria-hidden="true">&laquo;</span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link" aria-label="Previous">
+                                                            <span aria-hidden="true">&laquo;</span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
+                                                <!-- center page numbers -->
+                                                {% for i in incomes.paginator.page_range %}
+                                                    {% if incomes.number == i %}
+                                                        <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+
+                                                    {% else %}
+                                                        <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">{{ i }}</a></li>
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                                <!-- center page numbers -->
+                                                {% if incomes.has_next %}
+                                                    <a class="page-link" aria-label="Next"  href="?page={{ incomes.next_page_number }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">
+                                                        <span aria-hidden="true">&raquo;</span>
+                                                        <span class="sr-only">Next</span>
+                                                    </a>
+                                                {% else %}
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link" aria-label="Next">
+                                                            <span aria-hidden="true">&raquo;</span>
+                                                            <span class="sr-only">Next</span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
+                                                <li class="page-item"><a class="page-link">Last</a></li>
+                                            </ul>
+                                        </nav>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <!-- Section: Block Content -->
+
+        </div>
+
+        <!-- filter section -->
+        <div class="col-sm-3 mb-3">
+
+            <!-- Panel -->
+            <div class="card">
+
+                <div class="card-header white-text primary-color">
+                    فیلتر
+                </div>
+
+                <div class="card-body text-center px-3">
+                    <div class="list-group list-group-flush">
+
+                        <!-- project -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <div dir="ltr" >
+                                <label class="float-right">پروژه ها</label>
+                                <select id="filter-income-project" class="mdb-select md-form " multiple >
+                                    <option value="" disabled selected>انتخاب پروژه</option>
+                                    {% for project in projects %}
+                                        <option value="{{ project.id }}" {{ project.id|is_selected:filter_param.projects_list }}>{{ project.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- date filter -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <div>
+
+                                <!-- start date -->
+                                <label for="filter-income-startDate" class="float-right">تاریخ شروع</label>
+                                <div class="row" dir="ltr" style="width: 100%">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text cursor-pointer" id="dt_class_filter_startDate"><i class="fa fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input type="text" id="filter-income-startDate" class="form-control" value="{{ filter_param.start_date|default_if_none:"" }}">
+                                    </div>
+                                    <label id="showDate_class_filter_startDate" class="text-black-50 small"> </label>
+                                </div>
+
+                                <!-- end date -->
+                                <label for="filter-income-endDate" class="float-right">تاریخ پایان</label>
+                                <div class="row" dir="ltr" style="width: 100%">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text cursor-pointer" id="dt_class_filter_endDate"><i class="fa fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input type="text" id="filter-income-endDate" class="form-control" value="{{ filter_param.end_date|default_if_none:"" }}">
+                                    </div>
+                                    <label id="showDate_class_filter_endDate" class="text-black-50 small"> </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <!-- in/outcoe money -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <div class="text-left">
+                                <!-- income money -->
+                                <div class="form-check" >
+                                    <input type="checkbox" class="form-check-input" id="filter-income-inmoney" {{ filter_param.is_income|is_true:filter_param.is_income }}>
+                                    <label class="form-check-label" for="filter-income-inmoney">هزینه ها</label>
+                                </div>
+                                <!-- outcome money -->
+                                <div class="form-check ">
+                                    <input type="checkbox" class="form-check-input" id="filter-income-outmoney" {{ filter_param.is_outcome|is_true:filter_param.is_outcome }}>
+                                    <label class="form-check-label" for="filter-income-outmoney">درآمدها</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- date filter -->
+                        <div class="list-group-item d-flex justify-content-between">
+
+                            <a onclick="incomeFilterChanged()" class="btn btn-rounded btn-outline-primary btn-block" >فیلتر</a>
+                        </div>
+
+                        <!-- link for apply filter -->
+                        <a id="income-tag-a-filter" class="d-none" href="?page-size=20">20</a>
+                        <script>
+                            {#document.getElementById('income-selector-page-size').value={{ page_size }};#}
+                            function incomeFilterChanged() {
+
+                                //-- get selected projects --//
+                                let project_list = document.getElementById("filter-income-project");
+                                let res = getSelectedOptions(project_list);
+                                let selectedTemp = [];
+                                for( let i=1; i<res.length; i++){
+                                    {#console.log(res[i].text + res[i].value);#}
+                                    selectedTemp.push(res[i].value);
+                                }
+                                let selectedProject = selectedTemp.join("_");
+
+
+                                let date_start = document.getElementById("filter-income-startDate").value;
+                                let date_end = document.getElementById("filter-income-endDate").value;
+                                let tag_a = document.getElementById("income-tag-a-filter");
+
+                                let isIncome = document.getElementById("filter-income-inmoney").checked;
+                                let isOutcome = document.getElementById("filter-income-outmoney").checked;
+
+                                document.getElementById("query-filter").setAttribute("value", "&start_date=" + date_start
+                                    + "&end_date=" + date_end + "&isIncome=" + isIncome + "&isOutcome=" + isOutcome + "&selectedProjects=" + selectedProject);
+
+                                let query_search = document.getElementById("query-search").value;
+                                let query_filter = document.getElementById("query-filter").value;
+
+                                tag_a.href = "?page-size=" + {{page_size}} + query_search + query_filter;
+                                tag_a.click();
+                            }
+
+                            // arguments: reference to select list, callback function (optional)
+                            function getSelectedOptions(sel, fn) {
+                                var opts = [], opt;
+
+                                // loop through options in select list
+                                for (var i=0, len=sel.options.length; i<len; i++) {
+                                    opt = sel.options[i];
+
+                                    // check if selected
+                                    if ( opt.selected ) {
+                                        // add to array of option elements to return from this function
+                                        opts.push(opt);
+
+                                        // invoke optional callback function if provided
+                                        if (fn) {
+                                            fn(opt);
+                                        }
+                                    }
+                                }
+
+                                // return array containing references to selected option elements
+                                return opts;
+                            }
+                        </script>
+
+                    </div>
+                </div>
 
             </div>
+            <!-- Panel -->
+
         </div>
-    </div>
 
-    <!-- pagination -->
-    <div class="d-flex justify-content-center">
-        {% if salaries.has_other_pages %}
-            <nav aria-label="Page navigation example">
-                <ul class="pagination pagination-circle pg-blue">
-                    <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">First</a></li>
-                    {% if salaries.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" aria-label="Previous" href="?page={{ tasks.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">
-                                <span aria-hidden="true">&laquo;</span>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled">
-                        <a class="page-link" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                    </li>
-                    {% endif %}
-
-                    <!-- center page numbers -->
-                    {% for i in incomes.paginator.page_range %}
-                        {% if incomes.number == i %}
-                            <li class="page-item active"><a class="page-link">{{ i }}</a></li>
-
-                        {% else %}
-                            <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">{{ i }}</a></li>
-                        {% endif %}
-                    {% endfor %}
-
-                    <!-- center page numbers -->
-                    {% if incomes.has_next %}
-                        <a class="page-link" aria-label="Next"  href="?page={{ incomes.next_page_number }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">
-                            <span aria-hidden="true">&raquo;</span>
-                            <span class="sr-only">Next</span>
-                        </a>
-                    {% else %}
-                        <li class="page-item disabled">
-                            <a class="page-link" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </li>
-                    {% endif %}
-
-                    <li class="page-item"><a class="page-link">Last</a></li>
-                </ul>
-            </nav>
-        {% endif %}
     </div>
 
     <!-- Modal new -->
@@ -549,9 +650,10 @@
     <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
 
     <!-- filter queries -->
-    <input type="hidden" id="query-filter" value="&start_date={{filter_param.start_date}}&end_date={{filter_param.end_date}}&isIncome={{filter_param.is_income}}&isOutcome={{isOutcome.is_outcome}}">
+    <input type="hidden" id="query-filter" value="&start_date={{filter_param.start_date|default_if_none:''}}&end_date={{filter_param.end_date|default_if_none:''}}&isIncome={{filter_param.is_income|default_if_none:''}}&isOutcome={{filter_param.is_outcome|default_if_none:''}}&">
     <!-- search queries -->
     <input type="hidden" id="query-search" value="&search={{search}}">
+
 
 {% endblock %}
 
@@ -628,7 +730,7 @@
 
         // Material Select Initialization
         $(document).ready(function() {
-        $('.mdb-select').materialSelect();
+            $('.mdb-select').materialSelect();
         });
 
 
@@ -740,11 +842,6 @@
 
         });
 
-
-    //-- filter initial --//
-        $(document).ready(function() {
-            $('.mdb-select').materialSelect();
-        });
     </script>
 
 {% endblock %}

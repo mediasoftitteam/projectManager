@@ -28,3 +28,11 @@ def is_true(self, m_date):
         return 'checked'
     else:
         return 'unchecked'
+
+
+@register.filter(name='is_selected')
+def is_selected(self, m_date):
+    if str(self) in m_date:
+        return 'selected'
+    else:
+        return ''

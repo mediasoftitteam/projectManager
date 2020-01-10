@@ -32,10 +32,9 @@
 - [ ] 
 
 #####_income list page:_
-- [ ] date filter **h : 4, d : 4**
-- [ ] project filter **h : 1, **8:30
-- [ ] status filter
-- [ ] 
+- [x] date filter **h : 4, d : 4**
+- [x] project filter **h : 1, d : 3**
+- [x] status filter **h : 2, d : 2**
 - [ ] 
 
 #####_eqm list page:_
@@ -46,6 +45,7 @@
 #####_worked day list page:_
 - [ ] filter section **h : 4**
 - [x] jalaly calender **h : 1, d: 0.5**
+- [ ] employee list use multi select with user image (mdb)
 - [ ]
 
 #####_task list page:_

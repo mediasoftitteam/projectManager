@@ -1,10 +1,8 @@
-
 from django.db.models import Q
 # from drf_multiple_model.views import ObjectMultipleModelAPIView
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 # from mypy.test import update
-from django.db.models import Q
 
 from project import models
 
@@ -54,7 +52,7 @@ def index(request):
     debts = models.Debt.objects.all()
     debts_sum = models.Debt.objects.aggregate(Sum('price'))['price__sum']
 
-    return render(request, 'project/index.html',{
+    return render(request, 'project/index.html', {
         'project_count': project.count(),
         'project_total_money': cost,
         'employee_count': employee.count(),
@@ -115,6 +113,8 @@ def project_view(request, project_id):
 
 
 from django.utils.dateparse import parse_date
+
+
 @user_passes_test(lambda u: u.is_superuser)
 def project_create(request):
     # form = ProjectForm(request.POST or None)
@@ -155,8 +155,8 @@ def project_update(request):
     m_user = User.objects.get(id=post_data['user'])
     m_title = post_data['title']
     m_projectOwner = post_data['projectOwner']
-    m_startDate = timezone.now #post_data['startDate']
-    m_deadline = timezone.now #post_data['deadline']
+    m_startDate = timezone.now  # post_data['startDate']
+    m_deadline = timezone.now  # post_data['deadline']
     m_status = post_data['status']
     m_money = int(post_data['money'])
     m_description = post_data['description']
@@ -265,10 +265,15 @@ class IncomeForm(ModelForm):
         model = models.Income
         fields = ['project', 'pic', 'incomeDate', 'money', 'user']
 
+
 import datetime
 import dateutil.parser
 from django.utils import timezone
+import operator
+import functools
 from datetime import datetime
+
+
 # @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def income_list(request, isOutcome=None):
@@ -277,34 +282,44 @@ def income_list(request, isOutcome=None):
     page_size = request.GET.get('page-size', 10)
     search = request.GET.get('search', '')
 
-    start_date = request.GET.get('start_date') #datetime.now().strftime('%Y-%m-%d')
-    end_date = request.GET.get('end_date')
-    is_income = request.GET.get('isIncome')
-    is_outcome = request.GET.get('isOutcome')
+    start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
+    end_date = request.GET.get('end_date', None)
+    is_income = request.GET.get('isIncome', None)
+    is_outcome = request.GET.get('isOutcome', None)
+    selected_projects = request.GET.get('selectedProjects', None)
 
     incomes = models.Income.objects.filter(Q(project__title__icontains=search)
-                                                 | Q(incomeDate__icontains=search)
-                                                 | Q(description__icontains=search)
-                                                 | Q(money__icontains=search)
-                                                 | Q(isOutcome__icontains=search)
-                                                 )
+                                           | Q(incomeDate__icontains=search)
+                                           | Q(description__icontains=search)
+                                           | Q(money__icontains=search)
+                                           | Q(isOutcome__icontains=search)
+                                           ).distinct()
 
-    if start_date is not None and end_date is not None and  start_date is not "" and end_date is not "":
-        incomes = incomes.filter(incomeDate__range=[start_date, end_date])
+    # date range filter
+    if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
+        incomes = incomes.filter(incomeDate__range=[start_date, end_date]).distinct()
 
+    # income/outcome filter
     if is_income is not None and is_outcome is not None and is_income is not "" and is_outcome is not "":
         if is_income == 'true' and is_outcome == 'true':
             pass
         elif is_income == 'true':
-            incomes = incomes.filter(isOutcome=True)
+            incomes = incomes.filter(isOutcome=True).distinct()
         elif is_outcome == 'true':
-            incomes = incomes.filter(isOutcome=False)
+            incomes = incomes.filter(isOutcome=False).distinct()
+
+    # project filter
+    projects_list = []
+    if selected_projects is not None and selected_projects is not "":
+        projects_list = selected_projects.split("_")
+        incomes = incomes.filter(functools.reduce(operator.or_, (Q(project=x) for x in projects_list))).distinct()
 
     filter_param = {
         'start_date': start_date,
         'end_date': end_date,
         'is_income': is_income,
         'is_outcome': is_outcome,
+        'projects_list': projects_list,
     }
 
     paginator = Paginator(incomes, page_size)
@@ -405,13 +420,13 @@ def task_list(request):
     search = request.GET.get('search', '')
 
     tasks = models.Task.objects.filter(Q(employees__fullName__icontains=search)
-                                                 | Q(project__title__icontains=search)
-                                                 | Q(taskDate__icontains=search)
-                                                 | Q(dueDate__icontains=search)
-                                                 | Q(description__icontains=search)
-                                                 | Q(title__icontains=search)
-                                                 | Q(status__icontains=search)
-                                                 )
+                                       | Q(project__title__icontains=search)
+                                       | Q(taskDate__icontains=search)
+                                       | Q(dueDate__icontains=search)
+                                       | Q(description__icontains=search)
+                                       | Q(title__icontains=search)
+                                       | Q(status__icontains=search)
+                                       )
 
     paginator = Paginator(tasks, page_size)
     try:
@@ -422,10 +437,10 @@ def task_list(request):
         tasks = paginator.page(paginator.num_pages)
 
     return render(request, 'project/task_list.html', {'tasks': tasks,
-                                                        'employees': employees,
-                                                        'projects': projects,
-                                                        'search': search,
-                                                        'page_size': page_size})
+                                                      'employees': employees,
+                                                      'projects': projects,
+                                                      'search': search,
+                                                      'page_size': page_size})
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -448,14 +463,14 @@ def task_create(request):
     m_status = post_data['status']
     m_description = post_data['description']
     p = models.Task(user=m_user
-                           , employees=m_employee
-                           , project=m_project
-                           , pic=m_pic
-                           , taskDate=m_taskDate
-                           , dueDate=m_dueDate
-                           , title=m_title
-                           , status=m_status
-                           , description=m_description)
+                    , employees=m_employee
+                    , project=m_project
+                    , pic=m_pic
+                    , taskDate=m_taskDate
+                    , dueDate=m_dueDate
+                    , title=m_title
+                    , status=m_status
+                    , description=m_description)
     p.save()
 
     return redirect('project:task-list')
@@ -547,9 +562,9 @@ def salary_create(request):
     m_workHour = post_data['workHour']
     m_description = post_data['description']
     p = models.MonthSalary(user=m_user, employee=m_employee
-                       , pic=m_pic
-                       , salaryDate=m_salaryDate
-                       , money=m_money, workHour=m_workHour, description=m_description)
+                           , pic=m_pic
+                           , salaryDate=m_salaryDate
+                           , money=m_money, workHour=m_workHour, description=m_description)
     p.save()
 
     return redirect('project:salary-list')
@@ -598,13 +613,13 @@ def debt_list(request):
     search = request.GET.get('search', '')
 
     debts = models.Debt.objects.filter(Q(employee__fullName__icontains=search)
-                                                 | Q(title__icontains=search)
-                                                 | Q(description__icontains=search)
-                                                 | Q(status__icontains=search)
-                                                 | Q(debtDate__icontains=search)
-                                                 | Q(paymentDebtDate__icontains=search)
-                                                 | Q(price__icontains=search)
-                                                 )
+                                       | Q(title__icontains=search)
+                                       | Q(description__icontains=search)
+                                       | Q(status__icontains=search)
+                                       | Q(debtDate__icontains=search)
+                                       | Q(paymentDebtDate__icontains=search)
+                                       | Q(price__icontains=search)
+                                       )
 
     paginator = Paginator(debts, page_size)
     try:
@@ -615,9 +630,9 @@ def debt_list(request):
         debts = paginator.page(paginator.num_pages)
 
     return render(request, 'project/debt_list.html', {'debts': debts,
-                                                        'employees': employees,
-                                                        'search': search,
-                                                        'page_size': page_size})
+                                                      'employees': employees,
+                                                      'search': search,
+                                                      'page_size': page_size})
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -696,10 +711,10 @@ def company_equipment_list(request):
     search = request.GET.get('search', '')
 
     companyEquipments = models.CompanyEquipment.objects.filter(Q(title__icontains=search)
-                                       | Q(description__icontains=search)
-                                       | Q(buyDate__icontains=search)
-                                       | Q(price__icontains=search)
-                                       )
+                                                               | Q(description__icontains=search)
+                                                               | Q(buyDate__icontains=search)
+                                                               | Q(price__icontains=search)
+                                                               )
 
     paginator = Paginator(companyEquipments, page_size)
     try:
@@ -710,8 +725,8 @@ def company_equipment_list(request):
         companyEquipments = paginator.page(paginator.num_pages)
 
     return render(request, 'project/companyEquipment_list.html', {'companyEquipments': companyEquipments,
-                                                      'search': search,
-                                                      'page_size': page_size})
+                                                                  'search': search,
+                                                                  'page_size': page_size})
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -784,10 +799,10 @@ def workDay_list(request):
     search = request.GET.get('search', '')
 
     workdays = models.WorkDay.objects.filter(Q(employee__fullName__icontains=search)
-                                       | Q(description__icontains=search)
-                                       | Q(workDate__icontains=search)
-                                       | Q(workHour__icontains=search)
-                                       )
+                                             | Q(description__icontains=search)
+                                             | Q(workDate__icontains=search)
+                                             | Q(workHour__icontains=search)
+                                             )
 
     paginator = Paginator(workdays, page_size)
     try:
@@ -798,9 +813,9 @@ def workDay_list(request):
         workdays = paginator.page(paginator.num_pages)
 
     return render(request, 'project/workDay_list.html', {'workdays': workdays,
-                                                      'employees': employees,
-                                                      'search': search,
-                                                      'page_size': page_size})
+                                                         'employees': employees,
+                                                         'search': search,
+                                                         'page_size': page_size})
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -881,10 +896,14 @@ def financial(request):
         emp.total_salary = models.MonthSalary.objects.filter(employee=emp.id).aggregate(Sum('money'))['money__sum']
         if emp.total_salary is None:
             emp.total_salary = 0
-        emp.total_debt = models.Debt.objects.filter(employee=emp.id).filter(status__icontains='بدهی').aggregate(Sum('price'))['price__sum']
+        emp.total_debt = \
+        models.Debt.objects.filter(employee=emp.id).filter(status__icontains='بدهی').aggregate(Sum('price'))[
+            'price__sum']
         if emp.total_debt is None:
             emp.total_debt = 0
-        emp.total_demand = models.Debt.objects.filter(employee=emp.id).filter(status__icontains='طلب').aggregate(Sum('price'))['price__sum']
+        emp.total_demand = \
+        models.Debt.objects.filter(employee=emp.id).filter(status__icontains='طلب').aggregate(Sum('price'))[
+            'price__sum']
         if emp.total_demand is None:
             emp.total_demand = 0
         emp.save()
