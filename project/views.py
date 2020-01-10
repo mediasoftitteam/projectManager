@@ -419,6 +419,14 @@ def task_list(request):
     page_size = request.GET.get('page-size', 10)
     search = request.GET.get('search', '')
 
+    start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
+    end_date = request.GET.get('end_date', None)
+    is_income = request.GET.get('isIncome', None)
+    is_outcome = request.GET.get('isOutcome', None)
+    selected_projects = request.GET.get('selectedProjects', None)
+    selected_employees = request.GET.get('selectedEmployees', None)
+    selected_status = request.GET.get('selectedStatus', None)
+
     tasks = models.Task.objects.filter(Q(employees__fullName__icontains=search)
                                        | Q(project__title__icontains=search)
                                        | Q(taskDate__icontains=search)
@@ -427,6 +435,38 @@ def task_list(request):
                                        | Q(title__icontains=search)
                                        | Q(status__icontains=search)
                                        )
+
+    # date range filter
+    if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
+        tasks = tasks.filter(taskDate__range=[start_date, end_date]).distinct()
+
+    # project filter
+    projects_list = []
+    if selected_projects is not None and selected_projects is not "":
+        projects_list = selected_projects.split("_")
+        tasks = tasks.filter(functools.reduce(operator.or_, (Q(project=x) for x in projects_list))).distinct()
+
+    # employee filter
+    employee_list = []
+    if selected_employees is not None and selected_employees is not "":
+        employee_list = selected_employees.split("_")
+        tasks = tasks.filter(functools.reduce(operator.or_, (Q(employees=x) for x in employee_list))).distinct()
+
+    # employee filter
+    status_list = []
+    if selected_status is not None and selected_status is not "":
+        status_list = selected_status.split("_")
+        tasks = tasks.filter(functools.reduce(operator.or_, (Q(status=x) for x in status_list))).distinct()
+
+    filter_param = {
+        'start_date': start_date,
+        'end_date': end_date,
+        'is_income': is_income,
+        'is_outcome': is_outcome,
+        'projects_list': projects_list,
+        'employee_list': employee_list,
+        'status_list': status_list,
+    }
 
     paginator = Paginator(tasks, page_size)
     try:
@@ -440,6 +480,7 @@ def task_list(request):
                                                       'employees': employees,
                                                       'projects': projects,
                                                       'search': search,
+                                                      'filter_param': filter_param,
                                                       'page_size': page_size})
 
 

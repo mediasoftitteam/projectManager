@@ -86,6 +86,15 @@ class Income(models.Model):
         return self.user
 
 
+TASK_STATUS_CHOICES = (
+    ("0", "تعریف شده"),
+    ("1", "در حال انجام"),
+    ("2", "انجام شده"),
+    ("3", "متوقف"),
+    ("4", "تعلیق"),
+)
+
+
 class Task(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
@@ -95,7 +104,7 @@ class Task(models.Model):
     dueDate = models.DateField(default=timezone.now)
     description = models.CharField(max_length=120, null=True, blank=True, help_text='توضیحات')
     title = models.CharField(max_length=120, null=True, blank=True, help_text='عنوان')
-    status = models.CharField(max_length=50, null=True, blank=True, help_text='وضعیت')
+    status = models.CharField(max_length=50, null=True, blank=True, help_text='وضعیت', choices=TASK_STATUS_CHOICES, default='4')
     pic = models.ImageField('uploaded image', null=True, blank=True, upload_to=scramble_uploaded_filename)
 
     class Meta:

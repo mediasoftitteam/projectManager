@@ -43,13 +43,13 @@
 - [ ]
 
 #####_worked day list page:_
-- [ ] filter section **h : 4**
+- [x] filter section **h : 4**
 - [x] jalaly calender **h : 1, d: 0.5**
 - [ ] employee list use multi select with user image (mdb)
 - [ ]
 
 #####_task list page:_
-- [ ] filter section **h : 4**
+- [x] filter section **h : 4**
 - [ ] 
 
 #####_salary list page:_

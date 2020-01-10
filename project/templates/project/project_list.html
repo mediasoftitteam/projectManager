@@ -47,6 +47,7 @@
                                            ,'m_deadline_jalali': '{{ project.deadline|to_jalali:'%y/%m/%d' }}'
                                            ,'m_money': '{{ project.money }}'
                                            ,'m_description': '{{ project.description }}'
+                                           ,'m_status': '{{ project.status }}'
                                            ,'m_title': '{{ project.title }}'})"
                                    data-toggle="modal" data-target="#modelProjectEdit"
                                 ><i class="fa fa-edit ml-1"></i>ویرایش</a>
@@ -130,6 +131,7 @@
                     <!-- model body -->
                     <div class="modal-body">
                         <div class="col-md-12 col-xl-12">
+
                             <!-- Grid row (title) -->
                             <div class="row">
                                 <div class="col-md-12">
@@ -289,7 +291,6 @@
                                 </div>
                             </div>
 
-
                             <!-- Grid row (start date) -->
                             <label for="contact-Subject" class="">تاریخ شروع
                             : <span id="lbl-project-edit-startDate"></span>
@@ -341,7 +342,7 @@
                             <!-- Dropdown (status) -->
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="md-form">
+                                    <div class="md-form select-project-edit-status">
                                         <input type="hidden" id="selected-project-edit-status-id" name="status" value="-1">
                                         <select class="mdb-select md-form" id="selectBox-edit-project-status" searchable="جست و جو" onchange="changeProjectStatusEditFunc()">
                                             <option value="" disabled selected >.    وضعیت موردنظر را اتخاب کنید</option>
@@ -492,6 +493,7 @@
              $('#input-edit-startDate').attr('value', project.m_startDate);
              $('#lbl-project-edit-startDate').html(project.m_startDate_jalali);
              $('#selcted-project-id').attr('value', project.m_id);
+
         }
 
         // Data Picker Initialization

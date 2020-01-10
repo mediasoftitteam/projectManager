@@ -1,6 +1,8 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
 {% load jalali_tags %}
+{% load humanize %}
+{% load auth_extras %}
 {% block title %}
     <title>مدیریت تسک ها</title>
 {% endblock %}
@@ -17,150 +19,361 @@
     <link rel="stylesheet" href="{% static 'project/css/addons/datatables-select.min.css' %}"><!-- MDBootstrap Datatables  -->
 
 
-    <!-- new/delete/edit buttons -->
-    <div class="text-center">
-      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelTaskNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
-      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelTaskEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
-      <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-task-delete"
-      onclick="showTaskDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
-    </div>
-
-
-    <!-- PAGE SIZE/ search -->
-    <div class="container">
-        <div class="row ">
-            <div class="col-1 mb-2">
-                <p>تعداد صفحات</p>
-            </div>
-            <div class="col-2 mb-2">
-                <select id="task-selector-page-size" class="browser-default custom-select" onchange="taskPageSizeChanged(this.options[this.selectedIndex].value)">
-                    <option value="10">10</option>
-                    <option value="20" >20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-                <a id="task-tag-a-page-size" class="d-none" href="?page-size=20">20</a>
-                <script>
-                    document.getElementById('task-selector-page-size').value={{ page_size }};
-                    function taskPageSizeChanged(page_size) {
-                        {#alert(page_size)#}
-                        let tag_a = document.getElementById("task-tag-a-page-size");
-                        tag_a.href = "?page-size=" + page_size;
-                        tag_a.click();
-                    }
-                </script>
-            </div>
-            <div class="col-6"></div>
-
-            <!-- Search form -->
-            <div class="col-3 mb-2 ml-0 text-left">
-                <input id="search-task" class="form-control" type="text" placeholder="جست و جو" aria-label="Search" value="{{ search }}">
-            </div>
-        </div>
-    <div class="clearfix"></div>
-    </div>
-
     <!-- body -->
-    <div >
-        <div class="container py-1">
+    <div class="container-fluid row">
 
-            <div class="row pagination-sm table-responsive" id="task-list">
+        <!-- table and tools -->
+        <div class="col-sm-9 mb-2">
 
-                <table class="table table-sm table-hover table-striped"  id="task-table">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">کارمند</th>
-                        <th scope="col">پروژه</th>
-                        <th scope="col">عنوان</th>
-                        <th scope="col">وضعیت</th>
-                        <th scope="col">تاریخ تسک</th>
-                        <th scope="col">تاریخ اتمام</th>
-                        <th scope="col">توضیحات</th>
-                        <th scope="col">تصویر</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for task in tasks %}
-                        <tr>
-                            <input class="taskId" type="hidden" dataId={{ task.id }}>
-                            <input class="employee" type="hidden" employeId={{ task.employees.id }}>
-                            <input class="project" type="hidden" projectId={{ task.project.id }}>
-                            <th scope="row" >{{ forloop.counter }}</th>
-                            <td class="employee" >{{ task.employees.fullName }}</td>
-                            <td class="project" >{{ task.project.title }}</td>
-                            <td class="title">{{ task.title }}</td>
-                            <td class="status">{{ task.status }}</td>
-                            <td class="taskDate" data-taskDate="{{ task.taskDate|date:"Y-m-d"}}">{{ task.taskDate|to_jalali:'%y/%m/%d' }}</td>
-                            <td class="dueDate" data-dueDate="{{ task.dueDate|date:"Y-m-d" }}">{{ task.dueDate|to_jalali:'%y/%m/%d' }}</td>
-                            <td class="description">{{ task.description }}</td>
-                            {% if task.pic %}
-                                <td ><a href="{{ task.pic.url }}"><i class="fa fa-image"></i></a></td>
-                            {% else %}
-                                <td ><a href="#"></a></td>
+            <!-- body -->
+            <section class="">
 
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-list">
+
+                            <!-- header -->
+                            <div class="card-header white d-flex justify-content-between align-items-center py-3 bg-transparent mx-1 mt-1">
+
+                                <div class="container-fluid">
+                                    <!-- new/delete/edit buttons -->
+                                    <div class="text-center mb-4 pt-1 pb-1 border border-info rounded">
+                                        <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelTaskNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
+                                        <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelTaskEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
+                                        <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-task-delete"
+                                                onclick="showTaskDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
+                                    </div>
+
+                                    <!-- PAGE SIZE/ search -->
+                                    <div class="container">
+                                        <div class="row ">
+
+                                            <div class="col-5 mb-2">
+                                                <div class="row">
+                                                    <p>تعداد صفحات</p>
+                                                    <select id="task-selector-page-size" class="browser-default custom-select" onchange="taskPageSizeChanged(this.options[this.selectedIndex].value)">
+                                                        <option value="10">10</option>
+                                                        <option value="20" >20</option>
+                                                        <option value="50">50</option>
+                                                        <option value="100">100</option>
+                                                    </select>
+                                                    <a id="task-tag-a-page-size" class="d-none" href="?page-size=20">20</a>
+                                                    <script>
+                                                        document.getElementById('task-selector-page-size').value={{ page_size }};
+                                                        function taskPageSizeChanged(page_size) {
+                                                            {#alert(page_size)#}
+                                                            let tag_a = document.getElementById("task-tag-a-page-size");
+                                                            tag_a.href = "?page-size=" + page_size;
+                                                            tag_a.click();
+                                                        }
+                                                    </script>
+                                                </div>
+                                            </div>
+
+                                            <!-- Search form -->
+                                            <div class="col-6 mb-2 mr-4">
+                                                <div class="row">
+                                                    <p>جست و جو</p>
+                                                    <input id="search-task" class="form-control" type="text" placeholder="جست و جو" aria-label="Search" value="{{ search }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- table -->
+                            <div class="card-body table-responsive">
+
+                                <table class="table table-sm table-hover"  id="task-table">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">کارمند</th>
+                                        <th scope="col">پروژه</th>
+                                        <th scope="col">عنوان</th>
+                                        <th scope="col">وضعیت</th>
+                                        <th scope="col">تاریخ تسک</th>
+                                        <th scope="col">تاریخ اتمام</th>
+                                        <th scope="col">توضیحات</th>
+                                        <th scope="col">تصویر</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for task in tasks %}
+                                        <tr>
+                                            <input class="taskId" type="hidden" dataId={{ task.id }}>
+                                            <input class="employee" type="hidden" employeId={{ task.employees.id }}>
+                                            <input class="project" type="hidden" projectId={{ task.project.id }}>
+                                            <th scope="row" >{{ forloop.counter }}</th>
+                                            <td class="employee" >{{ task.employees.fullName }}</td>
+                                            <td class="project" >{{ task.project.title }}</td>
+                                            <td class="title">{{ task.title }}</td>
+                                            <td class="status"><span class="badge badge-success">{{ task.get_status_display }}</span></td>
+                                            <td class="taskDate" data-taskDate="{{ task.taskDate|date:"Y-m-d"}}">{{ task.taskDate|to_jalali:'%y/%m/%d' }}</td>
+                                            <td class="dueDate" data-dueDate="{{ task.dueDate|date:"Y-m-d" }}">{{ task.dueDate|to_jalali:'%y/%m/%d' }}</td>
+                                            <td class="description">{{ task.description }}</td>
+                                            {% if task.pic %}
+                                                <td ><a href="{{ task.pic.url }}"><i class="fa fa-image"></i></a></td>
+                                            {% else %}
+                                                <td ><a href="#"></a></td>
+
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                            <!-- pagination -->
+                            <div class="card-footer white py-3 d-flex justify-content-between">
+
+                                <div class="d-flex justify-content-center w-100">
+                                    {% if tasks.has_other_pages %}
+                                        <nav aria-label="Page navigation example">
+                                            <ul class="pagination pagination-circle pg-blue">
+                                                <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-task').value">First</a></li>
+                                                {% if tasks.has_previous %}
+                                                    <li class="page-item">
+                                                        <a class="page-link" aria-label="Previous" href="?page={{ tasks.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-task').value">
+                                                            <span aria-hidden="true">&laquo;</span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link" aria-label="Previous">
+                                                            <span aria-hidden="true">&laquo;</span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
+                                                <!-- center page numbers -->
+                                                {% for i in tasks.paginator.page_range %}
+                                                    {% if tasks.number == i %}
+                                                        <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+
+                                                    {% else %}
+                                                        <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-task').value">{{ i }}</a></li>
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                                <!-- center page numbers -->
+                                                {% if tasks.has_next %}
+                                                    <a class="page-link" aria-label="Next"  href="?page={{ tasks.next_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-task').value">
+                                                        <span aria-hidden="true">&raquo;</span>
+                                                        <span class="sr-only">Next</span>
+                                                    </a>
+                                                {% else %}
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link" aria-label="Next">
+                                                            <span aria-hidden="true">&raquo;</span>
+                                                            <span class="sr-only">Next</span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
+                                                <li class="page-item"><a class="page-link">Last</a></li>
+                                            </ul>
+                                        </nav>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <!-- Section: Block Content -->
+
+        </div>
+
+        <!-- filter section -->
+        <div class="col-sm-3 mb-3">
+
+            <!-- Panel -->
+            <div class="card">
+
+                <div class="card-header white-text primary-color">
+                    فیلتر
+                </div>
+
+                <div class="card-body text-center px-3">
+                    <div class="list-group list-group-flush">
+
+                        <!-- project -->
+                        <div class="list-group-item d-flex justify-content-between  small">
+                            <div dir="ltr" class="">
+                                <label class="float-right">پروژه ها</label>
+                                <select id="filter-task-project" class="mdb-select md-form small" multiple >
+                                    <option value="" disabled selected>انتخاب پروژه</option>
+                                    {% for project in projects %}
+                                        <option value="{{ project.id }}" {{ project.id|is_selected:filter_param.projects_list }}>{{ project.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- employees -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <div dir="ltr" >
+                                <label class="float-right">کارمندها </label>
+                                <select id="filter-task-employee" class="mdb-select md-form " multiple >
+                                    <option value="" disabled selected>انتخاب کارمند</option>
+                                    {% for employee in employees %}
+                                        <option value="{{ employee.id }}" {{ employee.id|is_selected:filter_param.employee_list }}>{{ employee.fullName }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- task status -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <div dir="ltr" >
+                                <label class="float-right">وظایف </label>
+                                <select id="filter-task-status" class="mdb-select md-form " multiple >
+                                    <option value="" disabled selected>انتخاب وضعیت</option>
+
+                                    <option value="0" {{ "0"|is_selected:filter_param.status_list }}>تعریف شده</option>
+                                    <option value="1" {{ "1"|is_selected:filter_param.status_list }}>در حال انجام</option>
+                                    <option value="2" {{ "2"|is_selected:filter_param.status_list }}>انجام شده</option>
+                                    <option value="3" {{ "3"|is_selected:filter_param.status_list }}>متوقف</option>
+                                    <option value="4" {{ "4"|is_selected:filter_param.status_list }}>تعلیق</option>
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- date filter -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <div>
+
+                                <!-- start date -->
+                                <label for="filter-task-startDate" class="float-right">تاریخ شروع</label>
+                                <div class="row" dir="ltr" style="width: 100%">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text cursor-pointer" id="dt_class_task_filter_startDate"><i class="fa fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input type="text" id="filter-task-startDate" class="form-control" value="{{ filter_param.start_date|default_if_none:"" }}">
+                                    </div>
+                                    <label id="showDate_class_task_filter_startDate" class="text-black-50 small"> </label>
+                                </div>
+
+                                <!-- end date -->
+                                <label for="filter-task-endDate" class="float-right">تاریخ پایان</label>
+                                <div class="row" dir="ltr" style="width: 100%">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text cursor-pointer" id="dt_class_task_filter_endDate"><i class="fa fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input type="text" id="filter-task-endDate" class="form-control" value="{{ filter_param.end_date|default_if_none:"" }}">
+                                    </div>
+                                    <label id="showDate_class_task_filter_endDate" class="text-black-50 small"> </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <!-- date filter -->
+                        <div class="list-group-item d-flex justify-content-between">
+
+                            <a onclick="taskFilterChanged()" class="btn btn-rounded btn-outline-primary btn-block" >فیلتر</a>
+                        </div>
+
+                        <!-- link for apply filter -->
+                        <a id="task-tag-a-filter" class="d-none" href="?page-size=20">20</a>
+                        <script>
+                            document.getElementById('task-selector-page-size').value={{ page_size }};
+                            function taskFilterChanged() {
+
+                                //-- get selected projects --//
+                                let project_list = document.getElementById("filter-task-project");
+                                let res = getSelectedOptions(project_list);
+                                let selectedTemp = [];
+                                for( let i=1; i<res.length; i++){
+                                    console.log(res[i].text + res[i].value);
+                                    selectedTemp.push(res[i].value);
+                                }
+                                let selectedProject = selectedTemp.join("_");
+
+                                //-- get selected employee --//
+                                let employee_list = document.getElementById("filter-task-employee");
+                                let res_employee = getSelectedOptions(employee_list);
+                                let selectedEmpTemp = [];
+                                for( let i=1; i<res_employee.length; i++){
+                                    {#console.log(res_employee[i].text + res_employee[i].value);#}
+                                    selectedEmpTemp.push(res_employee[i].value);
+                                }
+                                let selectedEmployee = selectedEmpTemp.join("_");
+
+                                //-- get selected status --//
+                                let status_list = document.getElementById("filter-task-status");
+                                let res_status = getSelectedOptions(status_list);
+                                let selectedStatusTemp = [];
+                                for( let i=1; i<res_status.length; i++){
+                                    selectedStatusTemp.push(res_status[i].value);
+                                }
+                                let selectedStatus = selectedStatusTemp.join("_");
+
+
+                                let date_start = document.getElementById("filter-task-startDate").value;
+                                let date_end = document.getElementById("filter-task-endDate").value;
+                                let tag_a = document.getElementById("task-tag-a-filter");
+
+
+                                document.getElementById("query-task-filter").setAttribute("value", "&start_date=" + date_start
+                                    + "&end_date=" + date_end + "&selectedEmployees=" + selectedEmployee + "&selectedProjects=" + selectedProject + "&selectedStatus=" + selectedStatus);
+
+                                let query_search = document.getElementById("query-task-search").value;
+                                let query_filter = document.getElementById("query-task-filter").value;
+
+                                tag_a.href = "?page-size=" + {{page_size}} + query_search + query_filter;
+                                tag_a.click();
+                            }
+
+                            // arguments: reference to select list, callback function (optional)
+                            function getSelectedOptions(sel, fn) {
+                                var opts = [], opt;
+
+                                // loop through options in select list
+                                for (var i=0, len=sel.options.length; i<len; i++) {
+                                    opt = sel.options[i];
+
+                                    // check if selected
+                                    if ( opt.selected ) {
+                                        // add to array of option elements to return from this function
+                                        opts.push(opt);
+
+                                        // invoke optional callback function if provided
+                                        if (fn) {
+                                            fn(opt);
+                                        }
+                                    }
+                                }
+
+                                // return array containing references to selected option elements
+                                return opts;
+                            }
+                        </script>
+
+                    </div>
+                </div>
 
             </div>
+            <!-- Panel -->
+
         </div>
+
     </div>
 
-    <!-- pagination -->
-    <div class="d-flex justify-content-center">
-        {% if salaries.has_other_pages %}
-            <nav aria-label="Page navigation example">
-                <ul class="pagination pagination-circle pg-blue">
-                    <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-task').value">First</a></li>
-                    {% if salaries.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" aria-label="Previous" href="?page={{ tasks.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-task').value">
-                                <span aria-hidden="true">&laquo;</span>
-                                <span class="sr-only">Previous</span>
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled">
-                        <a class="page-link" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                    </li>
-                    {% endif %}
-
-                    <!-- center page numbers -->
-                    {% for i in tasks.paginator.page_range %}
-                        {% if tasks.number == i %}
-                            <li class="page-item active"><a class="page-link">{{ i }}</a></li>
-
-                        {% else %}
-                            <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-task').value">{{ i }}</a></li>
-                        {% endif %}
-                    {% endfor %}
-
-                    <!-- center page numbers -->
-                    {% if tasks.has_next %}
-                        <a class="page-link" aria-label="Next"  href="?page={{ tasks.next_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-task').value">
-                            <span aria-hidden="true">&raquo;</span>
-                            <span class="sr-only">Next</span>
-                        </a>
-                    {% else %}
-                        <li class="page-item disabled">
-                            <a class="page-link" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                                <span class="sr-only">Next</span>
-                            </a>
-                        </li>
-                    {% endif %}
-
-                    <li class="page-item"><a class="page-link">Last</a></li>
-                </ul>
-            </nav>
-        {% endif %}
-    </div>
 
     <!-- Modal new -->
     <div class="modal fade" id="modelTaskNew" tabindex="-1" role="dialog" aria-labelledby="modelTaskNewLabel"
@@ -243,8 +456,24 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="text" id="task-input-new-status" name="status" class="form-control">
-                                        <label for="contact-Subject" class="">وضعیت</label>
+                                        <input type="hidden" id="task-input-new-status-id" name="status" value="">
+                                        <select class="mdb-select md-form" id="selectBox-task-status1" searchable="جست و جو" onchange="changeTaskStatusNewFunc()">
+                                            <option value="" disabled selected >.    وضعیت موردنظر را اتخاب کنید</option>
+                                            <option value="0" >.    تعریف شده</option>
+                                            <option value="1" >.    در حال انجام</option>
+                                            <option value="2" >.    انجام شده</option>
+                                            <option value="3" >.    متوقف</option>
+                                            <option value="4" >.    تعلیق</option>
+                                        </select>
+                                        <label class="mdb-main-label">وضعیت پروژه</label>
+                                        <script>
+                                            function changeTaskStatusNewFunc() {
+                                                let selectBox = document.getElementById("selectBox-task-status1");
+                                                let selectedValue = selectBox.options[selectBox.selectedIndex].value;
+                                                document.getElementById('task-input-new-status-id').value=selectedValue;
+                                                {#alert(selectedValue)#}
+                                           }
+                                        </script>
                                     </div>
                                 </div>
                             </div>
@@ -410,8 +639,24 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="text" id="task-input-edit-status" name="status" class="form-control">
-                                        <label for="contact-Subject" class="">وضعیت</label>
+                                        <input type="hidden" id="selected-task-edit-status-id" name="status" value="-1">
+                                        <select class="mdb-select md-form" id="selectBox-edit-task-status" searchable="جست و جو" onchange="changeTaskStatusEditFunc()">
+                                            <option value="" disabled selected >.    وضعیت موردنظر را اتخاب کنید</option>
+                                            <option value="0" >.    تعریف شده</option>
+                                            <option value="1" >.    در حال انجام</option>
+                                            <option value="2" >.    انجام شده</option>
+                                            <option value="3" >.    متوقف</option>
+                                            <option value="4" >.    تعلیق</option>
+                                        </select>
+                                        <label class="mdb-main-label">وضعیت پروژه</label>
+                                        <script>
+                                            function changeTaskStatusEditFunc() {
+                                                let selectBox = document.getElementById("selectBox-edit-task-status");
+                                                let selectedValue = selectBox.options[selectBox.selectedIndex].value;
+                                                document.getElementById('selected-task-edit-status-id').value=selectedValue;
+                                                {#alert(selectedValue)#}
+                                           }
+                                        </script>
                                     </div>
                                 </div>
                             </div>
@@ -515,6 +760,11 @@
 
     <!-- base url address -->
     <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
+    <!-- filter queries -->
+    <input type="hidden" id="query-task-filter" value="&start_date={{filter_param.start_date|default_if_none:''}}&end_date={{filter_param.end_date|default_if_none:''}}&">
+{#    selectedEmployees={{ filter_param.end_date|default_if_none:'' }}">#}
+    <!-- search queries -->
+    <input type="hidden" id="query-task-search" value="&search={{search}}">
 
 
 {% endblock %}
@@ -677,6 +927,22 @@
             $("#dt_class_edit_dueDate").MdPersianDateTimePicker({
                 targetDateSelector: "#task-input-edit-dueDate",
                 targetTextSelector: "#showDate_class_edit_dueDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                //inLine: true
+            });
+            $("#dt_class_task_filter_startDate").MdPersianDateTimePicker({
+                targetDateSelector: "#filter-task-startDate",
+                targetTextSelector: "#showDate_class_task_filter_startDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                //inLine: true
+            });
+            $("#dt_class_task_filter_endDate").MdPersianDateTimePicker({
+                targetDateSelector: "#filter-task-endDate",
+                targetTextSelector: "#showDate_class_task_filter_endDate",
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
