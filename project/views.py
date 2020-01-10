@@ -768,8 +768,6 @@ def company_equipment_update(request):
     m_title = post_data['title']
     m_description = post_data['description']
     m_id = post_data['eqmId']
-    print("-----")
-    print(m_id)
 
     eqm = get_object_or_404(models.CompanyEquipment, pk=m_id)
     eqm.user = m_user
@@ -798,11 +796,31 @@ def workDay_list(request):
     page_size = request.GET.get('page-size', 10)
     search = request.GET.get('search', '')
 
+    start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
+    end_date = request.GET.get('end_date', None)
+    selected_employees = request.GET.get('selectedEmployees', None)
+
     workdays = models.WorkDay.objects.filter(Q(employee__fullName__icontains=search)
                                              | Q(description__icontains=search)
                                              | Q(workDate__icontains=search)
                                              | Q(workHour__icontains=search)
                                              )
+
+    # date range filter
+    if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
+        workdays = workdays.filter(workDate__range=[start_date, end_date]).distinct()
+
+    # employee filter
+    employee_list = []
+    if selected_employees is not None and selected_employees is not "":
+        employee_list = selected_employees.split("_")
+        workdays = workdays.filter(functools.reduce(operator.or_, (Q(employee=x) for x in employee_list))).distinct()
+
+    filter_param = {
+        'start_date': start_date,
+        'end_date': end_date,
+        'employee_list': employee_list,
+    }
 
     paginator = Paginator(workdays, page_size)
     try:
@@ -815,7 +833,8 @@ def workDay_list(request):
     return render(request, 'project/workDay_list.html', {'workdays': workdays,
                                                          'employees': employees,
                                                          'search': search,
-                                                         'page_size': page_size})
+                                                         'page_size': page_size,
+                                                         'filter_param': filter_param})
 
 
 @user_passes_test(lambda u: u.is_superuser)
