@@ -1,6 +1,7 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
 {% load humanize %}
+{% load auth_extras %}
 {% block title %}
     <title>شرکت مدیاسافت | خانه</title>
 {% endblock %}
@@ -16,6 +17,8 @@
 
     <!-- auth checking -->
     {% if user.is_authenticated%}
+
+        {%if user.is_superuser %}
         <div class="card-body grey lighten-5 rounded-bottom">
 
             <!-- Grid row -->
@@ -155,6 +158,11 @@
             <!-- Grid row -->
 
         </div>
+        {% elif user|has_group:'level1' or user|has_group:'level2' %}
+
+            <a href="{% url 'project:employee-detail' employee_user.id%}"> goto employee</a>
+
+        {% endif %}
 
     {% else %}
         <!-- Material form subscription -->

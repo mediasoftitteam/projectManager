@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 # from mypy.test import update
+from django.urls import reverse
 
 from project import models
 
@@ -22,7 +23,9 @@ from django.db.models import Sum
 
 
 # first page
+@login_required
 def index(request):
+
     project = models.Project.objects.all()
     cost = 0
     for prj in project:
@@ -34,6 +37,8 @@ def index(request):
     for emp in employee:
         if emp.salary is not None:
             salary_sum = salary_sum + emp.salary
+
+    employee_user = get_object_or_404(models.Employee, user=request.user)
 
     tasks = models.Task.objects.all()
 
@@ -67,7 +72,9 @@ def index(request):
         'outcome_sum': outcome_sum,
         'debts_count': debts.count(),
         'debts_sum': debts_sum,
+        'employee_user': employee_user,
     })
+
 
 
 #########################
@@ -201,32 +208,61 @@ def employee_list(request):
 
 
 # @login_required
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def employee_view(request, employee_id):
-    employee = get_object_or_404(models.Employee, pk=employee_id)
-    tasks = models.Task.objects.filter(employees=employee.id)
-    workDays = models.WorkDay.objects.filter(employee=employee.id)
-    salaries = models.MonthSalary.objects.filter(employee=employee.id)
-    salaries_sum = salaries.aggregate(Sum('money'))['money__sum']
-    debts = models.Debt.objects.filter(employee=employee.id)
-    debt_sum = debts.filter(status__icontains='بدهی').aggregate(Sum('price'))['price__sum']
-    if debt_sum is None:
-        debt_sum = 0
-    demand_sum = debts.filter(status__icontains='طلب').aggregate(Sum('price'))['price__sum']
-    if demand_sum is None:
-        demand_sum = 0
-    debts_sum = demand_sum - debt_sum
-    return render(request, 'project/employee_detail.html', {
-        'employee': employee,
-        'tasks': tasks,
-        'workDays': workDays,
-        'salaries': salaries,
-        'salaries_sum': salaries_sum,
-        'debts': debts,
-        'debt_sum': debt_sum,
-        'demand_sum': demand_sum,
-        'debts_sum': debts_sum,
-    })
+
+    if request.user.is_superuser:
+        employee = get_object_or_404(models.Employee, pk=employee_id)
+        tasks = models.Task.objects.filter(employees=employee.id)
+        workDays = models.WorkDay.objects.filter(employee=employee.id)
+        salaries = models.MonthSalary.objects.filter(employee=employee.id)
+        salaries_sum = salaries.aggregate(Sum('money'))['money__sum']
+        debts = models.Debt.objects.filter(employee=employee.id)
+        debt_sum = debts.filter(status__icontains='بدهی').aggregate(Sum('price'))['price__sum']
+        if debt_sum is None:
+            debt_sum = 0
+        demand_sum = debts.filter(status__icontains='طلب').aggregate(Sum('price'))['price__sum']
+        if demand_sum is None:
+            demand_sum = 0
+        debts_sum = demand_sum - debt_sum
+        return render(request, 'project/employee_detail.html', {
+            'employee': employee,
+            'tasks': tasks,
+            'workDays': workDays,
+            'salaries': salaries,
+            'salaries_sum': salaries_sum,
+            'debts': debts,
+            'debt_sum': debt_sum,
+            'demand_sum': demand_sum,
+            'debts_sum': debts_sum,
+        })
+    else:
+
+        employee = get_object_or_404(models.Employee, user=request.user)
+        tasks = models.Task.objects.filter(employees=employee.id)
+        workDays = models.WorkDay.objects.filter(employee=employee.id)
+        salaries = models.MonthSalary.objects.filter(employee=employee.id)
+        salaries_sum = salaries.aggregate(Sum('money'))['money__sum']
+        debts = models.Debt.objects.filter(employee=employee.id)
+        debt_sum = debts.filter(status__icontains='بدهی').aggregate(Sum('price'))['price__sum']
+        if debt_sum is None:
+            debt_sum = 0
+        demand_sum = debts.filter(status__icontains='طلب').aggregate(Sum('price'))['price__sum']
+        if demand_sum is None:
+            demand_sum = 0
+        debts_sum = demand_sum - debt_sum
+        return render(request, 'project/employee_detail.html', {
+            'employee': employee,
+            'tasks': tasks,
+            'workDays': workDays,
+            'salaries': salaries,
+            'salaries_sum': salaries_sum,
+            'debts': debts,
+            'debt_sum': debt_sum,
+            'demand_sum': demand_sum,
+            'debts_sum': debts_sum,
+        })
 
 
 @user_passes_test(lambda u: u.is_superuser)
