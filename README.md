@@ -12,7 +12,7 @@
 - [ ] 
 
 #####_project detail page:_
-- [ ] UI layout **h : 4**
+- [x] UI layout **h : 4**
 - [ ] Add/Edit/Delete for payments, tasks and projects **h : 5**
 - [ ] 
 - [ ] 
@@ -27,8 +27,9 @@
 - [ ] 
 
 #####_employee detail page:_
-- [ ] UI layout **h : 5**
+- [x] UI layout **h : 5**
 - [ ] Add/Edit/Delete for payments, tasks, works day, debts and employee **h : 6**
+- [ ] payment type complete
 - [ ] 
 
 #####_income list page:_
@@ -70,5 +71,8 @@
 
 #####_new fitures:_
 - [ ] message for employees **h : 10**
+
+#####_user permitions:_
+- [ ] user page permitions **h : 4**
 
 ##total predict time: 84.5 h

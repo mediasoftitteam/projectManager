@@ -1,6 +1,7 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
 {% load humanize %}
+{% load jalali_tags %}
 {% block title %}
     <title>مشخصات کارمندی</title>
 {% endblock %}
@@ -9,87 +10,343 @@
     <!-- load static file in django -->
     {% load staticfiles %}
 
-    <!-- employee information-->
-    <h1>مشخصات کارمند</h1>
-    {% if employee.pic %}
-        <img src="{{ employee.pic.url }}">
-    {% endif %}
-    <h5>نام: {{employee.fullName}}</h5>
-    <h5>تاریخ شروع فعالیت: {{ employee.startDate }}</h5>
-    <h5>حقوق ماهانه: {{ employee.salary|intcomma }} تومان</h5>
-    <h5>تماس: {{ employee.phone }}</h5>
-    <h5>آدرس: {{ employee.address }}</h5>
-    <h5>ایمیل: {{ employee.email }}</h5>
-    <div class="row">
-        <a href="#" class="btn btn-info"><i class="fa fa-edit"></i></a>
-        <a href="#" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+
+    <!-- employee information -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-8 col-lg-6 mx-auto">
+
+
+                <!-- Section: employee info -->
+                <section>
+
+                    <!-- Card -->
+                    <div class="card testimonial-card">
+
+                        <!-- Background color -->
+                        <div class="card-up warning-color-dark p-3 white-text">
+                            <p class="font-weight-normal mb-0">{{ employee.fullName }}</p>
+                            <p class="small mb-0">{{ employee.position }}</p>
+                            <p class="small mb-0 text-white-50">{{ employee.education }}</p>
+                            <div class="row">
+                                <a href="#" class="small text-white-50 mb-0  mr-3"><i class="fa fa-edit"></i></a>
+                                <a href="#" class="small text-white-50 mb-0 mr-1"><i class="fa fa-trash"></i></a>
+                            </div>
+                        </div>
+
+                        <!-- Avatar -->
+                        <div class="avatar mx-auto white">
+                            {% if employee.pic %}
+                                <img src="{{ employee.pic.url }}" class="rounded-circle" alt="woman avatar">
+                            {% else %}
+                                <img src="{% static 'project/images/Blank-Placeholder.jpg' %}" class="rounded-circle" alt="woman avatar">
+                            {% endif %}
+                        </div>
+
+                        <!-- Content -->
+                        <div class="card-body px-3 py-4">
+                            <div class="row">
+                                <div class="col-4 text-center">
+                                    <p class="font-weight-bold mb-0">{{ employee.email|default_if_none:"-" }}</p>
+                                    <p class="small text-uppercase mb-0">ایمیل</p>
+                                </div>
+                                <div class="col-4 text-center border-left border-right">
+                                    <p class="font-weight-bold mb-0">{{ employee.phone|default_if_none:"-" }}</p>
+                                    <p class="small text-uppercase mb-0">شماره تماس</p>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <p class="font-weight-bold mb-0">{{ employee.address|default_if_none:"-" }}</p>
+                                    <p class="small text-uppercase mb-0">آدرس</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Card -->
+
+                </section>
+                <!-- Section: Block Content -->
+
+
+            </div>
+        </div>
     </div>
-    <hr>
 
-    <!-- employee tasks -->
-    <h3>تسک ها:</h3>
-    {% for task in tasks %}
+    <!-- all sections -->
+    <div class="container-fluid my-5">
+
         <div class="row">
-            <p1>{{ forloop.counter }} - {{ task.title }}</p1>
-            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
-            <a href="#" class=""><i class="fa fa-trash"></i></a>
+
+
+            <div class="col-xl-3 col-sm-6 mb-2">
+
+                <!-- employee tasks -->
+                <section>
+
+                    <div class="card">
+                        <div class="card-body">
+
+                            <h5 class="text-center font-weight-bold mb-4"><i class="fas fa-clipboard-list pl-2"></i>
+                                تسک های اخیر
+                                <span class="float-left"><a href="#"><i class="fa fa-plus-circle small text-black-50"></i></a></span>
+                            </h5>
+
+                            <hr>
+
+                            <!--Grid row-->
+                            <div class="row">
+
+                                <!--Grid column-->
+                                <div class="col-12 mb-3 mx-auto">
+
+                                    {% for task in tasks %}
+                                        <div class="media">
+                                            {% if task.pic %}
+                                                <img src="{{ task.pic.url }}" class="d-flex mr-3 img-thumbnail ml-2" alt="{{ task.title }}" style="width: 50px; object-fit: cover">
+                                            {% else %}
+                                                <img src="{% static 'project/images/task_placeholder.png' %}" class="d-flex mr-3 img-thumbnail ml-2" alt="{{ task.title }}" style="width: 50px; object-fit: cover">
+                                            {% endif %}
+
+                                            <div class="media-body">
+                                                <h6 class="mt-1 font-weight-bold">
+                                                    <a href="#!">{{ task.title }}</a>
+                                                    <span>
+                                                        <a href="#" class="ml-0 mr-2 text-black-50 small"><i class="fa fa-edit"></i></a>
+                                                        <a href="#" class="text-black-50 small"><i class="fa fa-trash-alt"></i></a>
+                                                    </span>
+                                                    {% if task.status == '0' %}
+                                                        <a><span class="badge badge-default float-left">{{ task.get_status_display }}</span></a>
+                                                    {% elif task.status == '1' %}
+                                                        <a><span class="badge badge-info float-left">{{ task.get_status_display }}</span></a>
+                                                    {% elif task.status == '2' %}
+                                                        <a><span class="badge badge-success float-left">{{ task.get_status_display }}</span></a>
+                                                    {% elif task.status == '3' %}
+                                                        <a><span class="badge badge-danger float-left">{{ task.get_status_display }}</span></a>
+                                                    {% elif task.status == '4' %}
+                                                        <a><span class="badge badge-warning float-left">{{ task.get_status_display }}</span></a>
+                                                    {% endif %}
+                                                </h6>
+                                                <p class="text-muted">{{ task.description|truncatechars:200 }}</p>
+                                            </div>
+                                        </div>
+                                        <hr>
+
+
+                                    {% endfor %}
+
+                                </div>
+                                <!--Grid row-->
+
+                            </div>
+
+                            <p class="text-center mt-4 mb-1"><a href="#!">مشاهده تمامی تسک ها</a></p>
+
+
+                            <span class="float-left small">تعداد: {{ tasks.count }} </span>
+                        </div>
+
+                </section>
+
+
+            </div>
+
+            <div class="col-xl-3 col-sm-6 mb-2">
+
+                <!-- employee salaries -->
+                <section class="">
+
+                    <div class="card">
+                        <div class="card-body">
+
+                            <h5 class="text-center font-weight-bold mb-4"><i class="fas fa-money-bill pl-2"></i>
+                                حقوق ها
+                                <span class="float-left"><a href="#"><i class="fa fa-plus-circle small text-black-50"></i></a></span>
+                            </h5>
+
+                            <hr>
+
+                            <!--Grid row-->
+                            <div class="row">
+
+                                <!--Grid column-->
+                                <div class="col-12 mb-3 mx-auto">
+
+                                    {% for salary in salaries %}
+                                        <div class="media">
+                                            {% if task.pic %}
+                                                <img src="{{ salary.pic.url }}" class="d-flex mr-3 img-thumbnail ml-2" alt="{{ task.title }}" style="width: 50px; object-fit: cover">
+                                            {% else %}
+                                                <img src="{% static 'project/images/money_placeholder.png' %}" class="d-flex mr-3 img-thumbnail ml-2" alt="{{ task.title }}" style="width: 50px; object-fit: cover">
+                                            {% endif %}
+
+                                            <div class="media-body">
+                                                <h6 class="mt-1 font-weight-bold">
+                                                    <a href="#!">{{ salary.money|intcomma }} تومان</a>
+                                                    <span>
+                                                        <a href="#" class="ml-0 mr-2 text-black-50 small"><i class="fa fa-edit"></i></a>
+                                                        <a href="#" class="text-black-50 small"><i class="fa fa-trash-alt"></i></a>
+                                                    </span>
+                                                    <a><span class="badge badge-default float-left"><i class="far fa-clock pl-1"></i>{{ salary.workHour }} ساعت</span></a>
+                                                    <a><span class="badge badge-info float-left ml-1"><i class="far fa-calendar-alt pl-1"></i>{{ salary.salaryDate|to_jalali:'%y/%m/%d' }} </span></a>
+                                                </h6>
+                                                <p class="text-muted">{{ salary.description|truncatechars:200 }}</p>
+                                            </div>
+
+                                        </div>
+                                        <hr>
+
+
+                                    {% endfor %}
+
+                                </div>
+                                <!--Grid row-->
+                            </div>
+                            {#                    <hr>#}
+
+                            <p class="text-center mt-4 mb-1"><a href="#!">مشاهده تمامی حقوق ها</a></p>
+
+                            <span class="float-left small">جمع: {{ salaries_sum|intcomma }} تومان</span>
+
+
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <div class="col-xl-3 col-sm-6 mb-2">
+
+                <!-- employee work days -->
+                <section>
+
+                    <div class="card">
+                        <div class="card-body">
+
+                            <h5 class="text-center font-weight-bold mb-4"><i class="fas fa-clock pl-2"></i>
+                                روزهای کاری
+                                <span class="float-left"><a href="#"><i class="fa fa-plus-circle small text-black-50"></i></a></span>
+                            </h5>
+
+                            <hr>
+
+                            <!--Grid row-->
+                            <div class="row">
+
+                                <!--Grid column-->
+                                <div class="col-12 mb-3 mx-auto">
+
+                                    {% for workDay in workDays %}
+                                        <div class="media">
+                                            <img src="{% static 'project/images/date_placeholder.png' %}" class="d-flex mr-3 img-thumbnail ml-2" alt="{{ task.title }}" style="width: 50px; object-fit: cover">
+                                            <div class="media-body">
+                                                <h6 class="mt-1 font-weight-bold">
+                                                    <a href="#!">{{ workDay.workDate|to_jalali:'%y/%m/%d' }}</a>
+                                                    <span>
+                                                        <a href="#" class="ml-0 mr-2 text-black-50 small"><i class="fa fa-edit"></i></a>
+                                                        <a href="#" class="text-black-50 small"><i class="fa fa-trash-alt"></i></a>
+                                                    </span>
+                                                    <a><span class="badge badge-default float-left"><i class="far fa-clock pl-1"></i>{{ workDay.workHour }} ساعت</span></a>
+                                                </h6>
+                                                <p class="text-muted">{{ workDay.description|default_if_none:""|truncatechars:200 }}</p>
+                                            </div>
+                                        </div>
+                                        <hr>
+
+
+                                    {% endfor %}
+
+                                </div>
+                                <!--Grid row-->
+                            </div>
+
+
+                            <p class="text-center mt-4 mb-1"><a href="#!">مشاهده تمامی روزها</a></p>
+
+                        </div>
+                    </div>
+
+                </section>
+
+
+            </div>
+
+            <div class="col-xl-3 col-sm-6 mb-2">
+
+
+                <!-- employee debts -->
+                <section class="">
+
+                    <div class="card">
+                        <div class="card-body">
+
+                            <h5 class="text-center font-weight-bold mb-4"><i class="fas fa-money-check pl-2"></i>
+                                طلب ها و بدهی ها
+                                <span class="float-left"><a href="#"><i class="fa fa-plus-circle small text-black-50"></i></a></span>
+                            </h5>
+
+                            <hr>
+
+                            <!--Grid row-->
+                            <div class="row">
+
+                                <!--Grid column-->
+                                <div class="col-12 mb-3 mx-auto">
+
+                                    {% for debt in debts %}
+                                        <div class="media">
+                                            <img src="{% static 'project/images/debt_placeholder.png' %}" class="d-flex mr-3 img-thumbnail ml-2" alt="{{ task.title }}" style="width: 50px; object-fit: cover">
+
+                                            <div class="media-body">
+                                                <h6 class="mt-1 font-weight-bold">
+                                                    <a href="#!">{{ debt.title }}
+                                                        <span class="small">({{ debt.price|intcomma }} تومان)</span>
+                                                    </a>
+                                                    <span>
+                                                <a href="#" class="ml-0 mr-2 text-black-50 small"><i class="fa fa-edit"></i></a>
+                                                <a href="#" class="text-black-50 small"><i class="fa fa-trash-alt"></i></a>
+                                            </span>
+
+                                                    {% if debt.status == 'طلب' %}
+                                                        <a><span class="badge badge-default float-left">{{ debt.status }}</span></a>
+                                                    {% elif debt.status == 'بدهی' %}
+                                                        <a><span class="badge badge-warning float-left">{{ debt.status }}</span></a>
+                                                    {% elif debt.status == 'تصویه' %}
+                                                        <a><span class="badge badge-success float-left">{{ debt.status }}</span></a>
+                                                    {% endif %}
+                                                    <a><span class="badge badge-info float-left ml-1"><i class="far fa-calendar-alt pl-1"></i>{{ debt.debtDate|to_jalali:'%y/%m/%d' }} </span></a>
+                                                </h6>
+                                                <p class="text-muted">{{ debt.description|truncatechars:200 }}</p>
+                                            </div>
+                                        </div>
+                                        <hr>
+
+
+                                    {% endfor %}
+
+                                </div>
+                                <!--Grid row-->
+
+                            </div>
+
+                            <p class="text-center mt-4 mb-1"><a href="#!">مشاهده تمامی مواردا</a></p>
+
+
+                            <span class="float-left small">جمع: {{ debts_sum }} تومان</span>
+                            <span class="float-left small ml-2">طلب: {{ demand_sum }} تومان</span>
+                            <span class="float-left small ml-2">بدهی: {{ debt_sum }} تومان</span>
+                        </div>
+
+                </section>
+
+            </div>
+
+
         </div>
-        <h6>{{ task.description }}</h6>
-        <br>
-    {% endfor %}
-    <h6>تعدا تسک های انجام شده: 5</h6>
-    <h6>تعدا کل: 5</h6>
-    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>
-    <hr>
-
-    <!-- employee work days -->
-    <h3>روزهای کاری:</h3>
-    {% for workDay in workDays %}
-        <div class="row">
-            <p1>{{ forloop.counter }} - {{ workDay.workDate }} - {{ workDay.workHour }}</p1>
-            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
-            <a href="#" class=""><i class="fa fa-trash"></i></a>
-        </div>
-        <h6>{{ workDay.description }}</h6>
-        <br>
-    {% endfor %}
-    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>
-    <hr>
-
-    <!-- employee salaries -->
-    <h3>حقوق ها:</h3>
-    {% for salary in salaries %}
-        <div class="row">
-            <p1>{{ forloop.counter }} - {{ salary.salaryDate }} - {{ salary.workHour }} - {{ salary.money|intcomma }}</p1>
-            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
-            <a href="#" class=""><i class="fa fa-trash"></i></a>
-        </div>
-        <h6>{{ salary.description }}</h6>
-        <br>
-    {% endfor %}
-    <h6>جمع : {{ salaries_sum|intcomma}} تومان</h6>
-    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>
-    <hr>
-
-    <!-- employee salaries -->
-    <h3>طلب ها - بدهی ها:</h3>
-    {% for debt in debts %}
-        <div class="row">
-            <p1>{{ forloop.counter }} - {{ debt.title }} - {{ debt.status }} - {{ debt.price|intcomma }} تومان - </p1>
-            <p>{{ debt.debtDate }} -> {{ debt.paymentDebtDate }}</p>
-            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
-            <a href="#" class=""><i class="fa fa-trash"></i></a>
-        </div>
-        <h6>{{ debt.description }}</h6>
-        <br>
-    {% endfor %}
-    <h6>جمع طلب ها: {{ demand_sum|intcomma }}</h6>
-    <h6>جمع بدهی ها: {{ debt_sum|intcomma }}</h6>
-    <h6> جمع: {{ debts_sum|intcomma }}</h6>
-    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>
-    <hr>
 
 
+    </div>
 
 
 

@@ -1,6 +1,7 @@
 <!-- use base html template -->
 {% extends 'project/base.html' %}
 {% load humanize %}
+{% load jalali_tags %}
 {% block title %}
     <title>مدیریت پروژه</title>
 {% endblock %}
@@ -13,65 +14,249 @@
     <link rel="stylesheet" href="{% static 'project/css/bootstrap-rtl.css' %}">
     <link rel="stylesheet" href="{% static 'project/css/project_detail.css' %}">
 
+    <!-- project info.-->
+    <div class="container-fluid my-5 py-5 z-depth-1" dir="ltr">
 
+        <!--Section: Content-->
+        <section class="px-md-5 mx-md-5 dark-grey-text text-center text-lg-left">
 
-    <!-- project information-->
-    {% if project.pic %}
-        <img src="{{ project.pic.url }}">
-    {% else %}
-        <img src="{% static 'project/images/project_placeholder.png' %}" alt="">
-    {% endif %}
-    <h1>{{project.title}}</h1>
-    <p>کارفرما: {{project.projectOwner}}</p>
-    <p>تاریخ شروع: {{ project.startDate }}</p>
-    <p>تاریخ شروع: {{ project.deadline }}</p>
-    <p>هزینه: {{ project.money|intcomma }}</p>
-    <p>توضیحات: {{ project.description }}</p>
-    <div class="row">
-        <a href="#" class="btn btn-info"><i class="fa fa-edit"></i></a>
-        <a href="#" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+            <!--Grid row-->
+            <div class="row">
+
+                <!--image-->
+                <div class="col-lg-6 mb-4 mb-lg-0 d-flex align-items-center justify-content-center">
+
+                    {% if project.pic %}
+                        <img src="{{ project.pic.url }}" class="img-fluid rounded z-depth-1"  style="object-fit: contain">
+                    {% else %}
+                        <img src="{% static 'project/images/Blank-Placeholder.jpg' %}" class="rounded-circle" alt="woman avatar">
+                    {% endif %}
+
+                </div>
+
+                <!--info.-->
+                <div class="col-lg-6 mb-4 mb-lg-0 text-right">
+
+                    <h3 class="font-weight-bold">
+                        {{ project.title }}
+                    </h3>
+
+                    <p class="font-weight-bold badge badge-info">وضعیت: {{ project.get_status_display }}</p>
+
+                    <p class="text-muted">{{ project.description|default_if_none:"" }}</p>
+
+                    <p>کارفرما: {{ project.owner }}</p>
+                    <p>تاریخ شروع: {{ project.startDate|to_jalali:'%y/%m/%d' }}</p>
+                    <p> مهلت نهایی: {{ project.deadline|to_jalali:'%y/%m/%d' }}</p>
+                    <p>بودجه: {{ project.money|intcomma }} <span class="small">تومان</span></p>
+
+                    <span class="">
+                        <a href="#" class="small text-black-50 mb-0 "><i class="fa fa-edit"></i></a>
+                        <a href="#" class="small text-black-50 mb-0 mr-1"><i class="fa fa-trash"></i></a>
+                    </span>
+                </div>
+
+            </div>
+
+        </section>
+
     </div>
-    <hr>
+
 
     <!-- project employees-->
-    <h3>افراد:</h3>
-    {% for employee in employees %}
-        <p1>{{ forloop.counter }} - {{ employee.fullName }}</p1>
-        <br>
-    {% endfor %}
-    <hr>
+    <div class="container my-5">
 
-    <!-- project tasks -->
-    <h3>تسک ها:</h3>
-    {% for task in tasks %}
+        <!-- Section: Block Content -->
+        <section class="team-section">
+
+            <div class="card">
+
+                <div class="card-header white">
+                    <p class="h5-responsive font-weight-bold mb-0 text-center">افراد تیم</p>
+                </div>
+
+                <div class="card-body">
+                    <div class="row pt-4">
+
+                        {% for employee in employees %}
+                            <div class="col-lg-3 col-md-4 col-sm-6 pb-4">
+                                <div class="avatar white text-center">
+                                    {% if employee.pic %}
+                                        <img src="{{ employee.pic.url }}" class="img-fluid rounded-circle z-depth-1"/>
+                                    {% else %}
+                                        <img src="https://mdbootstrap.com/img/Photos/Avatars/img%20(9).jpg" class="img-fluid rounded-circle z-depth-1"/>
+                                    {% endif %}
+                                </div>
+                                <div class="text-center mt-2">
+                                    <h6 class="font-weight-bold pt-2 mb-0">{{ employee.fullName }}</h6>
+                                    <p class="text-muted mb-0"><small>{{ employee.position }}</small></p>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+
+    <div class="container-fluid">
         <div class="row">
-            <p1>{{ forloop.counter }} - {{ task.title }}</p1>
-            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
-            <a href="#" class=""><i class="fa fa-trash"></i></a>
+
+            <!-- project tasks-->
+            <div class="col-sm-6 mb-2">
+
+                <section>
+
+                    <div class="card">
+                        <div class="card-body">
+
+                            <h5 class="text-center font-weight-bold mb-4"><i class="fas fa-clipboard-list pl-2"></i>
+                                تسک های اخیر
+                                <span class="float-left"><a href="#"><i class="fa fa-plus-circle small text-black-50"></i></a></span>
+                            </h5>
+
+                            <hr>
+
+                            <!--Grid row-->
+                            <div class="row">
+
+                                <!--Grid column-->
+                                <div class="col-12 mb-3 mx-auto">
+
+                                    {% for task in tasks %}
+                                        <div class="media">
+                                            {% if task.pic %}
+                                                <img src="{{ task.pic.url }}" class="d-flex mr-3 img-thumbnail ml-2" alt="{{ task.title }}" style="width: 50px; object-fit: cover">
+                                            {% else %}
+                                                <img src="{% static 'project/images/task_placeholder.png' %}" class="d-flex mr-3 img-thumbnail ml-2" alt="{{ task.title }}" style="width: 50px; object-fit: cover">
+                                            {% endif %}
+
+                                            <div class="media-body">
+                                                <h6 class="mt-1 font-weight-bold">
+                                                    <a href="#!">{{ task.title }}</a>
+                                                    <span>
+                                                        <a href="#" class="ml-0 mr-2 text-black-50 small"><i class="fa fa-edit"></i></a>
+                                                        <a href="#" class="text-black-50 small"><i class="fa fa-trash-alt"></i></a>
+                                                    </span>
+                                                    {% if task.status == '0' %}
+                                                        <a><span class="badge badge-default float-left">{{ task.get_status_display }}</span></a>
+                                                    {% elif task.status == '1' %}
+                                                        <a><span class="badge badge-info float-left">{{ task.get_status_display }}</span></a>
+                                                    {% elif task.status == '2' %}
+                                                        <a><span class="badge badge-success float-left">{{ task.get_status_display }}</span></a>
+                                                    {% elif task.status == '3' %}
+                                                        <a><span class="badge badge-danger float-left">{{ task.get_status_display }}</span></a>
+                                                    {% elif task.status == '4' %}
+                                                        <a><span class="badge badge-warning float-left">{{ task.get_status_display }}</span></a>
+                                                    {% endif %}
+                                                </h6>
+                                                <p class="text-muted">{{ task.description|truncatechars:200 }}</p>
+                                            </div>
+                                        </div>
+                                        <hr>
+
+
+                                    {% endfor %}
+
+                                </div>
+                                <!--Grid row-->
+
+                            </div>
+
+                            <p class="text-center mt-4 mb-1"><a href="#!">مشاهده تمامی تسک ها</a></p>
+
+
+                            <span class="float-left small">تعداد: {{ tasks.count }} </span>
+                        </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- project incomes-->
+            <div class="col-sm-6 mb-2">
+
+                <!-- employee debts -->
+                <section class="">
+
+                    <div class="card">
+                        <div class="card-body">
+
+                            <h5 class="text-center font-weight-bold mb-4"><i class="fas fa-money-check pl-2"></i>
+                                تراکنش ها
+                                <span class="float-left"><a href="#"><i class="fa fa-plus-circle small text-black-50"></i></a></span>
+                            </h5>
+
+                            <hr>
+
+                            <!--Grid row-->
+                            <div class="row">
+
+                                <!--Grid column-->
+                                <div class="col-12 mb-3 mx-auto">
+
+                                    {% for income in incomes %}
+                                        <div class="media">
+
+                                            {% if task.pic %}
+                                                <img src="{{ income.pic.url }}" class="d-flex mr-3 img-thumbnail ml-2" style="width: 50px; object-fit: cover">
+                                            {% else %}
+                                                <img src="{% static 'project/images/debt_placeholder.png' %}" class="d-flex mr-3 img-thumbnail ml-2" style="width: 50px; object-fit: cover">
+                                            {% endif %}
+
+                                            <div class="media-body">
+                                                <h6 class="mt-1 font-weight-bold">
+                                                    <a href="#!">{{ income.money|intcomma }}
+                                                        <span class="small">تومان</span>
+                                                    </a>
+                                                    <span>
+                                                <a href="#" class="ml-0 mr-2 text-black-50 small"><i class="fa fa-edit"></i></a>
+                                                <a href="#" class="text-black-50 small"><i class="fa fa-trash-alt"></i></a>
+                                            </span>
+
+                                                    <a><span class="badge badge-info float-left ml-1"><i class="far fa-calendar-alt pl-1"></i>{{ income.incomeDate|to_jalali:'%y/%m/%d' }} </span></a>
+                                                </h6>
+                                                <p class="text-muted">{{ income.description|truncatechars:200 }}</p>
+                                            </div>
+                                        </div>
+                                        <hr>
+
+
+                                    {% endfor %}
+
+                                </div>
+                                <!--Grid row-->
+
+                            </div>
+
+                            <p class="text-center mt-4 mb-1"><a href="#!">مشاهده تمامی موارد</a></p>
+
+
+                            <span class="float-left small mr-2">کل دریافتی ها: {{ incomes_sum|intcomma  }} تومان</span>
+                            <span class="float-left small"> مانده دریافتی: {{ money_res|intcomma  }} تومان</span>
+
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+
         </div>
-        <h6>{{ task.description }}</h6>
-        <br>
-    {% endfor %}
-    <a href="#" class="btn btn-info"><i class="fa fa-plus"></i></a>
-    <hr>
-
-    <!-- project financial -->
-    <h3>پرداختی ها:</h3>
-    {% for income in incomes %}
-        <div class="row">
-            <p1>{{ forloop.counter }} - {{ income.incomeDate }} : {{ income.money }}</p1>
-            <a href="#" class="ml-2 mr-2"><i class="fa fa-edit"></i></a>
-            <a href="#" class=""><i class="fa fa-trash"></i></a>
-        </div>
-        <h6>{{ income.description }}</h6>
-        <br>
-    {% endfor %}
-    <a href="#" onclick="document.getElementById('income-modal-add-btn').click()" class="btn btn-info"><i class="fa fa-plus"></i></a>
-    <h6>کل دریافتی ها: {{ incomes_sum|intcomma  }} تومان</h6>
-    <h6> مانده دریافتی: {{ money_res|intcomma  }} تومان</h6>
-    <hr>
+    </div>
 
 
+
+
+    <p>-</p>
 
 <!-- end of body block -->
 {% endblock %}
