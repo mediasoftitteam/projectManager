@@ -1,0 +1,191 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% load jalali_tags %}
+{% load humanize %}
+{% block title %}
+    <title>مدیریت بدهی ها</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+
+    <!-- load static file in django -->
+    {% load staticfiles %}
+
+
+    <!-- Material Design Bootstrap table -->
+    <link rel="stylesheet" href="{% static 'project/css/addons/datatables.min.css' %}"><!-- MDBootstrap Datatables  -->
+    <!-- Material Design Bootstrap table -->
+    <link rel="stylesheet" href="{% static 'project/css/addons/datatables-select.min.css' %}"><!-- MDBootstrap Datatables  -->
+
+
+    <!-- PAGE SIZE/ search -->
+    <div class="container">
+        <div class="row ">
+            <div class="col-1 mb-2">
+                <p>تعداد صفحات</p>
+            </div>
+            <div class="col-2 mb-2">
+                <select id="debt-selector-page-size-employee" class="browser-default custom-select" onchange="debtPageSizeEmployeeChanged(this.options[this.selectedIndex].value)">
+                    <option value="10">10</option>
+                    <option value="20" >20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <a id="debt-tag-a-page-size-employee" class="d-none" href="?page-size=20">20</a>
+                <script>
+                    document.getElementById('debt-selector-page-size-employee').value={{ page_size }};
+                    function debtPageSizeEmployeeChanged(page_size) {
+                        {#alert(page_size)#}
+                        let tag_a = document.getElementById("debt-tag-a-page-size-employee");
+                        tag_a.href = "?page-size=" + page_size;
+                        tag_a.click();
+                    }
+                </script>
+            </div>
+            <div class="col-6"></div>
+
+            <!-- Search form -->
+            <div class="col-3 mb-2 ml-0 text-left">
+                <input id="search-debt-employee" class="form-control" type="text" placeholder="جست و جو" aria-label="Search" value="{{ search }}">
+            </div>
+        </div>
+    <div class="clearfix"></div>
+    </div>
+
+    <!-- body -->
+    <div >
+        <div class="container py-1">
+
+            <div class="row pagination-sm table-responsive" id="debt-list-employee">
+
+                <table class="table table-sm table-hover table-striped"  id="debt-table-employee">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">کارمند</th>
+                        <th scope="col">عنوان</th>
+                        <th scope="col">توضیحات</th>
+                        <th scope="col">وضعیت</th>
+                        <th scope="col">تاریخ بدهی</th>
+                        <th scope="col">تاریخ پرداخت</th>
+                        <th scope="col">مبلغ</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for debt in debts %}
+                        <tr>
+                            <input class="debtId" type="hidden" dataId={{ debt.id }}>
+                            <input class="employee" type="hidden" employeId={{ debt.employee.id }}>
+                            <th scope="row" >{{ forloop.counter }}</th>
+                            <td class="employee" >{{ debt.employee.fullName }}</td>
+                            <td class="title">{{ debt.title }}</td>
+                            <td class="description">{{ debt.description }}</td>
+                            <td class="status">{{ debt.status }}</td>
+                            <td class="debtDate" data-debtDate="{{ debt.debtDate|date:"Y-m-d" }}">{{ debt.debtDate|to_jalali:'%y/%m/%d' }}</td>
+                            <td class="paymentDebtDate" data-paymentDebtDate="{{ debt.paymentDebtDate|date:"Y-m-d" }}">{{ debt.paymentDebtDate|to_jalali:'%y/%m/%d' }}</td>
+                            <td class="price" data-price="{{ debt.price }}">{{ debt.price|intcomma }} تومان</td>
+
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- pagination -->
+    <div class="d-flex justify-content-center">
+        {% if debts.has_other_pages %}
+            <nav aria-label="Page navigation example">
+                <ul class="pagination pagination-circle pg-blue">
+                    <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-debt').value">First</a></li>
+                    {% if debts.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" aria-label="Previous" href="?page={{ debts.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-debt').value">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                        <a class="page-link" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- center page numbers -->
+                    {% for i in debts.paginator.page_range %}
+                        {% if debts.number == i %}
+                            <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+
+                        {% else %}
+                            <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-debt').value">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- center page numbers -->
+                    {% if debts.has_next %}
+                        <a class="page-link" aria-label="Next"  href="?page={{ debts.next_page_number }}&page-size={{ page_size }}" onclick="this.href += '&search=' + document.getElementById('search-debt').value">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item"><a class="page-link">Last</a></li>
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+
+    <!-- base url address -->
+    <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
+
+{% endblock %}
+
+
+{% block javascript %}
+
+    <!-- table select -->
+    <script>
+
+        $("#debt-table-employee tr").click(function(){
+           $(this).addClass('table-primary').siblings().removeClass('table-primary');
+           var value=$(this).find('input.debtId').attr("dataId");
+
+        });
+
+        $('.ok').on('click', function(e){
+            alert($("#debt-table-employee tr.selected td:first").html());
+        });
+
+        // Material Select Initialization
+        $(document).ready(function() {
+        $('.mdb-select').materialSelect();
+        });
+
+
+    </script>
+
+    <!-- search -->
+    <script>
+        $("#search-debt-employee").on('keyup', function (e) {
+            if (e.keyCode === 13) {
+                let srchterm = $("#search-debt-employee").val();
+                let tag_a = document.getElementById("debt-tag-a-page-size-employee");
+                tag_a.href = "?page-size=" + {{ page_size }} + "&search=" + srchterm;
+                tag_a.click();
+            }
+        });
+    </script>
+
+{% endblock %}

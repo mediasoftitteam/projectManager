@@ -677,32 +677,59 @@ def task_delete(request, task_id):
     return redirect('project:task-list')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def salary_list(request):
-    employees = models.Employee.objects.all()
-    page = request.GET.get('page', 1)
-    page_size = request.GET.get('page-size', 10)
-    search = request.GET.get('search', '')
+    if request.user.is_superuser:
+        employees = models.Employee.objects.all()
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
 
-    salaries = models.MonthSalary.objects.filter(Q(employee__fullName__icontains=search)
-                                                 | Q(money__icontains=search)
-                                                 | Q(description__icontains=search)
-                                                 | Q(workHour__icontains=search)
-                                                 | Q(salaryDate__icontains=search)
-                                                 )
+        salaries = models.MonthSalary.objects.filter(Q(employee__fullName__icontains=search)
+                                                     | Q(money__icontains=search)
+                                                     | Q(description__icontains=search)
+                                                     | Q(workHour__icontains=search)
+                                                     | Q(salaryDate__icontains=search)
+                                                     )
 
-    paginator = Paginator(salaries, page_size)
-    try:
-        salaries = paginator.page(page)
-    except PageNotAnInteger:
-        salaries = paginator.page(1)
-    except EmptyPage:
-        salaries = paginator.page(paginator.num_pages)
+        paginator = Paginator(salaries, page_size)
+        try:
+            salaries = paginator.page(page)
+        except PageNotAnInteger:
+            salaries = paginator.page(1)
+        except EmptyPage:
+            salaries = paginator.page(paginator.num_pages)
 
-    return render(request, 'project/salary_list.html', {'salaries': salaries,
-                                                        'employees': employees,
-                                                        'search': search,
-                                                        'page_size': page_size})
+        return render(request, 'project/salary/salary_list.html', {'salaries': salaries,
+                                                            'employees': employees,
+                                                            'search': search,
+                                                            'page_size': page_size})
+    else:
+        employee = get_object_or_404(models.Employee, user=request.user)
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
+
+        salaries = models.MonthSalary.objects.filter(Q(employee=employee)
+                                                     & (Q(money__icontains=search)
+                                                     | Q(description__icontains=search)
+                                                     | Q(workHour__icontains=search)
+                                                     | Q(salaryDate__icontains=search))
+                                                     )
+
+        paginator = Paginator(salaries, page_size)
+        try:
+            salaries = paginator.page(page)
+        except PageNotAnInteger:
+            salaries = paginator.page(1)
+        except EmptyPage:
+            salaries = paginator.page(paginator.num_pages)
+
+        return render(request, 'project/salary/salaryEmployee.html', {'salaries': salaries,
+                                                            'employee': employee,
+                                                            'search': search,
+                                                            'page_size': page_size})
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -765,34 +792,63 @@ def salary_update(request):
     return redirect('project:salary-list')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def debt_list(request):
-    employees = models.Employee.objects.all()
-    page = request.GET.get('page', 1)
-    page_size = request.GET.get('page-size', 10)
-    search = request.GET.get('search', '')
+    if request.user.is_superuser:
+        employees = models.Employee.objects.all()
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
 
-    debts = models.Debt.objects.filter(Q(employee__fullName__icontains=search)
-                                       | Q(title__icontains=search)
-                                       | Q(description__icontains=search)
-                                       | Q(status__icontains=search)
-                                       | Q(debtDate__icontains=search)
-                                       | Q(paymentDebtDate__icontains=search)
-                                       | Q(price__icontains=search)
-                                       )
+        debts = models.Debt.objects.filter(Q(employee__fullName__icontains=search)
+                                           | Q(title__icontains=search)
+                                           | Q(description__icontains=search)
+                                           | Q(status__icontains=search)
+                                           | Q(debtDate__icontains=search)
+                                           | Q(paymentDebtDate__icontains=search)
+                                           | Q(price__icontains=search)
+                                           )
 
-    paginator = Paginator(debts, page_size)
-    try:
-        debts = paginator.page(page)
-    except PageNotAnInteger:
-        debts = paginator.page(1)
-    except EmptyPage:
-        debts = paginator.page(paginator.num_pages)
+        paginator = Paginator(debts, page_size)
+        try:
+            debts = paginator.page(page)
+        except PageNotAnInteger:
+            debts = paginator.page(1)
+        except EmptyPage:
+            debts = paginator.page(paginator.num_pages)
 
-    return render(request, 'project/debt_list.html', {'debts': debts,
-                                                      'employees': employees,
-                                                      'search': search,
-                                                      'page_size': page_size})
+        return render(request, 'project/debt/debt_list.html', {'debts': debts,
+                                                          'employees': employees,
+                                                          'search': search,
+                                                          'page_size': page_size})
+    else:
+        employee = get_object_or_404(models.Employee, user=request.user)
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
+
+        debts = models.Debt.objects.filter(Q(employee=employee)
+                                           & (Q(title__icontains=search)
+                                           | Q(description__icontains=search)
+                                           | Q(status__icontains=search)
+                                           | Q(debtDate__icontains=search)
+                                           | Q(paymentDebtDate__icontains=search)
+                                           | Q(price__icontains=search))
+                                           )
+
+        paginator = Paginator(debts, page_size)
+        try:
+            debts = paginator.page(page)
+        except PageNotAnInteger:
+            debts = paginator.page(1)
+        except EmptyPage:
+            debts = paginator.page(paginator.num_pages)
+
+        return render(request, 'project/debt/debtEmployee.html', {'debts': debts,
+                                                               'employee': employee,
+                                                               'search': search,
+                                                               'page_size': page_size})
 
 
 @user_passes_test(lambda u: u.is_superuser)

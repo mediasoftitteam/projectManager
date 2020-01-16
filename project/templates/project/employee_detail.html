@@ -139,7 +139,7 @@
 
                             </div>
 
-                            <p class="text-center mt-4 mb-1"><a href="#!">مشاهده تمامی تسک ها</a></p>
+                            <p class="text-center mt-4 mb-1"><a href="{% url 'project:task-list' %}">مشاهده تمامی تسک ها</a></p>
 
 
                             <span class="float-left small">تعداد: {{ tasks.count }} </span>
@@ -203,7 +203,7 @@
                             </div>
                             {#                    <hr>#}
 
-                            <p class="text-center mt-4 mb-1"><a href="#!">مشاهده تمامی حقوق ها</a></p>
+                            <p class="text-center mt-4 mb-1"><a href="{% url 'project:salary-list' %}">مشاهده تمامی حقوق ها</a></p>
 
                             <span class="float-left small">جمع: {{ salaries_sum|intcomma }} تومان</span>
 
@@ -262,7 +262,7 @@
                             </div>
 
 
-                            <p class="text-center mt-4 mb-1"><a href="#!">مشاهده تمامی روزها</a></p>
+                            <p class="text-center mt-4 mb-1"><a href="{% url 'project:workDay-list' %}">مشاهده تمامی روزها</a></p>
 
                         </div>
                     </div>
@@ -330,7 +330,7 @@
 
                             </div>
 
-                            <p class="text-center mt-4 mb-1"><a href="#!">مشاهده تمامی مواردا</a></p>
+                            <p class="text-center mt-4 mb-1"><a href="{% url 'project:debt-list' %}">مشاهده تمامی مواردا</a></p>
 
 
                             <span class="float-left small">جمع: {{ debts_sum }} تومان</span>
