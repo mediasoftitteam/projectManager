@@ -18,7 +18,7 @@
 - [ ] 
 
 #####_dashboard page for employees:_
-- [ ] UX layout and permissions **h : 10**
+- [x] UX layout and permissions **h : 10**
 - [ ] 
 
 #####_employee list:_
