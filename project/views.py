@@ -470,77 +470,137 @@ def income_delete(request, income_id):
     return redirect('project:income-list')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def task_list(request):
-    employees = models.Employee.objects.all()
-    projects = models.Project.objects.all()
-    page = request.GET.get('page', 1)
-    page_size = request.GET.get('page-size', 10)
-    search = request.GET.get('search', '')
+    if request.user.is_superuser:
+        employees = models.Employee.objects.all()
+        projects = models.Project.objects.all()
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
 
-    start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
-    end_date = request.GET.get('end_date', None)
-    is_income = request.GET.get('isIncome', None)
-    is_outcome = request.GET.get('isOutcome', None)
-    selected_projects = request.GET.get('selectedProjects', None)
-    selected_employees = request.GET.get('selectedEmployees', None)
-    selected_status = request.GET.get('selectedStatus', None)
+        start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
+        end_date = request.GET.get('end_date', None)
+        is_income = request.GET.get('isIncome', None)
+        is_outcome = request.GET.get('isOutcome', None)
+        selected_projects = request.GET.get('selectedProjects', None)
+        selected_employees = request.GET.get('selectedEmployees', None)
+        selected_status = request.GET.get('selectedStatus', None)
 
-    tasks = models.Task.objects.filter(Q(employees__fullName__icontains=search)
-                                       | Q(project__title__icontains=search)
-                                       | Q(taskDate__icontains=search)
-                                       | Q(dueDate__icontains=search)
-                                       | Q(description__icontains=search)
-                                       | Q(title__icontains=search)
-                                       | Q(status__icontains=search)
-                                       )
+        tasks = models.Task.objects.filter(Q(employees__fullName__icontains=search)
+                                           | Q(project__title__icontains=search)
+                                           | Q(taskDate__icontains=search)
+                                           | Q(dueDate__icontains=search)
+                                           | Q(description__icontains=search)
+                                           | Q(title__icontains=search)
+                                           | Q(status__icontains=search)
+                                           )
 
-    # date range filter
-    if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
-        tasks = tasks.filter(taskDate__range=[start_date, end_date]).distinct()
+        # date range filter
+        if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
+            tasks = tasks.filter(taskDate__range=[start_date, end_date]).distinct()
 
-    # project filter
-    projects_list = []
-    if selected_projects is not None and selected_projects is not "":
-        projects_list = selected_projects.split("_")
-        tasks = tasks.filter(functools.reduce(operator.or_, (Q(project=x) for x in projects_list))).distinct()
+        # project filter
+        projects_list = []
+        if selected_projects is not None and selected_projects is not "":
+            projects_list = selected_projects.split("_")
+            tasks = tasks.filter(functools.reduce(operator.or_, (Q(project=x) for x in projects_list))).distinct()
 
-    # employee filter
-    employee_list = []
-    if selected_employees is not None and selected_employees is not "":
-        employee_list = selected_employees.split("_")
-        tasks = tasks.filter(functools.reduce(operator.or_, (Q(employees=x) for x in employee_list))).distinct()
+        # employee filter
+        employee_list = []
+        if selected_employees is not None and selected_employees is not "":
+            employee_list = selected_employees.split("_")
+            tasks = tasks.filter(functools.reduce(operator.or_, (Q(employees=x) for x in employee_list))).distinct()
 
-    # employee filter
-    status_list = []
-    if selected_status is not None and selected_status is not "":
-        status_list = selected_status.split("_")
-        tasks = tasks.filter(functools.reduce(operator.or_, (Q(status=x) for x in status_list))).distinct()
+        # employee filter
+        status_list = []
+        if selected_status is not None and selected_status is not "":
+            status_list = selected_status.split("_")
+            tasks = tasks.filter(functools.reduce(operator.or_, (Q(status=x) for x in status_list))).distinct()
 
-    filter_param = {
-        'start_date': start_date,
-        'end_date': end_date,
-        'is_income': is_income,
-        'is_outcome': is_outcome,
-        'projects_list': projects_list,
-        'employee_list': employee_list,
-        'status_list': status_list,
-    }
+        filter_param = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'is_income': is_income,
+            'is_outcome': is_outcome,
+            'projects_list': projects_list,
+            'employee_list': employee_list,
+            'status_list': status_list,
+        }
 
-    paginator = Paginator(tasks, page_size)
-    try:
-        tasks = paginator.page(page)
-    except PageNotAnInteger:
-        tasks = paginator.page(1)
-    except EmptyPage:
-        tasks = paginator.page(paginator.num_pages)
+        paginator = Paginator(tasks, page_size)
+        try:
+            tasks = paginator.page(page)
+        except PageNotAnInteger:
+            tasks = paginator.page(1)
+        except EmptyPage:
+            tasks = paginator.page(paginator.num_pages)
 
-    return render(request, 'project/task_list.html', {'tasks': tasks,
-                                                      'employees': employees,
-                                                      'projects': projects,
-                                                      'search': search,
-                                                      'filter_param': filter_param,
-                                                      'page_size': page_size})
+        return render(request, 'project/task/task_list.html', {'tasks': tasks,
+                                                               'employees': employees,
+                                                               'projects': projects,
+                                                               'search': search,
+                                                               'filter_param': filter_param,
+                                                               'page_size': page_size})
+    else:
+        employee = get_object_or_404(models.Employee, user=request.user)
+        tasks = models.Task.objects.filter(employees=employee).distinct()
+        projects = models.Project.objects.filter(task__in=tasks).distinct()
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
+
+        start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
+        end_date = request.GET.get('end_date', None)
+        selected_projects = request.GET.get('selectedProjects', None)
+        selected_status = request.GET.get('selectedStatus', None)
+
+        tasks = tasks.filter(Q(project__title__icontains=search)
+                             | Q(taskDate__icontains=search)
+                             | Q(dueDate__icontains=search)
+                             | Q(description__icontains=search)
+                             | Q(title__icontains=search)
+                             | Q(status__icontains=search)
+                             ).distinct()
+
+        # date range filter
+        if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
+            tasks = tasks.filter(taskDate__range=[start_date, end_date]).distinct()
+
+        # project filter
+        projects_list = []
+        if selected_projects is not None and selected_projects is not "":
+            projects_list = selected_projects.split("_")
+            tasks = tasks.filter(functools.reduce(operator.or_, (Q(project=x) for x in projects_list))).distinct()
+
+        # status filter
+        status_list = []
+        if selected_status is not None and selected_status is not "":
+            status_list = selected_status.split("_")
+            tasks = tasks.filter(functools.reduce(operator.or_, (Q(status=x) for x in status_list))).distinct()
+
+        filter_param = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'projects_list': projects_list,
+            'status_list': status_list,
+        }
+
+        paginator = Paginator(tasks, page_size)
+        try:
+            tasks = paginator.page(page)
+        except PageNotAnInteger:
+            tasks = paginator.page(1)
+        except EmptyPage:
+            tasks = paginator.page(paginator.num_pages)
+
+        return render(request, 'project/task/taskEmployee.html', {'tasks': tasks,
+                                                                  'employee': employee,
+                                                                  'projects': projects,
+                                                                  'search': search,
+                                                                  'filter_param': filter_param,
+                                                                  'page_size': page_size})
 
 
 @user_passes_test(lambda u: u.is_superuser)
