@@ -2,6 +2,7 @@
 {% extends 'project/base.html' %}
 {% load jalali_tags %}
 {% load humanize %}
+{% load auth_extras %}
 {% block title %}
     <title>مدیریت تسک ها</title>
 {% endblock %}
@@ -19,10 +20,12 @@
 
     <!-- new/delete/edit buttons -->
     <div class="text-center">
-      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelEqmNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
-      <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelEqmEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
-      <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-eqm-delete"
-      onclick="showEqmDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
+        <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelEqmNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
+        <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelEqmEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
+        {% if user.is_superuser %}
+            <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-eqm-delete"
+                    onclick="showEqmDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
+        {% endif %}
     </div>
 
 

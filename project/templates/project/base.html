@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {#https://mdbootstrap.com/docs/jquery/components/demo/#}
+{% load auth_extras %}
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -88,6 +89,8 @@
                                     <i class="fa fa-lock-open align-middle ml-2" style="width: 18px;"></i>
                                     (دسترسی مدیریت)
                                 </a>
+                            {% elif request.user|has_group:"level1" %}
+                                <a href="#" class="dropdown-item d-none d-md-block text-right  pr-3" style="color: black; cursor: pointer; font-size: 14px">(دسترسی ادمین)</a>
                             {% else %}
                                 <a href="#" class="dropdown-item d-none d-md-block text-right  pr-3" style="color: black; cursor: pointer; font-size: 14px">(دسترسی کاربر)</a>
                             {% endif %}
@@ -146,11 +149,13 @@
                             <div class="mask rgba-blue-grey-light"></div>
                         </a>
                     </li>
+                {% endif %}
+                {% if user.is_superuser or request.user|has_group:"level1" %}
                     <li class="list-group-item waves-light" style="background-color: #2C3E50">
                         <a href="{% url 'project:income-list' %}" class="text-white">
                             <span id="incomes">
                                 <i id="companies-icon" class="fa fa-box-usd align-middle ml-2"></i>
-                                درآمد/هزینه ها
+                                تراکنش ها
                             </span>
                             <div class="mask rgba-blue-grey-light"></div>
                         </a>

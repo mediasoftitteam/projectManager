@@ -434,7 +434,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="hidden" id="workDay-selected-edit-employee-id" name="employee" value="-1">
+                                        <input type="text" id="workDay-selected-edit-employee-id" name="employee" value="-1">
                                         <select class="mdb-select md-form" id="workDay-selectBoxEdit" searchable="جست و جو" onchange="workDayChangeFunc();">
                                             <option value="" disabled selected >.    کارمند موردنظر را اتخاب کنید</option>
                                             {% for employee in employees %}
@@ -595,7 +595,8 @@
             $('#workDay-input-edit-workHour').attr('value', $(this).find('td.workHour').html());
             $('#workDay-input-edit-description').val( $(this).find('td.description').html());
             let empId =$(this).find('input.employee').attr("employeId");
-            $('#workDay-selectBoxEdit').val(empId)
+            $('#workDay-selectBoxEdit').val(empId);
+            $('#workDay-selected-edit-employee-id').val(empId);
 
 
         });

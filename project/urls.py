@@ -60,4 +60,7 @@ urlpatterns = [
 
     # financial urls
     url(r'^financial/$', views.financial, name='financial'),
+
+    # 505 urls
+    url(r'^505/$', views.pageNotExist, name='pageNotExist'),
 ]

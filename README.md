@@ -71,8 +71,12 @@
 
 #####_new fitures:_
 - [ ] message for employees **h : 10**
+- [ ] work day and hour with login to system (local wifi) **h : 10**
 
 #####_user permitions:_
 - [ ] user page permitions **h : 4**
+
+####_BUGS:_
+- [ ] edit of multiselect is not work **h : 4**
 
 ##total predict time: 84.5 h

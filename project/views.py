@@ -333,134 +333,148 @@ import functools
 from datetime import datetime
 
 
-# @login_required
-@user_passes_test(lambda u: u.is_superuser)
-def income_list(request, isOutcome=None):
-    projects = models.Project.objects.all()
-    page = request.GET.get('page', 1)
-    page_size = request.GET.get('page-size', 10)
-    search = request.GET.get('search', '')
+@login_required
+# @user_passes_test(lambda u: u.is_superuser)
+def income_list(request):
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        projects = models.Project.objects.all()
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
 
-    start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
-    end_date = request.GET.get('end_date', None)
-    is_income = request.GET.get('isIncome', None)
-    is_outcome = request.GET.get('isOutcome', None)
-    selected_projects = request.GET.get('selectedProjects', None)
+        start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
+        end_date = request.GET.get('end_date', None)
+        is_income = request.GET.get('isIncome', None)
+        is_outcome = request.GET.get('isOutcome', None)
+        selected_projects = request.GET.get('selectedProjects', None)
 
-    incomes = models.Income.objects.filter(Q(project__title__icontains=search)
-                                           | Q(incomeDate__icontains=search)
-                                           | Q(description__icontains=search)
-                                           | Q(money__icontains=search)
-                                           | Q(isOutcome__icontains=search)
-                                           ).distinct()
+        incomes = models.Income.objects.filter(Q(project__title__icontains=search)
+                                               | Q(incomeDate__icontains=search)
+                                               | Q(description__icontains=search)
+                                               | Q(money__icontains=search)
+                                               | Q(isOutcome__icontains=search)
+                                               ).distinct()
+        # filter data for level1 access (only access to outcome payment)
+        if request.user.groups.filter(name='level1').exists():
+            incomes = incomes.filter(isOutcome=True)
 
-    # date range filter
-    if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
-        incomes = incomes.filter(incomeDate__range=[start_date, end_date]).distinct()
+        # date range filter
+        if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
+            incomes = incomes.filter(incomeDate__range=[start_date, end_date]).distinct()
 
-    # income/outcome filter
-    if is_income is not None and is_outcome is not None and is_income is not "" and is_outcome is not "":
-        if is_income == 'true' and is_outcome == 'true':
-            pass
-        elif is_income == 'true':
-            incomes = incomes.filter(isOutcome=True).distinct()
-        elif is_outcome == 'true':
-            incomes = incomes.filter(isOutcome=False).distinct()
+        # income/outcome filter
+        if is_income is not None and is_outcome is not None and is_income is not "" and is_outcome is not "":
+            if is_income == 'true' and is_outcome == 'true':
+                pass
+            elif is_income == 'true':
+                incomes = incomes.filter(isOutcome=True).distinct()
+            elif is_outcome == 'true':
+                incomes = incomes.filter(isOutcome=False).distinct()
 
-    # project filter
-    projects_list = []
-    if selected_projects is not None and selected_projects is not "":
-        projects_list = selected_projects.split("_")
-        incomes = incomes.filter(functools.reduce(operator.or_, (Q(project=x) for x in projects_list))).distinct()
+        # project filter
+        projects_list = []
+        if selected_projects is not None and selected_projects is not "":
+            projects_list = selected_projects.split("_")
+            incomes = incomes.filter(functools.reduce(operator.or_, (Q(project=x) for x in projects_list))).distinct()
 
-    filter_param = {
-        'start_date': start_date,
-        'end_date': end_date,
-        'is_income': is_income,
-        'is_outcome': is_outcome,
-        'projects_list': projects_list,
-    }
+        filter_param = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'is_income': is_income,
+            'is_outcome': is_outcome,
+            'projects_list': projects_list,
+        }
 
-    paginator = Paginator(incomes, page_size)
-    try:
-        incomes = paginator.page(page)
-    except PageNotAnInteger:
-        incomes = paginator.page(1)
-    except EmptyPage:
-        incomes = paginator.page(paginator.num_pages)
+        paginator = Paginator(incomes, page_size)
+        try:
+            incomes = paginator.page(page)
+        except PageNotAnInteger:
+            incomes = paginator.page(1)
+        except EmptyPage:
+            incomes = paginator.page(paginator.num_pages)
 
-    return render(request, 'project/income_list.html', {'incomes': incomes,
-                                                        'projects': projects,
-                                                        'search': search,
-                                                        'page_size': page_size,
-                                                        'filter_param': filter_param,
-                                                        })
+        return render(request, 'project/income/income_list.html', {'incomes': incomes,
+                                                            'projects': projects,
+                                                            'search': search,
+                                                            'page_size': page_size,
+                                                            'filter_param': filter_param,
+                                                                   })
+    else:
+        return render(request, 'project/505.html')
 
 
 # @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def income_view(request, income_id):
     income = get_object_or_404(models.Income, pk=income_id)
-    return render(request, 'project/income_detail.html', {'income': income})
+    return render(request, 'project/income/income_detail.html', {'income': income})
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def income_create(request):
-    post_data = request.POST
-    m_user = User.objects.get(id=post_data['user'])
-    m_project = models.Project.objects.get(id=post_data['project'])
-    m_pic = None
-    if post_data['isIncomePicValid'] == 'true':
-        m_pic = request.FILES['pic']
-    try:
-        m_incomeDate = (post_data['incomeDate'])
-    except ValueError:
-        m_incomeDate = str(timezone.now)
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        post_data = request.POST
+        m_user = User.objects.get(id=post_data['user'])
+        m_project = models.Project.objects.get(id=post_data['project'])
+        m_pic = None
+        if post_data['isIncomePicValid'] == 'true':
+            m_pic = request.FILES['pic']
+        try:
+            m_incomeDate = (post_data['incomeDate'])
+        except ValueError:
+            m_incomeDate = str(timezone.now)
 
-    m_money = int(post_data['money'])
-    m_isOutcome = post_data['isOutcome']
-    m_description = post_data['description']
-    p = models.Income(user=m_user
-                      , project=m_project
-                      , pic=m_pic
-                      , incomeDate=m_incomeDate
-                      , money=m_money
-                      , isOutcome=m_isOutcome
-                      , description=m_description)
-    p.save()
+        m_money = int(post_data['money'])
+        m_isOutcome = post_data['isOutcome']
+        m_description = post_data['description']
+        p = models.Income(user=m_user
+                          , project=m_project
+                          , pic=m_pic
+                          , incomeDate=m_incomeDate
+                          , money=m_money
+                          , isOutcome=m_isOutcome
+                          , description=m_description)
+        p.save()
 
-    return redirect('project:income-list')
+        return redirect('project:income-list')
+    else:
+        return render(request, 'project/505.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def income_update(request):
-    post_data = request.POST
-    m_user = User.objects.get(id=post_data['user'])
-    m_project = models.Project.objects.get(id=post_data['project'])
-    try:
-        m_incomeDate = (post_data['incomeDate'])
-    except ValueError:
-        m_incomeDate = str(timezone.now)
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        post_data = request.POST
+        m_user = User.objects.get(id=post_data['user'])
+        m_project = models.Project.objects.get(id=post_data['project'])
+        try:
+            m_incomeDate = (post_data['incomeDate'])
+        except ValueError:
+            m_incomeDate = str(timezone.now)
 
-    m_money = int(post_data['money'])
-    m_isOutcome = post_data['isOutcome']
-    print('----')
-    print(m_isOutcome)
-    m_description = post_data['description']
-    m_id = post_data['incomeId']
+        m_money = int(post_data['money'])
+        if request.user.is_superuser:
+            m_isOutcome = post_data['isOutcome']
+        m_description = post_data['description']
+        m_id = post_data['incomeId']
 
-    income = get_object_or_404(models.Income, pk=m_id)
-    income.user = m_user
-    income.employee = m_project
-    if post_data['isIncomePicValid'] == 'true':
-        income.pic = request.FILES['pic']
-    income.money = m_money
-    income.isOutcome = m_isOutcome
-    income.incomeDate = m_incomeDate
-    income.description = m_description
-    income.save()
+        income = get_object_or_404(models.Income, pk=m_id)
+        income.user = m_user
+        income.employee = m_project
+        if post_data['isIncomePicValid'] == 'true':
+            income.pic = request.FILES['pic']
+        income.money = m_money
+        if request.user.is_superuser:
+            income.isOutcome = m_isOutcome
+        income.incomeDate = m_incomeDate
+        income.description = m_description
+        income.save()
 
-    return redirect('project:income-list')
+        return redirect('project:income-list')
+    else:
+        return render(request, 'project/505.html')
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -795,7 +809,7 @@ def salary_update(request):
 # @user_passes_test(lambda u: u.is_superuser)
 @login_required
 def debt_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
         employees = models.Employee.objects.all()
         page = request.GET.get('page', 1)
         page_size = request.GET.get('page-size', 10)
@@ -851,151 +865,175 @@ def debt_list(request):
                                                                'page_size': page_size})
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def debt_create(request):
-    post_data = request.POST
-    m_user = User.objects.get(id=post_data['user'])
-    m_employee = models.Employee.objects.get(id=post_data['employee'])
-    m_price = int(post_data['price'])
-    m_title = post_data['title']
-    m_status = post_data['status']
-    m_description = post_data['description']
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        post_data = request.POST
+        m_user = User.objects.get(id=post_data['user'])
+        m_employee = models.Employee.objects.get(id=post_data['employee'])
+        m_price = int(post_data['price'])
+        m_title = post_data['title']
+        m_status = post_data['status']
+        m_description = post_data['description']
 
-    try:
-        m_debt_date = (post_data['debtDate'])
-        m_payment_debt_date = (post_data['paymentDebtDate'])
-    except ValueError:
-        m_debt_date = str(timezone.now)
-        m_payment_debt_date = str(timezone.now)
+        try:
+            m_debt_date = (post_data['debtDate'])
+            m_payment_debt_date = (post_data['paymentDebtDate'])
+        except ValueError:
+            m_debt_date = str(timezone.now)
+            m_payment_debt_date = str(timezone.now)
 
-    p = models.Debt(user=m_user
-                    , employee=m_employee
-                    , title=m_title
-                    , status=m_status
-                    , price=m_price
-                    , debtDate=m_debt_date
-                    , paymentDebtDate=m_payment_debt_date
-                    , description=m_description)
-    p.save()
+        p = models.Debt(user=m_user
+                        , employee=m_employee
+                        , title=m_title
+                        , status=m_status
+                        , price=m_price
+                        , debtDate=m_debt_date
+                        , paymentDebtDate=m_payment_debt_date
+                        , description=m_description)
+        p.save()
 
-    return redirect('project:debt-list')
+        return redirect('project:debt-list')
+    else:
+        return render(request, 'project/505.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def debt_update(request):
-    post_data = request.POST
-    m_user = User.objects.get(id=post_data['user'])
-    m_employee = models.Employee.objects.get(id=post_data['employee'])
-    try:
-        m_debt_date = (post_data['debtDate'])
-        m_payment_debt_date = (post_data['paymentDebtDate'])
-    except ValueError:
-        m_debt_date = str(timezone.now)
-        m_payment_debt_date = str(timezone.now)
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        post_data = request.POST
+        m_user = User.objects.get(id=post_data['user'])
+        m_employee = models.Employee.objects.get(id=post_data['employee'])
+        try:
+            m_debt_date = (post_data['debtDate'])
+            m_payment_debt_date = (post_data['paymentDebtDate'])
+        except ValueError:
+            m_debt_date = str(timezone.now)
+            m_payment_debt_date = str(timezone.now)
 
-    m_price = int(post_data['price'])
-    m_title = post_data['title']
-    m_status = post_data['status']
-    m_description = post_data['description']
-    m_id = post_data['debtId']
+        m_price = int(post_data['price'])
+        m_title = post_data['title']
+        m_status = post_data['status']
+        m_description = post_data['description']
+        m_id = post_data['debtId']
 
-    debt = get_object_or_404(models.Debt, pk=m_id)
-    debt.user = m_user
-    debt.employee = m_employee
-    debt.debtDate = m_debt_date
-    debt.paymentDebtDate = m_payment_debt_date
-    debt.description = m_description
-    debt.price = m_price
-    debt.title = m_title
-    debt.status = m_status
-    debt.save()
+        debt = get_object_or_404(models.Debt, pk=m_id)
+        debt.user = m_user
+        debt.employee = m_employee
+        debt.debtDate = m_debt_date
+        debt.paymentDebtDate = m_payment_debt_date
+        debt.description = m_description
+        debt.price = m_price
+        debt.title = m_title
+        debt.status = m_status
+        debt.save()
 
-    return redirect('project:debt-list')
+        return redirect('project:debt-list')
+    else:
+        return render(request, 'project/505.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def debt_delete(request, debt_id):
-    debt = get_object_or_404(models.Debt, pk=debt_id)
-    debt.delete()
-    return redirect('project:debt-list')
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        debt = get_object_or_404(models.Debt, pk=debt_id)
+        debt.delete()
+        return redirect('project:debt-list')
+    else:
+        return render(request, 'project/505.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def company_equipment_list(request):
-    page = request.GET.get('page', 1)
-    page_size = request.GET.get('page-size', 10)
-    search = request.GET.get('search', '')
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
 
-    companyEquipments = models.CompanyEquipment.objects.filter(Q(title__icontains=search)
-                                                               | Q(description__icontains=search)
-                                                               | Q(buyDate__icontains=search)
-                                                               | Q(price__icontains=search)
-                                                               )
+        companyEquipments = models.CompanyEquipment.objects.filter(Q(title__icontains=search)
+                                                                   | Q(description__icontains=search)
+                                                                   | Q(buyDate__icontains=search)
+                                                                   | Q(price__icontains=search)
+                                                                   )
 
-    paginator = Paginator(companyEquipments, page_size)
-    try:
-        companyEquipments = paginator.page(page)
-    except PageNotAnInteger:
-        companyEquipments = paginator.page(1)
-    except EmptyPage:
-        companyEquipments = paginator.page(paginator.num_pages)
+        paginator = Paginator(companyEquipments, page_size)
+        try:
+            companyEquipments = paginator.page(page)
+        except PageNotAnInteger:
+            companyEquipments = paginator.page(1)
+        except EmptyPage:
+            companyEquipments = paginator.page(paginator.num_pages)
 
-    return render(request, 'project/companyEquipment_list.html', {'companyEquipments': companyEquipments,
-                                                                  'search': search,
-                                                                  'page_size': page_size})
+        return render(request, 'project/companyEquipment_list.html', {'companyEquipments': companyEquipments,
+                                                                      'search': search,
+                                                                      'page_size': page_size})
+    else:
+        return render(request, 'project/505.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def company_equipment_create(request):
-    post_data = request.POST
-    m_user = User.objects.get(id=post_data['user'])
-    m_title = post_data['title']
-    m_price = int(post_data['price'])
-    m_pic = None
-    if post_data['isEqmPicValid'] == 'true':
-        m_pic = request.FILES['pic']
-    try:
-        m_buyDate = (post_data['buyDate'])
-    except ValueError:
-        m_buyDate = str(timezone.now)
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        post_data = request.POST
+        m_user = User.objects.get(id=post_data['user'])
+        m_title = post_data['title']
+        m_price = int(post_data['price'])
+        m_pic = None
+        if post_data['isEqmPicValid'] == 'true':
+            m_pic = request.FILES['pic']
+        try:
+            m_buyDate = (post_data['buyDate'])
+        except ValueError:
+            m_buyDate = str(timezone.now)
 
-    m_description = post_data['description']
-    p = models.CompanyEquipment(user=m_user
-                                , title=m_title
-                                , price=m_price
-                                , pic=m_pic
-                                , buyDate=m_buyDate
-                                , description=m_description)
-    p.save()
+        m_description = post_data['description']
+        p = models.CompanyEquipment(user=m_user
+                                    , title=m_title
+                                    , price=m_price
+                                    , pic=m_pic
+                                    , buyDate=m_buyDate
+                                    , description=m_description)
+        p.save()
 
-    return redirect('project:companyEquipment-list')
+        return redirect('project:companyEquipment-list')
+    else:
+        return render(request, 'project/505.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def company_equipment_update(request):
-    post_data = request.POST
-    m_user = User.objects.get(id=post_data['user'])
-    try:
-        m_buyDate = (post_data['buyDate'])
-    except ValueError:
-        m_buyDate = str(timezone.now)
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        post_data = request.POST
+        m_user = User.objects.get(id=post_data['user'])
+        try:
+            m_buyDate = (post_data['buyDate'])
+        except ValueError:
+            m_buyDate = str(timezone.now)
 
-    m_price = int(post_data['price'])
-    m_title = post_data['title']
-    m_description = post_data['description']
-    m_id = post_data['eqmId']
+        m_price = int(post_data['price'])
+        m_title = post_data['title']
+        m_description = post_data['description']
+        m_id = post_data['eqmId']
 
-    eqm = get_object_or_404(models.CompanyEquipment, pk=m_id)
-    eqm.user = m_user
-    eqm.buyDate = m_buyDate
-    eqm.price = m_price
-    eqm.title = m_title
-    eqm.description = m_description
-    if post_data['isEqmPicValid'] == 'true':
-        eqm.pic = request.FILES['pic']
-    eqm.save()
+        eqm = get_object_or_404(models.CompanyEquipment, pk=m_id)
+        eqm.user = m_user
+        eqm.buyDate = m_buyDate
+        eqm.price = m_price
+        eqm.title = m_title
+        eqm.description = m_description
+        if post_data['isEqmPicValid'] == 'true':
+            eqm.pic = request.FILES['pic']
+        eqm.save()
 
-    return redirect('project:companyEquipment-list')
+        return redirect('project:companyEquipment-list')
+    else:
+        return render(request, 'project/505.html')
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -1008,7 +1046,7 @@ def company_equipment_delete(request, companyEquipment_id):
 # @user_passes_test(lambda u: u.is_superuser)
 @login_required
 def workDay_list(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
         employees = models.Employee.objects.all()
         page = request.GET.get('page', 1)
         page_size = request.GET.get('page-size', 10)
@@ -1093,60 +1131,72 @@ def workDay_list(request):
                                                                           'filter_param': filter_param})
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def workDay_create(request):
-    post_data = request.POST
-    m_user = User.objects.get(id=post_data['user'])
-    m_employee = models.Employee.objects.get(id=post_data['employee'])
-    m_description = post_data['description']
-    m_work_hour = (post_data['workHour'])
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        post_data = request.POST
+        m_user = User.objects.get(id=post_data['user'])
+        m_employee = models.Employee.objects.get(id=post_data['employee'])
+        m_description = post_data['description']
+        m_work_hour = (post_data['workHour'])
 
-    try:
-        m_work_date = (post_data['workDate'])
-    except ValueError:
-        m_work_date = str(timezone.now)
+        try:
+            m_work_date = (post_data['workDate'])
+        except ValueError:
+            m_work_date = str(timezone.now)
 
-    p = models.WorkDay(user=m_user
-                       , employee=m_employee
-                       , workDate=m_work_date
-                       , workHour=m_work_hour
-                       , description=m_description)
-    p.save()
+        p = models.WorkDay(user=m_user
+                           , employee=m_employee
+                           , workDate=m_work_date
+                           , workHour=m_work_hour
+                           , description=m_description)
+        p.save()
 
-    return redirect('project:workDay-list')
+        return redirect('project:workDay-list')
+    else:
+        return render(request, 'project/505.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def workDay_update(request):
-    post_data = request.POST
-    m_user = User.objects.get(id=post_data['user'])
-    m_employee = models.Employee.objects.get(id=post_data['employee'])
-    m_work_hour = (post_data['workHour'])
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        post_data = request.POST
+        m_user = User.objects.get(id=post_data['user'])
+        m_employee = models.Employee.objects.get(id=post_data['employee'])
+        m_work_hour = (post_data['workHour'])
 
-    try:
-        m_work_date = (post_data['workDate'])
-    except ValueError:
-        m_work_date = str(timezone.now)
+        try:
+            m_work_date = (post_data['workDate'])
+        except ValueError:
+            m_work_date = str(timezone.now)
 
-    m_description = post_data['description']
-    m_id = post_data['workDayId']
+        m_description = post_data['description']
+        m_id = post_data['workDayId']
 
-    workDay = get_object_or_404(models.WorkDay, pk=m_id)
-    workDay.user = m_user
-    workDay.employee = m_employee
-    workDay.workDate = m_work_date
-    workDay.workHour = m_work_hour
-    workDay.description = m_description
-    workDay.save()
+        workDay = get_object_or_404(models.WorkDay, pk=m_id)
+        workDay.user = m_user
+        workDay.employee = m_employee
+        workDay.workDate = m_work_date
+        workDay.workHour = m_work_hour
+        workDay.description = m_description
+        workDay.save()
 
-    return redirect('project:workDay-list')
+        return redirect('project:workDay-list')
+    else:
+        return render(request, 'project/505.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def workDay_delete(request, workDay_id):
-    eqm = get_object_or_404(models.WorkDay, pk=workDay_id)
-    eqm.delete()
-    return redirect('project:workDay-list')
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        eqm = get_object_or_404(models.WorkDay, pk=workDay_id)
+        eqm.delete()
+        return redirect('project:workDay-list')
+    else:
+        return render(request, 'project/505.html')
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -1199,3 +1249,7 @@ def financial(request):
                       'debt_total': debt_total,
                       'demand_total': demand_total,
                   })
+
+
+def pageNotExist(request):
+    return render(request, 'project/505.html')

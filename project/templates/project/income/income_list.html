@@ -252,20 +252,22 @@
 
 
                         <!-- in/outcoe money -->
-                        <div class="list-group-item d-flex justify-content-between">
-                            <div class="text-left">
-                                <!-- income money -->
-                                <div class="form-check" >
-                                    <input type="checkbox" class="form-check-input" id="filter-income-inmoney" {{ filter_param.is_income|is_true:filter_param.is_income }}>
-                                    <label class="form-check-label" for="filter-income-inmoney">هزینه ها</label>
-                                </div>
-                                <!-- outcome money -->
-                                <div class="form-check ">
-                                    <input type="checkbox" class="form-check-input" id="filter-income-outmoney" {{ filter_param.is_outcome|is_true:filter_param.is_outcome }}>
-                                    <label class="form-check-label" for="filter-income-outmoney">درآمدها</label>
+                        {% if user.is_superuser %}
+                            <div class="list-group-item d-flex justify-content-between">
+                                <div class="text-left">
+                                    <!-- income money -->
+                                    <div class="form-check" >
+                                        <input type="checkbox" class="form-check-input" id="filter-income-inmoney" {{ filter_param.is_income|is_true:filter_param.is_income }}>
+                                        <label class="form-check-label" for="filter-income-inmoney">هزینه ها</label>
+                                    </div>
+                                    <!-- outcome money -->
+                                    <div class="form-check ">
+                                        <input type="checkbox" class="form-check-input" id="filter-income-outmoney" {{ filter_param.is_outcome|is_true:filter_param.is_outcome }}>
+                                        <label class="form-check-label" for="filter-income-outmoney">درآمدها</label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        {% endif %}
 
                         <!-- date filter -->
                         <div class="list-group-item d-flex justify-content-between">
@@ -398,28 +400,30 @@
                             </div>
 
                             <!-- Grid row (isOutcome) -->
-                            <input id="isOutcome-input" type="hidden" name="isOutcome">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form"><!-- Material unchecked -->
-                                        <div class="row">
-                                            <!-- Group of material radios - option 1 -->
-                                            <div class="form-check">
-                                                <input type="radio" class="form-check-input" id="income-input-new-isOutcome-false" name="groupOfNewIsOutcomeRadio">
-                                                <label class="form-check-label" for="income-input-new-isOutcome-false">درآمد</label>
+                            <input id="isOutcome-input" type="hidden" name="isOutcome" value="true">
+                            {% if user.is_superuser %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="md-form"><!-- Material unchecked -->
+                                            <div class="row">
+                                                <!-- Group of material radios - option 1 -->
+                                                <div class="form-check">
+                                                    <input type="radio" class="form-check-input" id="income-input-new-isOutcome-false" name="groupOfNewIsOutcomeRadio">
+                                                    <label class="form-check-label" for="income-input-new-isOutcome-false">درآمد</label>
+                                                </div>
+
+                                                <!-- Group of material radios - option 2 -->
+                                                <div class="form-check">
+                                                    <input type="radio" class="form-check-input" id="income-input-new-isOutcome-true" name="groupOfNewIsOutcomeRadio" checked>
+                                                    <label class="form-check-label" for="income-input-new-isOutcome-true">هزینه</label>
+                                                </div>
                                             </div>
 
-                                            <!-- Group of material radios - option 2 -->
-                                            <div class="form-check">
-                                                <input type="radio" class="form-check-input" id="income-input-new-isOutcome-true" name="groupOfNewIsOutcomeRadio" checked>
-                                                <label class="form-check-label" for="income-input-new-isOutcome-true">هزینه</label>
-                                            </div>
                                         </div>
-
                                     </div>
                                 </div>
-                            </div>
-{#                            <hr>#}
+                            {% endif %}
+
 
                             <!-- Grid row (incomeDate) -->
                             <label for="contact-Subject" class="mt-2">تاریخ</label>
@@ -540,28 +544,30 @@
                             </div>
 
                             <!-- Grid row (isOutcome) -->
-                            <input id="isOutcome-edit-input" type="hidden" name="isOutcome">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="md-form"><!-- Material unchecked -->
-                                        <div class="row">
-                                            <!-- Group of material radios - option 1 -->
-                                            <div class="form-check">
-                                                <input type="radio" class="form-check-input" id="income-input-edit-isOutcome-false" name="groupOfEditIsOutcomeRadio">
-                                                <label class="form-check-label" for="income-input-edit-isOutcome-false">درآمد</label>
+                            {% if user.is_superuser %}
+                                <input id="isOutcome-edit-input" type="hidden" name="isOutcome">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="md-form"><!-- Material unchecked -->
+                                            <div class="row">
+                                                <!-- Group of material radios - option 1 -->
+                                                <div class="form-check">
+                                                    <input type="radio" class="form-check-input" id="income-input-edit-isOutcome-false" name="groupOfEditIsOutcomeRadio">
+                                                    <label class="form-check-label" for="income-input-edit-isOutcome-false">درآمد</label>
+                                                </div>
+
+                                                <!-- Group of material radios - option 2 -->
+                                                <div class="form-check">
+                                                    <input type="radio" class="form-check-input" id="income-input-edit-isOutcome-true" name="groupOfEditIsOutcomeRadio" checked>
+                                                    <label class="form-check-label" for="income-input-edit-isOutcome-true">هزینه</label>
+                                                </div>
                                             </div>
 
-                                            <!-- Group of material radios - option 2 -->
-                                            <div class="form-check">
-                                                <input type="radio" class="form-check-input" id="income-input-edit-isOutcome-true" name="groupOfEditIsOutcomeRadio" checked>
-                                                <label class="form-check-label" for="income-input-edit-isOutcome-true">هزینه</label>
-                                            </div>
                                         </div>
-
                                     </div>
                                 </div>
-                            </div>
-                            <hr>
+                                <hr>
+                            {% endif %}
 
                             <!-- Grid row (incomeDate) -->
                             <label for="contact-Subject" class="">تاریخ
