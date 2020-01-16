@@ -127,42 +127,44 @@
 
                 </li>
 
-                <li class="list-group-item waves-light" style="background-color: #2C3E50">
-                    <a href="{% url 'project:project-list' %}" class="text-white">
-                        <span id="projects" >
-                            <i id="materials-icon" class="fa fa-project-diagram align-middle ml-2" ></i>
-                            پروژه ها
-                        </span>
-                        <div class="mask rgba-blue-grey-light"></div>
-                    </a>
-                </li>
-                <li class="list-group-item  waves-light active" style="background-color: #2C3E50">
-                    <a href="{% url 'project:employee-list' %}" class="text-white">
-                        <span id="employees">
-                            <i id="companies-icon" class="fa fa-user align-middle ml-2"></i>
-                            کارمندها
-                        </span>
-                        <div class="mask rgba-blue-grey-light"></div>
-                    </a>
-                </li>
-                <li class="list-group-item waves-light" style="background-color: #2C3E50">
-                    <a href="{% url 'project:income-list' %}" class="text-white">
-                        <span id="incomes">
-                            <i id="companies-icon" class="fa fa-box-usd align-middle ml-2"></i>
-                            درآمد/هزینه ها
-                        </span>
-                        <div class="mask rgba-blue-grey-light"></div>
-                    </a>
-                </li>
-                <li class="list-group-item waves-light" style="background-color: #2C3E50">
-                    <a href="{% url 'project:companyEquipment-list' %}" class="text-white">
-                        <span id="eqms">
-                            <i id="companies-icon" class="fa fa-archive align-middle ml-2" ></i>
-                            دارایی ها
-                        </span>
-                        <div class="mask rgba-blue-grey-light"></div>
-                    </a>
-                </li>
+                {% if user.is_superuser %}
+                    <li class="list-group-item waves-light" style="background-color: #2C3E50">
+                        <a href="{% url 'project:project-list' %}" class="text-white">
+                            <span id="projects" >
+                                <i id="materials-icon" class="fa fa-project-diagram align-middle ml-2" ></i>
+                                پروژه ها
+                            </span>
+                            <div class="mask rgba-blue-grey-light"></div>
+                        </a>
+                    </li>
+                    <li class="list-group-item  waves-light active" style="background-color: #2C3E50">
+                        <a href="{% url 'project:employee-list' %}" class="text-white">
+                            <span id="employees">
+                                <i id="companies-icon" class="fa fa-user align-middle ml-2"></i>
+                                کارمندها
+                            </span>
+                            <div class="mask rgba-blue-grey-light"></div>
+                        </a>
+                    </li>
+                    <li class="list-group-item waves-light" style="background-color: #2C3E50">
+                        <a href="{% url 'project:income-list' %}" class="text-white">
+                            <span id="incomes">
+                                <i id="companies-icon" class="fa fa-box-usd align-middle ml-2"></i>
+                                درآمد/هزینه ها
+                            </span>
+                            <div class="mask rgba-blue-grey-light"></div>
+                        </a>
+                    </li>
+                    <li class="list-group-item waves-light" style="background-color: #2C3E50">
+                        <a href="{% url 'project:companyEquipment-list' %}" class="text-white">
+                            <span id="eqms">
+                                <i id="companies-icon" class="fa fa-archive align-middle ml-2" ></i>
+                                دارایی ها
+                            </span>
+                            <div class="mask rgba-blue-grey-light"></div>
+                        </a>
+                    </li>
+                {% endif %}
                 <li class="list-group-item waves-light" style="background-color: #2C3E50">
                     <a href="{% url 'project:workDay-list' %}" class="text-white">
                         <span id="workDays">
@@ -199,15 +201,17 @@
                         <div class="mask rgba-blue-grey-light"></div>
                     </a>
                 </li>
-                <li class="list-group-item waves-light" style="background-color: #2C3E50">
-                    <a href="{% url 'project:financial' %}" class="text-white">
-                        <div class="mask rgba-blue-grey-light"> </div>
-                        <span id="financial">
+                {% if user.is_superuser %}
+                    <li class="list-group-item waves-light" style="background-color: #2C3E50">
+                        <a href="{% url 'project:financial' %}" class="text-white">
+                            <div class="mask rgba-blue-grey-light"> </div>
+                            <span id="financial">
                             <i id="companies-icon" class="fa fa-money-check-alt align-middle ml-2"></i>
                             مالی
                         </span>
-                    </a>
-                </li>
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </div> <!-- /#sidebar-wrapper -->
 

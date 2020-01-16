@@ -1,0 +1,347 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% load jalali_tags %}
+{% load humanize %}
+{% load auth_extras %}
+{% block title %}
+    <title>مدیریت روزهای کاری</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+
+    <!-- load static file in django -->
+    {% load staticfiles %}
+
+
+    <!-- Material Design Bootstrap table -->
+    <link rel="stylesheet" href="{% static 'project/css/addons/datatables.min.css' %}"><!-- MDBootstrap Datatables  -->
+    <!-- Material Design Bootstrap table -->
+    <link rel="stylesheet" href="{% static 'project/css/addons/datatables-select.min.css' %}"><!-- MDBootstrap Datatables  -->
+
+    <!-- body -->
+    <div class="container-fluid row">
+
+        <!-- table and tools -->
+        <div class="col-sm-9 mb-2">
+
+            <!-- body -->
+            <section class="">
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-list">
+
+                            <!-- header -->
+                            <div class="card-header white d-flex justify-content-between align-items-center py-3 bg-transparent mx-1 mt-1">
+
+                                <div class="container-fluid">
+
+                                    <!-- PAGE SIZE/ search -->
+                                    <div class="container">
+                                        <div class="row ">
+
+                                            <div class="col-5 mb-2">
+                                                <div class="row">
+                                                    <p>تعداد صفحات</p>
+                                                    <select id="workDay-selector-page-size-employee" class="browser-default custom-select" onchange="workDayPageSizeEmployeeChanged(this.options[this.selectedIndex].value)">
+                                                        <option value="10">10</option>
+                                                        <option value="20" >20</option>
+                                                        <option value="50">50</option>
+                                                        <option value="100">100</option>
+                                                    </select>
+                                                    <a id="workDay-tag-a-page-size-employee" class="d-none" href="?page-size=20">20</a>
+                                                    <script>
+                                                        document.getElementById('workDay-selector-page-size-employee').value={{ page_size }};
+                                                        function workDayPageSizeEmployeeChanged(page_size) {
+                                                            {#alert(page_size)#}
+                                                            let tag_a = document.getElementById("workDay-tag-a-page-size-employee");
+                                                            tag_a.href = "?page-size=" + page_size;
+                                                            tag_a.click();
+                                                        }
+                                                    </script>
+                                                </div>
+                                            </div>
+
+                                            <!-- Search form -->
+                                            <div class="col-6 mb-2 mr-4">
+                                                <div class="row">
+                                                    <p>جست و جو</p>
+                                                    <input id="search-workDay-employee" class="form-control" type="text" placeholder="جست و جو" aria-label="Search" value="{{ search }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- table -->
+                            <div class="card-body table-responsive">
+
+                                <table class="table table-sm table-hover"  id="workDay-table-employee">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">کارمند</th>
+                                        <th scope="col">تاریخ کار</th>
+                                        <th scope="col">ساعت کاری</th>
+                                        <th scope="col">توضیحات</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for workDay in workdays %}
+                                        <tr>
+                                            <input class="workDayId" type="hidden" dataId={{ workDay.id }}>
+                                            <input class="employee" type="hidden" employeId={{ workDay.employee.id }}>
+                                            <th scope="row" >{{ forloop.counter }}</th>
+                                            <td class="employee" >{{ workDay.employee.fullName }}</td>
+                                            <td class="workDate" data-workDate="{{ workDay.workDate|date:"Y-m-d" }}">{{ workDay.workDate|to_jalali:'%y/%m/%d' }}</td>
+                                            <td class="workHour">{{ workDay.workHour }}</td>
+                                            <td class="description">{{ workDay.description }}</td>
+
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                            <!-- pagination -->
+                            <div class="card-footer white py-3 d-flex justify-content-between">
+
+                                <div class="d-flex justify-content-center w-100">
+                                    {% if workdays.has_other_pages %}
+                                        <nav aria-label="Page navigation example">
+                                            <ul class="pagination pagination-circle pg-blue">
+                                                <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-workDay-search').value + document.getElementById('query-workDay-filter').value">First</a></li>
+                                                {% if workdays.has_previous %}
+                                                    <li class="page-item">
+                                                        <a class="page-link" aria-label="Previous" href="?page={{ workdays.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-workDay-search').value + document.getElementById('query-workDay-filter').value">
+                                                            <span aria-hidden="true">&laquo;</span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link" aria-label="Previous">
+                                                            <span aria-hidden="true">&laquo;</span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
+                                                <!-- center page numbers -->
+                                                {% for i in workdays.paginator.page_range %}
+                                                    {% if workdays.number == i %}
+                                                        <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+
+                                                    {% else %}
+                                                        <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-workDay-search').value + document.getElementById('query-workDay-filter').value">{{ i }}</a></li>
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                                <!-- center page numbers -->
+                                                {% if workdays.has_next %}
+                                                    <a class="page-link" aria-label="Next"  href="?page={{ workdays.next_page_number }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-workDay-search').value + document.getElementById('query-workDay-filter').value">
+                                                        <span aria-hidden="true">&raquo;</span>
+                                                        <span class="sr-only">Next</span>
+                                                    </a>
+                                                {% else %}
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link" aria-label="Next">
+                                                            <span aria-hidden="true">&raquo;</span>
+                                                            <span class="sr-only">Next</span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
+                                                <li class="page-item"><a class="page-link">Last</a></li>
+                                            </ul>
+                                        </nav>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <!-- Section: Block Content -->
+
+        </div>
+
+        <!-- filter section -->
+        <div class="col-sm-3 mb-3">
+
+            <!-- Panel -->
+            <div class="card">
+
+                <div class="card-header white-text info-color">
+                    فیلتر
+                </div>
+
+                <div class="card-body text-center px-3">
+                    <div class="list-group list-group-flush">
+
+                        <!-- employees -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <div dir="ltr" >
+                                <label class="float-right">کارمند: {{ employee.fullName }}</label>
+                            </div>
+                        </div>
+
+                        <!-- date filter -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <div>
+
+                                <!-- start date -->
+                                <label for="filter-workDay-startDate-employee" class="float-right">تاریخ شروع</label>
+                                <div class="row" dir="ltr" style="width: 100%">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text cursor-pointer" id="dt_class_workDay_filter_startDate-employee"><i class="fa fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input type="text" id="filter-workDa-startDate-employee" class="form-control" value="{{ filter_param.start_date|default_if_none:"" }}">
+                                    </div>
+                                    <label id="showDate_class_workDay_filter_startDate-employee" class="text-black-50 small"> </label>
+                                </div>
+
+                                <!-- end date -->
+                                <label for="filter-workDay-endDate-employee" class="float-right">تاریخ پایان</label>
+                                <div class="row" dir="ltr" style="width: 100%">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text cursor-pointer" id="dt_class_workDay_filter_endDate-employee"><i class="fa fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input type="text" id="filter-workDa-endDate-employee" class="form-control" value="{{ filter_param.end_date|default_if_none:"" }}">
+                                    </div>
+                                    <label id="showDate_class_workDay_filter_endDate-employee" class="text-black-50 small"> </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- filter button -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <a onclick="workDayFilterEmployeeChanged()" class="btn btn-rounded btn-outline-primary btn-block" >فیلتر</a>
+                        </div>
+
+                        <!-- link for apply filter -->
+                        <a id="workDay-tag-a-filter-employee" class="d-none" href="?page-size=20">20</a>
+                        <script>
+                            document.getElementById('workDay-selector-page-size-employee').value={{ page_size }};
+                            function workDayFilterEmployeeChanged() {
+
+                                let date_start = document.getElementById("filter-workDa-startDate-employee").value;
+                                let date_end = document.getElementById("filter-workDa-endDate-employee").value;
+                                let tag_a = document.getElementById("workDay-tag-a-filter-employee");
+
+                                document.getElementById("query-workDay-filter-employee").setAttribute("value", "&start_date=" + date_start
+                                    + "&end_date=" + date_end);
+
+
+                                {#alert(document.getElementById("query-workDay-filter-employee").getAttribute("value"))#}
+
+                                let query_search = document.getElementById("query-workDay-search-employee").value;
+                                let query_filter = document.getElementById("query-workDay-filter-employee").value;
+
+                                tag_a.href = "?page-size=" + {{page_size}} + query_search + query_filter;
+
+                                tag_a.click();
+                            }
+
+                        </script>
+
+                    </div>
+                </div>
+
+            </div>
+            <!-- Panel -->
+
+        </div>
+
+    </div>
+
+
+    <!-- base url address -->
+    <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
+
+    <!-- filter queries -->
+    <input type="hidden" id="query-workDay-filter-employee" value="&start_date={{filter_param.start_date|default_if_none:''}}&end_date={{filter_param.end_date|default_if_none:''}}&">
+{#    selectedEmployees={{ filter_param.end_date|default_if_none:'' }}">#}
+    <!-- search queries -->
+    <input type="hidden" id="query-workDay-search-employee" value="&search={{search}}">
+
+{% endblock %}
+
+{% block javascript %}
+
+
+    <script>
+
+        $("#workDay-table-employee tr").click(function(){
+           $(this).addClass('table-primary').siblings().removeClass('table-primary');
+           var value=$(this).find('input.workDayId').attr("dataId");
+
+        });
+
+        $('.ok').on('click', function(e){
+            alert($("#workDay-table-employee tr.selected td:first").html());
+        });
+
+        // Material Select Initialization
+        $(document).ready(function() {
+        $('.mdb-select').materialSelect();
+        });
+
+
+    <!-- table select -->
+    </script>
+
+    <!-- search -->
+    <script>
+        $("#search-workDay-employee").on('keyup', function (e) {
+            if (e.keyCode === 13) {
+                let srchterm = $("#search-workDay-employee").val();
+
+                document.getElementById("query-workDay-search-employee").setAttribute("value", "&search=" + srchterm);
+
+                let query_search = document.getElementById("query-workDay-search-employee").value;
+                let query_filter = document.getElementById("query-workDay-filter-employee").value;
+
+                let tag_a = document.getElementById("workDay-tag-a-page-size-employee");
+                tag_a.href = "?page-size=" + {{ page_size }} + query_search + query_filter;
+                tag_a.click();
+            }
+        });
+    </script>
+
+    <!--jalali calender-->
+    <script>
+    // persian calender : https://github.com/Mds92/MD.BootstrapPersianDateTimePicker
+        $(document).ready(function () {
+            $("#dt_class_workDay_filter_startDate-employee").MdPersianDateTimePicker({
+                targetDateSelector: "#filter-workDa-startDate-employee",
+                targetTextSelector: "#showDate_class_workDay_filter_startDate-employee",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                //inLine: true,
+                //rangeSelector: true
+            });
+            $("#dt_class_workDay_filter_endDate-employee").MdPersianDateTimePicker({
+                targetDateSelector: "#filter-workDa-endDate-employee",
+                targetTextSelector: "#showDate_class_workDay_filter_endDate-employee",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                //inLine: true,
+            });
+        });
+
+    </script>
+
+{% endblock %}

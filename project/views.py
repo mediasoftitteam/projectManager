@@ -25,56 +25,80 @@ from django.db.models import Sum
 # first page
 @login_required
 def index(request):
+    if request.user.is_superuser:
+        project = models.Project.objects.all()
+        cost = 0
+        for prj in project:
+            if prj.money is not None:
+                cost = cost + prj.money
 
-    project = models.Project.objects.all()
-    cost = 0
-    for prj in project:
-        if prj.money is not None:
-            cost = cost + prj.money
+        employee = models.Employee.objects.all()
+        salary_sum = 0
+        for emp in employee:
+            if emp.salary is not None:
+                salary_sum = salary_sum + emp.salary
 
-    employee = models.Employee.objects.all()
-    salary_sum = 0
-    for emp in employee:
-        if emp.salary is not None:
-            salary_sum = salary_sum + emp.salary
+        employee_user = get_object_or_404(models.Employee, user=request.user)
 
-    employee_user = get_object_or_404(models.Employee, user=request.user)
+        tasks = models.Task.objects.all()
 
-    tasks = models.Task.objects.all()
+        salaries = models.MonthSalary.objects.all()
+        salaries_sum = models.MonthSalary.objects.aggregate(Sum('money'))['money__sum']
 
-    salaries = models.MonthSalary.objects.all()
-    salaries_sum = models.MonthSalary.objects.aggregate(Sum('money'))['money__sum']
+        incomes = models.Income.objects.all()
+        income_sum = incomes.filter(isOutcome=True).aggregate(Sum('money'))['money__sum']
+        if income_sum is None:
+            income_sum = 0
+        outcome_sum = incomes.filter(isOutcome=False).aggregate(Sum('money'))['money__sum']
+        if outcome_sum is None:
+            outcome_sum = 0
+        incomes_money = (income_sum) - (outcome_sum)
 
-    incomes = models.Income.objects.all()
-    income_sum = incomes.filter(isOutcome=True).aggregate(Sum('money'))['money__sum']
-    if income_sum is None:
-        income_sum = 0
-    outcome_sum = incomes.filter(isOutcome=False).aggregate(Sum('money'))['money__sum']
-    if outcome_sum is None:
-        outcome_sum = 0
-    incomes_money = (income_sum) - (outcome_sum)
+        debts = models.Debt.objects.all()
+        debts_sum = models.Debt.objects.aggregate(Sum('price'))['price__sum']
 
-    debts = models.Debt.objects.all()
-    debts_sum = models.Debt.objects.aggregate(Sum('price'))['price__sum']
-
-    return render(request, 'project/index.html', {
-        'project_count': project.count(),
-        'project_total_money': cost,
-        'employee_count': employee.count(),
-        'employee_total_money': cost,
-        'salary_sum': salary_sum,
-        'task_count': tasks.count(),
-        'salaries_count': salaries.count(),
-        'salaries_sum': salaries_sum,
-        'incomes_count': incomes.count(),
-        'incomes_money': incomes_money,
-        'income_sum': income_sum,
-        'outcome_sum': outcome_sum,
-        'debts_count': debts.count(),
-        'debts_sum': debts_sum,
-        'employee_user': employee_user,
-    })
-
+        return render(request, 'project/index.html', {
+            'project_count': project.count(),
+            'project_total_money': cost,
+            'employee_count': employee.count(),
+            'employee_total_money': cost,
+            'salary_sum': salary_sum,
+            'task_count': tasks.count(),
+            'salaries_count': salaries.count(),
+            'salaries_sum': salaries_sum,
+            'incomes_count': incomes.count(),
+            'incomes_money': incomes_money,
+            'income_sum': income_sum,
+            'outcome_sum': outcome_sum,
+            'debts_count': debts.count(),
+            'debts_sum': debts_sum,
+            'employee_user': employee_user,
+        })
+    else:
+        employee = get_object_or_404(models.Employee, user=request.user)
+        tasks = models.Task.objects.filter(employees=employee.id)
+        workDays = models.WorkDay.objects.filter(employee=employee.id)
+        salaries = models.MonthSalary.objects.filter(employee=employee.id)
+        salaries_sum = salaries.aggregate(Sum('money'))['money__sum']
+        debts = models.Debt.objects.filter(employee=employee.id)
+        debt_sum = debts.filter(status__icontains='بدهی').aggregate(Sum('price'))['price__sum']
+        if debt_sum is None:
+            debt_sum = 0
+        demand_sum = debts.filter(status__icontains='طلب').aggregate(Sum('price'))['price__sum']
+        if demand_sum is None:
+            demand_sum = 0
+        debts_sum = demand_sum - debt_sum
+        return render(request, 'project/employee_detail.html', {
+            'employee': employee,
+            'tasks': tasks,
+            'workDays': workDays,
+            'salaries': salaries,
+            'salaries_sum': salaries_sum,
+            'debts': debts,
+            'debt_sum': debt_sum,
+            'demand_sum': demand_sum,
+            'debts_sum': debts_sum,
+        })
 
 
 #########################
@@ -211,7 +235,6 @@ def employee_list(request):
 # @user_passes_test(lambda u: u.is_superuser)
 @login_required
 def employee_view(request, employee_id):
-
     if request.user.is_superuser:
         employee = get_object_or_404(models.Employee, pk=employee_id)
         tasks = models.Task.objects.filter(employees=employee.id)
@@ -866,52 +889,92 @@ def company_equipment_delete(request, companyEquipment_id):
     return redirect('project:companyEquipment-list')
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
+@login_required
 def workDay_list(request):
-    employees = models.Employee.objects.all()
-    page = request.GET.get('page', 1)
-    page_size = request.GET.get('page-size', 10)
-    search = request.GET.get('search', '')
+    if request.user.is_superuser:
+        employees = models.Employee.objects.all()
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
 
-    start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
-    end_date = request.GET.get('end_date', None)
-    selected_employees = request.GET.get('selectedEmployees', None)
+        start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
+        end_date = request.GET.get('end_date', None)
+        selected_employees = request.GET.get('selectedEmployees', None)
 
-    workdays = models.WorkDay.objects.filter(Q(employee__fullName__icontains=search)
-                                             | Q(description__icontains=search)
-                                             | Q(workDate__icontains=search)
-                                             | Q(workHour__icontains=search)
-                                             )
+        workdays = models.WorkDay.objects.filter(Q(employee__fullName__icontains=search)
+                                                 | Q(description__icontains=search)
+                                                 | Q(workDate__icontains=search)
+                                                 | Q(workHour__icontains=search)
+                                                 )
 
-    # date range filter
-    if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
-        workdays = workdays.filter(workDate__range=[start_date, end_date]).distinct()
+        # date range filter
+        if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
+            workdays = workdays.filter(workDate__range=[start_date, end_date]).distinct()
 
-    # employee filter
-    employee_list = []
-    if selected_employees is not None and selected_employees is not "":
-        employee_list = selected_employees.split("_")
-        workdays = workdays.filter(functools.reduce(operator.or_, (Q(employee=x) for x in employee_list))).distinct()
+        # employee filter
+        employee_list = []
+        if selected_employees is not None and selected_employees is not "":
+            employee_list = selected_employees.split("_")
+            workdays = workdays.filter(
+                functools.reduce(operator.or_, (Q(employee=x) for x in employee_list))).distinct()
 
-    filter_param = {
-        'start_date': start_date,
-        'end_date': end_date,
-        'employee_list': employee_list,
-    }
+        filter_param = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'employee_list': employee_list,
+        }
 
-    paginator = Paginator(workdays, page_size)
-    try:
-        workdays = paginator.page(page)
-    except PageNotAnInteger:
-        workdays = paginator.page(1)
-    except EmptyPage:
-        workdays = paginator.page(paginator.num_pages)
+        paginator = Paginator(workdays, page_size)
+        try:
+            workdays = paginator.page(page)
+        except PageNotAnInteger:
+            workdays = paginator.page(1)
+        except EmptyPage:
+            workdays = paginator.page(paginator.num_pages)
 
-    return render(request, 'project/workDay_list.html', {'workdays': workdays,
-                                                         'employees': employees,
-                                                         'search': search,
-                                                         'page_size': page_size,
-                                                         'filter_param': filter_param})
+        return render(request, 'project/workDay/workDay_list.html', {'workdays': workdays,
+                                                                     'employees': employees,
+                                                                     'search': search,
+                                                                     'page_size': page_size,
+                                                                     'filter_param': filter_param})
+    else:
+        employee = get_object_or_404(models.Employee, user=request.user)
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
+
+        start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
+        end_date = request.GET.get('end_date', None)
+
+        workdays = models.WorkDay.objects.filter((Q(description__icontains=search)
+                                                  | Q(workDate__icontains=search)
+                                                  | Q(workHour__icontains=search))
+                                                 & Q(employee=employee)
+                                                 )
+
+        # date range filter
+        if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
+            workdays = workdays.filter(workDate__range=[start_date, end_date]).distinct()
+
+        filter_param = {
+            'start_date': start_date,
+            'end_date': end_date,
+        }
+
+        paginator = Paginator(workdays, page_size)
+        try:
+            workdays = paginator.page(page)
+        except PageNotAnInteger:
+            workdays = paginator.page(1)
+        except EmptyPage:
+            workdays = paginator.page(paginator.num_pages)
+
+        return render(request, 'project/workDay/workDayOfEmployee.html', {'workdays': workdays,
+                                                                          'employee': employee,
+                                                                          'search': search,
+                                                                          'page_size': page_size,
+                                                                          'filter_param': filter_param})
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -993,13 +1056,13 @@ def financial(request):
         if emp.total_salary is None:
             emp.total_salary = 0
         emp.total_debt = \
-        models.Debt.objects.filter(employee=emp.id).filter(status__icontains='بدهی').aggregate(Sum('price'))[
-            'price__sum']
+            models.Debt.objects.filter(employee=emp.id).filter(status__icontains='بدهی').aggregate(Sum('price'))[
+                'price__sum']
         if emp.total_debt is None:
             emp.total_debt = 0
         emp.total_demand = \
-        models.Debt.objects.filter(employee=emp.id).filter(status__icontains='طلب').aggregate(Sum('price'))[
-            'price__sum']
+            models.Debt.objects.filter(employee=emp.id).filter(status__icontains='طلب').aggregate(Sum('price'))[
+                'price__sum']
         if emp.total_demand is None:
             emp.total_demand = 0
         emp.save()
