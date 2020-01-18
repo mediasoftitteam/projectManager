@@ -66,6 +66,7 @@ class Employee(models.Model):
         return self.user
 
 
+# remove
 class Income(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
@@ -118,6 +119,7 @@ class Task(models.Model):
         return self.user
 
 
+# remove
 class MonthSalary(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, help_text='کارمند')
@@ -157,6 +159,7 @@ class WorkDay(models.Model):
         return self.user
 
 
+# remove
 class CompanyEquipment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=120, null=True, blank=True, help_text='عنوان')
@@ -176,6 +179,7 @@ class CompanyEquipment(models.Model):
         return self.user
 
 
+# remove
 class Debt(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, help_text='کارمند')
@@ -196,3 +200,75 @@ class Debt(models.Model):
     def owner(self):
         return self.user
 
+
+ACCOUNT_CHOICES = (
+    ("0", "سرمایه"),
+    ("1", "بدهی"),
+    ("2", "دارایی"),
+)
+
+
+class Account(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    title = models.CharField(max_length=120, null=True, blank=True, help_text='عنوان')
+    description = models.CharField(max_length=120, null=True, blank=True, help_text='توضیحات')
+    type = models.CharField(max_length=120, null=True, blank=True, help_text='نوع', choices=ACCOUNT_CHOICES, default='2')
+    pic = models.ImageField('uploaded image', null=True, blank=True, upload_to=scramble_uploaded_filename, help_text='آیکون')
+
+    class Meta:
+        ordering = ["title"]
+
+    def __str__(self):
+        return self.title + " - " + self.get_type_display()
+
+    @property
+    def owner(self):
+        return self.user
+
+
+class SubAccount(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    title = models.CharField(max_length=120, null=True, blank=True, help_text='عنوان زیرشاخه حساب')
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, help_text='حساب')
+    description = models.CharField(max_length=120, null=True, blank=True, help_text='توضیحات')
+    pic = models.ImageField('uploaded image', null=True, blank=True, upload_to=scramble_uploaded_filename, help_text='آیکون')
+
+    class Meta:
+        ordering = ["title"]
+
+    def __str__(self):
+        return str(self.user.username) + " - " + self.title
+
+    @property
+    def owner(self):
+        return self.user
+
+
+TRANSACTION_CHOICES = (
+    ("0", "دریافت"),
+    ("1", "پرداخت"),
+    ("2", "انتقال"),
+)
+
+
+class Transaction(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    project = models.ForeignKey(Project, null=True, blank=True, on_delete=models.CASCADE, help_text='پروژه')
+    employee = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.CASCADE, help_text='کارمند')
+    source = models.ForeignKey(SubAccount, related_name='sourceAccount', on_delete=models.CASCADE, help_text='حساب مبدا')
+    destination = models.ForeignKey(SubAccount, related_name='destinationAccount', on_delete=models.CASCADE, help_text='حساب مقصد')
+    pic = models.ImageField('uploaded image', null=True, blank=True, upload_to=scramble_uploaded_filename)
+    createdAt = models.DateField(default=timezone.now)
+    money = models.BigIntegerField(null=True, blank=True, help_text='مبلغ')
+    description = models.CharField(max_length=120, null=True, blank=True, help_text='توضیحات')
+    type = models.CharField(max_length=120, null=True, blank=True, help_text='نوع', choices=TRANSACTION_CHOICES, default='1')
+
+    class Meta:
+        ordering = ["createdAt"]
+
+    def __str__(self):
+        return str(self.user.username) + " - " + self.project.title + " - " + str(self.createdAt)
+
+    @property
+    def owner(self):
+        return self.user

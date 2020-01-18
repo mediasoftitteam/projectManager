@@ -1,0 +1,861 @@
+<!-- use base html template -->
+{% extends 'project/base.html' %}
+{% load jalali_tags %}
+{% load humanize %}
+{% load auth_extras %}
+{% block title %}
+    <title>مدیریت تراکنش  ها</title>
+{% endblock %}
+<!-- begin of body block -->
+{% block body %}
+
+    <!-- load static file in django -->
+    {% load staticfiles %}
+
+
+    <!-- Material Design Bootstrap table -->
+    <link rel="stylesheet" href="{% static 'project/css/addons/datatables.min.css' %}"><!-- MDBootstrap Datatables  -->
+    <!-- Material Design Bootstrap table -->
+    <link rel="stylesheet" href="{% static 'project/css/addons/datatables-select.min.css' %}"><!-- MDBootstrap Datatables  -->
+
+    <!-- body -->
+    <div class="container-fluid row">
+
+        <!-- table and tools -->
+        <div class="col-sm-9 mb-2">
+
+            <!-- body -->
+            <section class="">
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-list">
+
+                            <!-- header -->
+                            <div class="card-header white d-flex justify-content-between align-items-center py-3 bg-transparent mx-1 mt-1">
+
+                                <div class="container-fluid">
+                                    <!-- new/delete/edit buttons -->
+                                    <div class="text-center mb-4 pt-1 pb-1 border border-info rounded">
+                                        <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" id="transaction-modal-add-btn" data-target="#modelTransactionNew"><i class="fas fa-plus-circle mr-1"></i> افزودن</button>
+                                        <button type="button" class="btn btn-rounded btn-info btn-sm" data-toggle="modal" data-target="#modelTransactionEdit"><i class="fas fa-edit mr-1"></i> ویرایش</button>
+                                        <button type="button" class="btn btn-rounded btn-danger btn-sm" data-toggle="modal" data-target="#modal-transaction-delete"
+                                                onclick="showTransactionDeleteModal()"><i class="fas fa-trash mr-1"></i> حذف</button>
+                                    </div>
+
+                                    <!-- PAGE SIZE/ search -->
+                                    <div class="container">
+                                        <div class="row ">
+
+                                            <div class="col-5 mb-2">
+                                                <div class="row">
+                                                    <p>تعداد صفحات</p>
+                                                    <select id="transaction-selector-page-size" class="browser-default custom-select" onchange="transactionPageSizeChanged(this.options[this.selectedIndex].value)">
+                                                        <option value="10">10</option>
+                                                        <option value="20" >20</option>
+                                                        <option value="50">50</option>
+                                                        <option value="100">100</option>
+                                                    </select>
+                                                    <a id="transaction-tag-a-page-size" class="d-none" href="?page-size=20">20</a>
+                                                    <script>
+                                                        document.getElementById('transaction-selector-page-size').value={{ page_size }};
+                                                        function transactionPageSizeChanged(page_size) {
+                                                            {#alert(page_size)#}
+                                                            let tag_a = document.getElementById("transaction-tag-a-page-size");
+                                                            tag_a.href = "?page-size=" + page_size;
+                                                            tag_a.click();
+                                                        }
+                                                    </script>
+                                                </div>
+                                            </div>
+
+                                            <!-- Search form -->
+                                            <div class="col-6 mb-2 mr-4">
+                                                <div class="row">
+                                                    <p>جست و جو</p>
+                                                    <input id="search-transaction" class="form-control small" type="text" placeholder="جست و جو" aria-label="Search" value="{{ search }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- table -->
+                            <div class="card-body table-responsive">
+
+                                <table class="table table-sm table-hover"  id="transaction-table">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">پروژه</th>
+                                        <th scope="col">کارمند</th>
+                                        <th scope="col">حساب مبدا</th>
+                                        <th scope="col">حساب مقصد</th>
+                                        <th scope="col">مبلغ</th>
+                                        <th scope="col">نوع</th>
+                                        <th scope="col">تاریخ</th>
+                                        <th scope="col">توضیحات</th>
+                                        <th scope="col">تصویر</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for transaction in transactions %}
+                                        <tr>
+                                            <input class="transactionId" type="hidden" dataId={{ transaction.id }}>
+                                            <input class="project" type="hidden" projectId={{ transaction.project.id }}>
+                                            <input class="employee" type="hidden" employeeId={{ transaction.employee.id }}>
+                                            <th scope="row" >{{ forloop.counter }}</th>
+                                            <td class="project" >{{ transaction.project.title }}</td>
+                                            <td class="employee" >{{ transaction.employee.fullname }}</td>
+                                            <td class="sourceAccount" >{{ transaction.sourceAccount.title }}</td>
+                                            <td class="destinationAccount" >{{ transaction.destinationAccount.title }}</td>
+                                            <td class="money" data-money="{{ transaction.money }}">{{ transaction.money|intcomma }} <span class="small text-black-50">تومان</span> </td>
+                                            {% if transaction.type == "1" %}
+                                                <td class="isOutcome" data-type="{{ transaction.type }}"><span class="badge badge-success">{{ transaction.get_type_display }}</span></td>
+                                            {% else %}
+                                                <td class="isOutcome" data-type="{{ transaction.type }}"><span class="badge badge-danger">{{ transaction.get_type_display }}</span></td>
+                                            {% endif %}
+
+                                            <td class="createdAt" data-createdAt="{{ transaction.createdAt|date:"Y-m-d" }}">{{ transaction.createdAt|to_jalali:'%y/%m/%d' }}</td>
+                                            <td class="description">{{ transaction.description|truncatechars:100 }}</td>
+                                            {% if transaction.pic %}
+                                                <td ><a href="{{ transaction.pic.url }}"><i class="fa fa-image"></i></a></td>
+                                            {% else %}
+                                                <td ><a href="#"></a></td>
+
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+
+                            </div>
+
+                            <!-- pagination -->
+                            <div class="card-footer white py-3 d-flex justify-content-between">
+
+                                <div class="d-flex justify-content-center w-100">
+                                    {% if transaction.has_other_pages %}
+                                        <nav aria-label="Page navigation example">
+                                            <ul class="pagination pagination-circle pg-blue">
+                                                <li class="page-item"><a class="page-link"  href="?page=1&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">First</a></li>
+                                                {% if transaction.has_previous %}
+                                                    <li class="page-item">
+                                                        <a class="page-link" aria-label="Previous" href="?page={{ transaction.previous_page_number }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">
+                                                            <span aria-hidden="true">&laquo;</span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link" aria-label="Previous">
+                                                            <span aria-hidden="true">&laquo;</span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
+                                                <!-- center page numbers -->
+                                                {% for i in transaction.paginator.page_range %}
+                                                    {% if transaction.number == i %}
+                                                        <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+
+                                                    {% else %}
+                                                        <li class="page-item"><a class="page-link"  href="?page={{ i }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">{{ i }}</a></li>
+                                                    {% endif %}
+                                                {% endfor %}
+
+                                                <!-- center page numbers -->
+                                                {% if transaction.has_next %}
+                                                    <a class="page-link" aria-label="Next"  href="?page={{ transaction.next_page_number }}&page-size={{ page_size }}" onclick="this.href += document.getElementById('query-search').value + document.getElementById('query-filter').value">
+                                                        <span aria-hidden="true">&raquo;</span>
+                                                        <span class="sr-only">Next</span>
+                                                    </a>
+                                                {% else %}
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link" aria-label="Next">
+                                                            <span aria-hidden="true">&raquo;</span>
+                                                            <span class="sr-only">Next</span>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+
+                                                <li class="page-item"><a class="page-link">Last</a></li>
+                                            </ul>
+                                        </nav>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+            <!-- Section: Block Content -->
+
+        </div>
+
+        <!-- filter section -->
+        <div class="col-sm-3 mb-3">
+
+            <!-- Panel -->
+            <div class="card">
+
+                <div class="card-header white-text primary-color">
+                    فیلتر
+                </div>
+
+                <div class="card-body text-center px-3">
+                    <div class="list-group list-group-flush">
+
+                        <!-- project -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <div dir="ltr" >
+                                <label class="float-right">پروژه ها</label>
+                                <select id="filter-income-project" class="mdb-select md-form " multiple >
+                                    <option value="" disabled selected>انتخاب پروژه</option>
+                                    {% for project in projects %}
+                                        <option value="{{ project.id }}" {{ project.id|is_selected:filter_param.projects_list }}>{{ project.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- date filter -->
+                        <div class="list-group-item d-flex justify-content-between">
+                            <div>
+
+                                <!-- start date -->
+                                <label for="filter-income-startDate" class="float-right">تاریخ شروع</label>
+                                <div class="row" dir="ltr" style="width: 100%">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text cursor-pointer" id="dt_class_filter_startDate"><i class="fa fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input type="text" id="filter-income-startDate" class="form-control" value="{{ filter_param.start_date|default_if_none:"" }}">
+                                    </div>
+                                    <label id="showDate_class_filter_startDate" class="text-black-50 small"> </label>
+                                </div>
+
+                                <!-- end date -->
+                                <label for="filter-income-endDate" class="float-right">تاریخ پایان</label>
+                                <div class="row" dir="ltr" style="width: 100%">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text cursor-pointer" id="dt_class_filter_endDate"><i class="fa fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input type="text" id="filter-income-endDate" class="form-control" value="{{ filter_param.end_date|default_if_none:"" }}">
+                                    </div>
+                                    <label id="showDate_class_filter_endDate" class="text-black-50 small"> </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <!-- in/outcoe money -->
+                        {% if user.is_superuser %}
+                            <div class="list-group-item d-flex justify-content-between">
+                                <div class="text-left">
+                                    <!-- income money -->
+                                    <div class="form-check" >
+                                        <input type="checkbox" class="form-check-input" id="filter-income-inmoney" {{ filter_param.is_income|is_true:filter_param.is_income }}>
+                                        <label class="form-check-label" for="filter-income-inmoney">هزینه ها</label>
+                                    </div>
+                                    <!-- outcome money -->
+                                    <div class="form-check ">
+                                        <input type="checkbox" class="form-check-input" id="filter-income-outmoney" {{ filter_param.is_outcome|is_true:filter_param.is_outcome }}>
+                                        <label class="form-check-label" for="filter-income-outmoney">درآمدها</label>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- date filter -->
+                        <div class="list-group-item d-flex justify-content-between">
+
+                            <a onclick="incomeFilterChanged()" class="btn btn-rounded btn-outline-primary btn-block" >فیلتر</a>
+                        </div>
+
+                        <!-- link for apply filter -->
+                        <a id="income-tag-a-filter" class="d-none" href="?page-size=20">20</a>
+                        <script>
+                            {#document.getElementById('income-selector-page-size').value={{ page_size }};#}
+                            function incomeFilterChanged() {
+
+                                //-- get selected projects --//
+                                let project_list = document.getElementById("filter-income-project");
+                                let res = getSelectedOptions(project_list);
+                                let selectedTemp = [];
+                                for( let i=1; i<res.length; i++){
+                                    {#console.log(res[i].text + res[i].value);#}
+                                    selectedTemp.push(res[i].value);
+                                }
+                                let selectedProject = selectedTemp.join("_");
+
+
+                                let date_start = document.getElementById("filter-income-startDate").value;
+                                let date_end = document.getElementById("filter-income-endDate").value;
+                                let tag_a = document.getElementById("income-tag-a-filter");
+
+                                let isIncome = document.getElementById("filter-income-inmoney").checked;
+                                let isOutcome = document.getElementById("filter-income-outmoney").checked;
+
+                                document.getElementById("query-filter").setAttribute("value", "&start_date=" + date_start
+                                    + "&end_date=" + date_end + "&isIncome=" + isIncome + "&isOutcome=" + isOutcome + "&selectedProjects=" + selectedProject);
+
+                                let query_search = document.getElementById("query-search").value;
+                                let query_filter = document.getElementById("query-filter").value;
+
+                                tag_a.href = "?page-size=" + {{page_size}} + query_search + query_filter;
+                                tag_a.click();
+                            }
+
+                            // arguments: reference to select list, callback function (optional)
+                            function getSelectedOptions(sel, fn) {
+                                var opts = [], opt;
+
+                                // loop through options in select list
+                                for (var i=0, len=sel.options.length; i<len; i++) {
+                                    opt = sel.options[i];
+
+                                    // check if selected
+                                    if ( opt.selected ) {
+                                        // add to array of option elements to return from this function
+                                        opts.push(opt);
+
+                                        // invoke optional callback function if provided
+                                        if (fn) {
+                                            fn(opt);
+                                        }
+                                    }
+                                }
+
+                                // return array containing references to selected option elements
+                                return opts;
+                            }
+                        </script>
+
+                    </div>
+                </div>
+
+            </div>
+            <!-- Panel -->
+
+        </div>
+
+    </div>
+
+    <!-- Modal new -->
+    <div class="modal fade" id="modelIncomeNew" tabindex="-1" role="dialog" aria-labelledby="modelIncomeNewLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- model header -->
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="modelIncomeNewLabel">ایجاد درآمد/هزینه جدید</h5>
+            </div>
+            <div class="card-body pr-5">
+                <!-- form -->
+                <form name="FormIncome" action="{% url 'project:income-create' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateIncomeForm()">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    <!-- picture field is empty or not? -->
+                    <input type="hidden" id="income-picValidator" name="isIncomePicValid" value="true">
+                    <!-- model body -->
+                    <div class="modal-body">
+                        <div class="col-md-12 col-xl-12">
+
+                            <!--Dropdown project-->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="hidden" id="income-selected-project-id" name="project" value="-1">
+                                        <select class="mdb-select md-form" id="income-selectBox-project" searchable="جست و جو" onchange="changeIncomeProjectNewFunc()">
+                                            <option value="" disabled selected >.    پروژه موردنظر را اتخاب کنید</option>
+                                            {% for project in projects %}
+                                                <option value="{{ project.id }}" >.    {{ project.title }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <script>
+                                            function changeIncomeProjectNewFunc() {
+                                                let selectBox = document.getElementById("income-selectBox-project");
+                                                let selectedValue = selectBox.options[selectBox.selectedIndex].value;
+                                                document.getElementById('income-selected-project-id').value=selectedValue
+                                           }
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (money) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" id="income-input-new-money" name="money" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (isOutcome) -->
+                            <input id="isOutcome-input" type="hidden" name="isOutcome" value="true">
+                            {% if user.is_superuser %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="md-form"><!-- Material unchecked -->
+                                            <div class="row">
+                                                <!-- Group of material radios - option 1 -->
+                                                <div class="form-check">
+                                                    <input type="radio" class="form-check-input" id="income-input-new-isOutcome-false" name="groupOfNewIsOutcomeRadio">
+                                                    <label class="form-check-label" for="income-input-new-isOutcome-false">درآمد</label>
+                                                </div>
+
+                                                <!-- Group of material radios - option 2 -->
+                                                <div class="form-check">
+                                                    <input type="radio" class="form-check-input" id="income-input-new-isOutcome-true" name="groupOfNewIsOutcomeRadio" checked>
+                                                    <label class="form-check-label" for="income-input-new-isOutcome-true">هزینه</label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+
+                            <!-- Grid row (incomeDate) -->
+                            <label for="contact-Subject" class="mt-2">تاریخ</label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_incomeDate"><i class="fa fa-calendar-alt"></i></span>
+                                    </div>
+                                    <input type="text" id="income-input-new-incomeDate" name="incomeDate" class="form-control" value="{% now "yy-m-d" %}">
+                                </div>
+                                <label id="showDate_class_new_incomeDate"> </label>
+                            </div>
+
+                            <!-- Grid row (description) -->
+                            <div class="row mb-4">
+
+                                <!-- Grid column -->
+                                <div class="col-md-12">
+
+                                    <div class="md-form">
+                                        <textarea type="text" name="description" class="md-textarea form-control" rows="3"></textarea>
+                                        <label for="contact-message">توضیحات</label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Grid row (image) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="file-field">
+                                        <div class="btn btn-primary btn-sm float-left">
+                                          <span>انتخاب تصویر</span>
+                                          <input type="file"  name="pic" id="income-modal-new-upload-img">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                          <input class="file-path validate" type="text" placeholder="Upload your file">
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- model footer -->
+                    <div id="task-model-a-tag" class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+                        <a >
+                            <button type="submit" class="btn btn-secondary">تایید</button>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal edit -->
+    <div class="modal fade" id="modelIncomeEdit" tabindex="-1" role="dialog" aria-labelledby="modelIncomeEditLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- model header -->
+            <div class="modal-header ">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title" id="modelIncomeEditLabel">ایجاد تسک جدید</h5>
+            </div>
+            <div class="card-body pr-5">
+                <!-- form -->
+                <form name="FormIncomeEdit" action="{% url 'project:income-update' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateIncomeEditForm()">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    <!-- picture field is empty or not? -->
+                    <input type="hidden" id="picValidatorIncome_edit" name="isIncomePicValid" value="true">
+                    <!-- selected income id -->
+                    <input type="hidden" id="selected-income-id" name="incomeId">
+                    <!-- model body -->
+                    <div class="modal-body">
+                        <div class="col-md-12 col-xl-12">
+
+                            <!--Dropdown project-->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="hidden" id="income-selected-edit-project-id" name="project" value="-1">
+                                        <select class="mdb-select md-form" id="income-project-selectBoxEdit" searchable="جست و جو" onchange="incomeProjectChangeFunc();">
+                                            <option value="" disabled selected >.    کارمند موردنظر را اتخاب کنید</option>
+                                            {% for project in projects %}
+                                                <option value="{{ project.id }}" >.    {{ project.title }}</option>
+                                                {% if forloop.counter == 1 %}
+                                                    <script>
+                                                        document.getElementById('income-selected-edit-project-id').value = {{ project.id }}
+                                                    </script>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        <script>
+                                            function incomeProjectChangeFunc() {
+                                                let selectBox = document.getElementById("income-project-selectBoxEdit");
+                                                let selectedValue = selectBox.options[selectBox.selectedIndex].value;
+                                                document.getElementById('income-selected-edit-project-id').value=selectedValue
+                                           }
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (money) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="md-form">
+                                        <input type="text" id="income-input-edit-money" name="money" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Grid row (isOutcome) -->
+                            {% if user.is_superuser %}
+                                <input id="isOutcome-edit-input" type="hidden" name="isOutcome">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="md-form"><!-- Material unchecked -->
+                                            <div class="row">
+                                                <!-- Group of material radios - option 1 -->
+                                                <div class="form-check">
+                                                    <input type="radio" class="form-check-input" id="income-input-edit-isOutcome-false" name="groupOfEditIsOutcomeRadio">
+                                                    <label class="form-check-label" for="income-input-edit-isOutcome-false">درآمد</label>
+                                                </div>
+
+                                                <!-- Group of material radios - option 2 -->
+                                                <div class="form-check">
+                                                    <input type="radio" class="form-check-input" id="income-input-edit-isOutcome-true" name="groupOfEditIsOutcomeRadio" checked>
+                                                    <label class="form-check-label" for="income-input-edit-isOutcome-true">هزینه</label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                            {% endif %}
+
+                            <!-- Grid row (incomeDate) -->
+                            <label for="contact-Subject" class="">تاریخ
+                            : <span id="lbl-income-edit-incomeDate"></span></label>
+                            <div class="row" dir="ltr">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text cursor-pointer" id="dt_class_edit_incomeDate"><i class="fa fa-calendar-alt"></i></span>
+                                    </div>
+                                    <input type="text" id="income-input-edit-incomeDate" name="incomeDate" class="form-control">
+                                </div>
+                                <label id="showDate_class_edit_incomeDate"> </label>
+                            </div>
+
+                            <!-- Grid row (description) -->
+                            <div class="row mb-4">
+
+                                <!-- Grid column -->
+                                <div class="col-md-12">
+
+                                    <div class="md-form">
+                                        <textarea type="text" id="income-input-edit-description" name="description" class="md-textarea form-control" rows="3" ></textarea>
+                                        <label for="contact-message">توضیحات</label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Grid row (image) -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="file-field">
+                                        <div class="btn btn-primary btn-sm float-left">
+                                          <span>انتخاب تصویر</span>
+                                          <input type="file"  name="pic" id="modal-income-edit-upload-img">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                          <input class="file-path validate" type="text" placeholder="Upload your file">
+                                        </div>
+                                      </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- model footer -->
+                    <div id="model-a-tag" class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+                        <a >
+                            <button type="submit" class="btn btn-secondary">تایید</button>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal delete -->
+    <input type="hidden" id="selected-income-delete-id" selected-id="-1">
+    <div class="modal fade" id="modal-income-delete" tabindex="-1" role="dialog" aria-labelledby="exampleIncomeModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleIncomeModalLabel"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="model-income-delete-body">
+            آیا از حذف این فیلد مطمئن هستید؟
+          </div>
+          <div id="model-income-delete-a-tag" class="modal-footer">
+              <button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>
+              <a >
+                  <button type="button" class="btn btn-secondary">تایید</button>
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- base url address -->
+    <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
+
+    <!-- filter queries -->
+    <input type="hidden" id="query-filter" value="&start_date={{filter_param.start_date|default_if_none:''}}&end_date={{filter_param.end_date|default_if_none:''}}&isIncome={{filter_param.is_income|default_if_none:''}}&isOutcome={{filter_param.is_outcome|default_if_none:''}}&">
+    <!-- search queries -->
+    <input type="hidden" id="query-search" value="&search={{search}}">
+
+
+{% endblock %}
+
+{% block javascript %}
+
+
+    <script>
+        //-- handle delete modal --//
+        function showIncomeDeleteModal() {
+            let idd = $("#selected-income-delete-id").attr("selected-id");
+            let a_tag = $("#model-income-delete-a-tag");
+            let modal_body = $("#model-income-delete-body");
+            let base_url = $("#url-base").attr("data-url");
+            a_tag.empty();
+            modal_body.empty();
+            if(idd == "-1"){
+                modal_body.append(
+                    `ابتدا آیتمی را انتخاب کنید`
+                );
+                a_tag.append(
+                    `<button type="button" class="btn btn-info" data-dismiss="modal">خروج</button>`
+                );
+            }
+            else {
+                modal_body.append(
+                    'آیا از حذف شدن این آیتم اطمینان دارید؟'
+                );
+                a_tag.append(
+                    `<button type="button" class="btn btn-info" data-dismiss="modal">انصراف</button>` +
+                    `<a href='${base_url}${idd}/income-delete/'">` +
+                    `<button type="button" class="btn btn-secondary">تایید</button>` +
+                    `</a>`
+                );
+            }
+        }
+    </script>
+
+    <script>
+
+        $("#income-table tr").click(function(){
+           $(this).addClass('table-primary').siblings().removeClass('table-primary');
+           var value=$(this).find('input.incomeId').attr("dataId");
+           $('#selected-income-delete-id').attr("selected-id", value);
+           $('#selected-income-id').attr("value", value); //edit
+
+            //-- fill edit fields --//
+            $('#income-input-edit-money').attr('value', $(this).find('td.money').attr("data-money"));
+            $('#income-input-edit-description').val( $(this).find('td.description').html());
+            $('#income-input-edit-incomeDate').attr('value', $(this).find('td.incomeDate').attr('data-incomeDate'));
+            $('#lbl-income-edit-incomeDate').html($(this).find('td.incomeDate').html());
+            $('#income-input-edit-isOutcome').attr('value', $(this).find('td.isOutcome').html());
+
+            if($(this).find('td.isOutcome').attr('data-isOutcome') == 'True'){
+                $('#income-input-edit-isOutcome-true').attr('checked', true);
+                $('#income-input-edit-isOutcome-false').attr('checked', false);
+                $('#isOutcome-edit-input').val('True')
+            }
+            else{
+                $('#income-input-edit-isOutcome-true').attr('checked', false);
+                $('#income-input-edit-isOutcome-false').attr('checked', true);
+                $('#isOutcome-edit-input').val('False')
+            }
+            {#alert($('#isOutcome-edit-input').val())#}
+
+            let prjId =$(this).find('input.project').attr("projectId");
+            $('#income-project-selectBoxEdit').val(prjId)
+
+
+        });
+
+        $('.ok').on('click', function(e){
+            alert($("#income-table tr.selected td:first").html());
+        });
+
+        // Material Select Initialization
+        $(document).ready(function() {
+            $('.mdb-select').materialSelect();
+        });
+
+
+        //-- validate image field in new project form --//
+        function validateIncomeForm() {
+
+            let isOutcome = $('#income-input-new-isOutcome-false').is(':checked');
+            if(isOutcome == true){
+                $('#isOutcome-input').val('False');
+            }
+            else{
+                $('#isOutcome-input').val('True');
+            }
+
+
+            let pic = document.forms["FormIncome"]["income-modal-new-upload-img"].value;
+            if (pic === null || pic === "") {
+                $('#income-picValidator').attr('value', false)
+            }
+            let incomeDate = document.forms["FormIncome"]["income-input-new-incomeDate"].value;
+            if (incomeDate === null || incomeDate === "") {
+                $('#income-input-new-incomeDate').attr('value', 0)
+            }
+            let taskDate = document.forms["FormIncome"]["income-input-new-money"].value;
+            if (taskDate === null || taskDate === "") {
+                $('#income-input-new-money').attr('value', 0)
+            }
+            let eprojectId = document.forms["FormIncome"]["income-selected-project-id"].value;
+            if (eprojectId === "-1") {
+                alert("پروژه مورد نظر را انتخاب کنید")
+                return false
+            }
+
+        }
+
+        //-- validate image field in edit salary form --//
+        function validateIncomeEditForm() {
+            let pic = document.forms["FormIncomeEdit"]["modal-income-edit-upload-img"].value;
+            if (pic === null || pic === "") {
+                $('#picValidatorIncome_edit').attr('value', false)
+            }
+
+            let isOutcome = $('#income-input-edit-isOutcome-false').is(':checked');
+            if(isOutcome == true){
+                $('#isOutcome-edit-input').val('False');
+            }
+            else{
+                $('#isOutcome-edit-input').val('True');
+            }
+        }
+
+    </script>
+
+    <!-- search -->
+    <script>
+        $("#search-income").on('keyup', function (e) {
+            if (e.keyCode === 13) {
+                let srchterm = $("#search-income").val();
+
+                document.getElementById("query-search").setAttribute("value", "&search=" + srchterm);
+
+                let query_search = document.getElementById("query-search").value;
+                let query_filter = document.getElementById("query-filter").value;
+
+                let tag_a = document.getElementById("income-tag-a-page-size");
+                tag_a.href = "?page-size=" + {{ page_size }} + query_search + query_filter;
+                tag_a.click();
+            }
+        });
+    </script>
+
+    <!--jalali calender-->
+    <script>
+    // persian calender : https://github.com/Mds92/MD.BootstrapPersianDateTimePicker
+        $(document).ready(function () {
+            $("#dt_class_new_incomeDate").MdPersianDateTimePicker({
+                targetDateSelector: "#income-input-new-incomeDate",
+                targetTextSelector: "#showDate_class_new_incomeDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                //inLine: true,
+                //rangeSelector: true
+            });
+            $("#dt_class_edit_incomeDate").MdPersianDateTimePicker({
+                targetDateSelector: "#income-input-edit-incomeDate",
+                targetTextSelector: "#showDate_class_edit_incomeDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                //inLine: true,
+            });
+            $("#dt_class_filter_startDate").MdPersianDateTimePicker({
+                targetDateSelector: "#filter-income-startDate",
+                targetTextSelector: "#showDate_class_filter_startDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                {#inLine: true,#}
+            });
+            $("#dt_class_filter_endDate").MdPersianDateTimePicker({
+                targetDateSelector: "#filter-income-endDate",
+                targetTextSelector: "#showDate_class_filter_endDate",
+                textFormat: " dddd dd MMMM yyyy ",
+                isGregorian: false,
+                dateFormat: "yyyy-MM-dd",
+                {#inLine: true,#}
+            });
+
+        });
+
+    </script>
+
+{% endblock %}
+

@@ -52,6 +52,25 @@ class TaskAdmin(ModelAdminJalaliMixin, admin.ModelAdmin):
     }
 
 
+@admin.register(models.Account)
+class AccountAdmin(ModelAdminJalaliMixin, admin.ModelAdmin):
+    list_display = ("id", "title", "type", "description",)
+    list_filter = ("type",)
+
+
+@admin.register(models.SubAccount)
+class SubAccountAdmin(ModelAdminJalaliMixin, admin.ModelAdmin):
+
+    list_display = ("id", "title", "account", "description",)
+    list_filter = ("account",)
+
+
+@admin.register(models.Transaction)
+class TransactionAdmin(ModelAdminJalaliMixin, admin.ModelAdmin):
+    formfield_overrides = {
+    }
+
+
 # admin.site.register(models.Project)
 # admin.site.register(models.Employee)
 # admin.site.register(models.Income)

@@ -394,10 +394,10 @@ def income_list(request):
             incomes = paginator.page(paginator.num_pages)
 
         return render(request, 'project/income/income_list.html', {'incomes': incomes,
-                                                            'projects': projects,
-                                                            'search': search,
-                                                            'page_size': page_size,
-                                                            'filter_param': filter_param,
+                                                                   'projects': projects,
+                                                                   'search': search,
+                                                                   'page_size': page_size,
+                                                                   'filter_param': filter_param,
                                                                    })
     else:
         return render(request, 'project/505.html')
@@ -716,9 +716,9 @@ def salary_list(request):
             salaries = paginator.page(paginator.num_pages)
 
         return render(request, 'project/salary/salary_list.html', {'salaries': salaries,
-                                                            'employees': employees,
-                                                            'search': search,
-                                                            'page_size': page_size})
+                                                                   'employees': employees,
+                                                                   'search': search,
+                                                                   'page_size': page_size})
     else:
         employee = get_object_or_404(models.Employee, user=request.user)
         page = request.GET.get('page', 1)
@@ -727,9 +727,9 @@ def salary_list(request):
 
         salaries = models.MonthSalary.objects.filter(Q(employee=employee)
                                                      & (Q(money__icontains=search)
-                                                     | Q(description__icontains=search)
-                                                     | Q(workHour__icontains=search)
-                                                     | Q(salaryDate__icontains=search))
+                                                        | Q(description__icontains=search)
+                                                        | Q(workHour__icontains=search)
+                                                        | Q(salaryDate__icontains=search))
                                                      )
 
         paginator = Paginator(salaries, page_size)
@@ -741,9 +741,9 @@ def salary_list(request):
             salaries = paginator.page(paginator.num_pages)
 
         return render(request, 'project/salary/salaryEmployee.html', {'salaries': salaries,
-                                                            'employee': employee,
-                                                            'search': search,
-                                                            'page_size': page_size})
+                                                                      'employee': employee,
+                                                                      'search': search,
+                                                                      'page_size': page_size})
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -833,9 +833,9 @@ def debt_list(request):
             debts = paginator.page(paginator.num_pages)
 
         return render(request, 'project/debt/debt_list.html', {'debts': debts,
-                                                          'employees': employees,
-                                                          'search': search,
-                                                          'page_size': page_size})
+                                                               'employees': employees,
+                                                               'search': search,
+                                                               'page_size': page_size})
     else:
         employee = get_object_or_404(models.Employee, user=request.user)
         page = request.GET.get('page', 1)
@@ -844,11 +844,11 @@ def debt_list(request):
 
         debts = models.Debt.objects.filter(Q(employee=employee)
                                            & (Q(title__icontains=search)
-                                           | Q(description__icontains=search)
-                                           | Q(status__icontains=search)
-                                           | Q(debtDate__icontains=search)
-                                           | Q(paymentDebtDate__icontains=search)
-                                           | Q(price__icontains=search))
+                                              | Q(description__icontains=search)
+                                              | Q(status__icontains=search)
+                                              | Q(debtDate__icontains=search)
+                                              | Q(paymentDebtDate__icontains=search)
+                                              | Q(price__icontains=search))
                                            )
 
         paginator = Paginator(debts, page_size)
@@ -860,9 +860,9 @@ def debt_list(request):
             debts = paginator.page(paginator.num_pages)
 
         return render(request, 'project/debt/debtEmployee.html', {'debts': debts,
-                                                               'employee': employee,
-                                                               'search': search,
-                                                               'page_size': page_size})
+                                                                  'employee': employee,
+                                                                  'search': search,
+                                                                  'page_size': page_size})
 
 
 # @user_passes_test(lambda u: u.is_superuser)
@@ -1253,3 +1253,83 @@ def financial(request):
 
 def pageNotExist(request):
     return render(request, 'project/505.html')
+
+
+@login_required
+def transaction_list(request):
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        projects = models.Project.objects.all()
+        employees = models.Employee.objects.all()
+        page = request.GET.get('page', 1)
+        page_size = request.GET.get('page-size', 10)
+        search = request.GET.get('search', '')
+
+        start_date = request.GET.get('start_date', None)  # datetime.now().strftime('%Y-%m-%d')
+        end_date = request.GET.get('end_date', None)
+        is_income = request.GET.get('isIncome', None)
+        is_outcome = request.GET.get('isOutcome', None)
+        selected_projects = request.GET.get('selectedProjects', None)
+        selected_employees = request.GET.get('selectedEmployees', None)
+
+        transaction = models.Transaction.objects.filter(Q(project__title__icontains=search)
+                                                        | Q(employee__fullName__icontains=search)
+                                                        | Q(createdAt__icontains=search)
+                                                        | Q(description__icontains=search)
+                                                        | Q(type__icontains=search)
+                                                        | Q(money__icontains=search)
+                                                        ).distinct()
+        # filter data for level1 access (only access to outcome payment)
+        if request.user.groups.filter(name='level1').exists():
+            transaction = transaction.filter(type="پرداختی")
+
+        # date range filter
+        if start_date is not None and end_date is not None and start_date is not "" and end_date is not "":
+            transaction = transaction.filter(createdAt__range=[start_date, end_date]).distinct()
+
+        # income/outcome filter
+        # if is_income is not None and is_outcome is not None and is_income is not "" and is_outcome is not "":
+        #     if is_income == 'true' and is_outcome == 'true':
+        #         pass
+        #     elif is_income == 'true':
+        #         incomes = incomes.filter(isOutcome=True).distinct()
+        #     elif is_outcome == 'true':
+        #         incomes = incomes.filter(isOutcome=False).distinct()
+
+        # project filter
+        projects_list = []
+        if selected_projects is not None and selected_projects is not "":
+            projects_list = selected_projects.split("_")
+            transaction = transaction.filter(functools.reduce(operator.or_, (Q(project=x) for x in projects_list))).distinct()
+
+        # employee filter
+        employees_list = []
+        if selected_employees is not None and selected_employees is not "":
+            employees_list = selected_employees.split("_")
+            transaction = transaction.filter(functools.reduce(operator.or_, (Q(employee=x) for x in employees_list))).distinct()
+
+        filter_param = {
+            'start_date': start_date,
+            'end_date': end_date,
+            # 'is_income': is_income,
+            # 'is_outcome': is_outcome,
+            'projects_list': projects_list,
+            'employees_list': employees_list,
+        }
+
+        paginator = Paginator(transaction, page_size)
+        try:
+            transaction = paginator.page(page)
+        except PageNotAnInteger:
+            transaction = paginator.page(1)
+        except EmptyPage:
+            transaction = paginator.page(paginator.num_pages)
+
+        return render(request, 'project/transaction_list.html', {'transactions': transaction,
+                                                                   'projects': projects,
+                                                                   'employees': employees,
+                                                                   'search': search,
+                                                                   'page_size': page_size,
+                                                                   'filter_param': filter_param,
+                                                                   })
+    else:
+        return render(request, 'project/505.html')
