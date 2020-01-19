@@ -1,0 +1,152 @@
+<!-- Button trigger modal -->
+<button id="btn-account-modal-expander" type="button" class="btn btn-primary" data-toggle="modal" data-target="#categoryModal">
+  Launch demo modal
+</button>
+
+{#<input type="hidden" id="selected-subcategory-in-modal" data-title="" data-dismiss="">#}
+
+<!-- Modal -->
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h5 class="modal-title text-left" id="categoryModalLabel">انتخاب حساب</h5>
+            </div>
+
+            <div class="modal-body">
+
+
+                <!--Accordion wrapper-->
+                <div class="accordion md-accordion accordion-blocks" id="accordionEx78" role="tablist"
+                     aria-multiselectable="true">
+
+                    <!-- Search form -->
+                    <form class="form-inline md-form form-sm mt-0 " dir="ltr">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input id="account-modal-search" class="form-control form-control-sm ml-3" type="text" placeholder="Search"
+                               aria-label="Search" style="width: 90%"  onchange="youFunction();"
+                                 onpaste="this.onchange();" oninput="this.onchange();">
+                    </form>
+
+                    {% for account in accounts %}
+                        <!-- Accordion card -->
+                        <div class="card card-m1-title" data-title="{{ account.title }}">
+
+                            <!-- Card header -->
+                            <div class="card-header" role="tab" id="heading-{{ account.id }}">
+                                <!--Options-->
+                                <div class="dropdown float-left">
+                                    <button class="btn btn-info btn-sm m-0 mr-3 p-2 dropdown-toggle" type="button" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false"><i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-info">
+                                        <a class="dropdown-item" href="#">Add new condition</a>
+                                        <a class="dropdown-item" href="#">Rename folder</a>
+                                        <a class="dropdown-item" href="#">Delete folder</a>
+                                    </div>
+                                </div>
+
+                                <!-- Heading -->
+                                <a data-toggle="collapse" data-parent="#accordionEx78" href="#collapse-{{ account.id }}" aria-expanded="true"
+                                   aria-controls="collapse-{{ account.id }}">
+                                    <h5 class="mt-1 mb-0">
+                                        <span>{{ account.title }}</span>
+                                        <i class="fas fa-angle-down rotate-icon ml-2"></i>
+                                    </h5>
+                                </a>
+                            </div>
+
+                            <!-- Card body -->
+                            <div id="collapse-{{ account.id }}" class="collapse" role="tabpanel" aria-labelledby="heading-{{ account.id }}"
+                                 data-parent="#accordionEx78">
+                                <div class="card-body">
+
+
+                                    <!-- Table responsive wrapper -->
+                                    <div class="table-responsive mx-3">
+                                        <!--Table-->
+                                        <table class="table table-hover mb-0">
+
+                                            <!--Table body-->
+                                            <tbody>
+                                            {% for sub_account in sub_accounts %}
+                                                {% if sub_account.account.id == account.id %}
+
+                                                    <tr>
+                                                        <td><a href="#" onclick="selectSubCatInModal({{ sub_account.id }}, '{{ sub_account.title }}')">{{ sub_account.title }}</a></td>
+                                                        <td>
+                                                            <a><i class="fas fa-info mx-1" data-toggle="tooltip" data-placement="top"
+                                                                  title="Tooltip on top"></i></a>
+                                                            <a><i class="fas fa-pen-square mx-1"></i></a>
+                                                            <a><i class="fas fa-times mx-1"></i></a>
+                                                        </td>
+                                                    </tr>
+
+                                                {% endif %}
+                                            {% endfor %}
+
+                                            </tbody>
+                                            <!--Table body-->
+
+                                        </table>
+                                        <!--Table-->
+                                    </div>
+                                    <!-- Table responsive wrapper -->
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- Accordion card -->
+                    {% endfor %}
+
+                </div>
+                <!--/.Accordion wrapper-->
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascript %}
+    <script>
+    {#alert("hgjhg")#}
+
+    function youFunction(){
+        {#console.log($('#account-modal-search').val())#}
+
+        let search = $('#account-modal-search').val();
+
+        $( ".card-m1-title" ).each(function( index ) {
+            console.log( index + ": " + $( this ).attr('data-title') );
+
+            if($( this ).attr('data-title').indexOf(search) > -1){
+                $( this ).removeClass('d-none')
+            }
+            else{
+                $( this ).addClass('d-none')
+            }
+        });
+    }
+
+    function selectSubCatInModal(cat_id, cat_title) {
+        {#$('#selected-subcategory-in-modal').attr('data-id', cat_id);#}
+        {#$('#selected-subcategory-in-modal').attr('data-title', cat_title);#}
+        {#$('#btn-account-modal-expander').attr('data-isValid', 'true');#}
+        $('#btn-account-modal-expander').click();
+
+        captureSelectedAccount(cat_id, cat_title)
+    }
+
+
+    </script>
+{% endblock %}

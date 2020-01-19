@@ -109,9 +109,9 @@
                                             <input class="employee" type="hidden" employeeId={{ transaction.employee.id }}>
                                             <th scope="row" >{{ forloop.counter }}</th>
                                             <td class="project" >{{ transaction.project.title }}</td>
-                                            <td class="employee" >{{ transaction.employee.fullname }}</td>
-                                            <td class="sourceAccount" >{{ transaction.sourceAccount.title }}</td>
-                                            <td class="destinationAccount" >{{ transaction.destinationAccount.title }}</td>
+                                            <td class="employee" >{{ transaction.employee.fullName }}</td>
+                                            <td class="sourceAccount" >{{ transaction.source.title }}</td>
+                                            <td class="destinationAccount" >{{ transaction.destination.title }}</td>
                                             <td class="money" data-money="{{ transaction.money }}">{{ transaction.money|intcomma }} <span class="small text-black-50">تومان</span> </td>
                                             {% if transaction.type == "1" %}
                                                 <td class="isOutcome" data-type="{{ transaction.type }}"><span class="badge badge-success">{{ transaction.get_type_display }}</span></td>
@@ -201,158 +201,158 @@
         </div>
 
         <!-- filter section -->
-        <div class="col-sm-3 mb-3">
-
-            <!-- Panel -->
-            <div class="card">
-
-                <div class="card-header white-text primary-color">
-                    فیلتر
-                </div>
-
-                <div class="card-body text-center px-3">
-                    <div class="list-group list-group-flush">
-
-                        <!-- project -->
-                        <div class="list-group-item d-flex justify-content-between">
-                            <div dir="ltr" >
-                                <label class="float-right">پروژه ها</label>
-                                <select id="filter-income-project" class="mdb-select md-form " multiple >
-                                    <option value="" disabled selected>انتخاب پروژه</option>
-                                    {% for project in projects %}
-                                        <option value="{{ project.id }}" {{ project.id|is_selected:filter_param.projects_list }}>{{ project.title }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- date filter -->
-                        <div class="list-group-item d-flex justify-content-between">
-                            <div>
-
-                                <!-- start date -->
-                                <label for="filter-income-startDate" class="float-right">تاریخ شروع</label>
-                                <div class="row" dir="ltr" style="width: 100%">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text cursor-pointer" id="dt_class_filter_startDate"><i class="fa fa-calendar-alt"></i></span>
-                                        </div>
-                                        <input type="text" id="filter-income-startDate" class="form-control" value="{{ filter_param.start_date|default_if_none:"" }}">
-                                    </div>
-                                    <label id="showDate_class_filter_startDate" class="text-black-50 small"> </label>
-                                </div>
-
-                                <!-- end date -->
-                                <label for="filter-income-endDate" class="float-right">تاریخ پایان</label>
-                                <div class="row" dir="ltr" style="width: 100%">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text cursor-pointer" id="dt_class_filter_endDate"><i class="fa fa-calendar-alt"></i></span>
-                                        </div>
-                                        <input type="text" id="filter-income-endDate" class="form-control" value="{{ filter_param.end_date|default_if_none:"" }}">
-                                    </div>
-                                    <label id="showDate_class_filter_endDate" class="text-black-50 small"> </label>
-                                </div>
-
-                            </div>
-                        </div>
-
-
-                        <!-- in/outcoe money -->
-                        {% if user.is_superuser %}
-                            <div class="list-group-item d-flex justify-content-between">
-                                <div class="text-left">
-                                    <!-- income money -->
-                                    <div class="form-check" >
-                                        <input type="checkbox" class="form-check-input" id="filter-income-inmoney" {{ filter_param.is_income|is_true:filter_param.is_income }}>
-                                        <label class="form-check-label" for="filter-income-inmoney">هزینه ها</label>
-                                    </div>
-                                    <!-- outcome money -->
-                                    <div class="form-check ">
-                                        <input type="checkbox" class="form-check-input" id="filter-income-outmoney" {{ filter_param.is_outcome|is_true:filter_param.is_outcome }}>
-                                        <label class="form-check-label" for="filter-income-outmoney">درآمدها</label>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        <!-- date filter -->
-                        <div class="list-group-item d-flex justify-content-between">
-
-                            <a onclick="incomeFilterChanged()" class="btn btn-rounded btn-outline-primary btn-block" >فیلتر</a>
-                        </div>
-
-                        <!-- link for apply filter -->
-                        <a id="income-tag-a-filter" class="d-none" href="?page-size=20">20</a>
-                        <script>
+{#        <div class="col-sm-3 mb-3">#}
+{##}
+{#            <!-- Panel -->#}
+{#            <div class="card">#}
+{##}
+{#                <div class="card-header white-text primary-color">#}
+{#                    فیلتر#}
+{#                </div>#}
+{##}
+{#                <div class="card-body text-center px-3">#}
+{#                    <div class="list-group list-group-flush">#}
+{##}
+{#                        <!-- project -->#}
+{#                        <div class="list-group-item d-flex justify-content-between">#}
+{#                            <div dir="ltr" >#}
+{#                                <label class="float-right">پروژه ها</label>#}
+{#                                <select id="filter-income-project" class="mdb-select md-form " multiple >#}
+{#                                    <option value="" disabled selected>انتخاب پروژه</option>#}
+{#                                    {% for project in projects %}#}
+{#                                        <option value="{{ project.id }}" {{ project.id|is_selected:filter_param.projects_list }}>{{ project.title }}</option>#}
+{#                                    {% endfor %}#}
+{#                                </select>#}
+{#                            </div>#}
+{#                        </div>#}
+{##}
+{#                        <!-- date filter -->#}
+{#                        <div class="list-group-item d-flex justify-content-between">#}
+{#                            <div>#}
+{##}
+{#                                <!-- start date -->#}
+{#                                <label for="filter-income-startDate" class="float-right">تاریخ شروع</label>#}
+{#                                <div class="row" dir="ltr" style="width: 100%">#}
+{#                                    <div class="input-group">#}
+{#                                        <div class="input-group-prepend">#}
+{#                                            <span class="input-group-text cursor-pointer" id="dt_class_filter_startDate"><i class="fa fa-calendar-alt"></i></span>#}
+{#                                        </div>#}
+{#                                        <input type="text" id="filter-income-startDate" class="form-control" value="{{ filter_param.start_date|default_if_none:"" }}">#}
+{#                                    </div>#}
+{#                                    <label id="showDate_class_filter_startDate" class="text-black-50 small"> </label>#}
+{#                                </div>#}
+{##}
+{#                                <!-- end date -->#}
+{#                                <label for="filter-income-endDate" class="float-right">تاریخ پایان</label>#}
+{#                                <div class="row" dir="ltr" style="width: 100%">#}
+{#                                    <div class="input-group">#}
+{#                                        <div class="input-group-prepend">#}
+{#                                            <span class="input-group-text cursor-pointer" id="dt_class_filter_endDate"><i class="fa fa-calendar-alt"></i></span>#}
+{#                                        </div>#}
+{#                                        <input type="text" id="filter-income-endDate" class="form-control" value="{{ filter_param.end_date|default_if_none:"" }}">#}
+{#                                    </div>#}
+{#                                    <label id="showDate_class_filter_endDate" class="text-black-50 small"> </label>#}
+{#                                </div>#}
+{##}
+{#                            </div>#}
+{#                        </div>#}
+{##}
+{##}
+{#                        <!-- in/outcoe money -->#}
+{#                        {% if user.is_superuser %}#}
+{#                            <div class="list-group-item d-flex justify-content-between">#}
+{#                                <div class="text-left">#}
+{#                                    <!-- income money -->#}
+{#                                    <div class="form-check" >#}
+{#                                        <input type="checkbox" class="form-check-input" id="filter-income-inmoney" {{ filter_param.is_income|is_true:filter_param.is_income }}>#}
+{#                                        <label class="form-check-label" for="filter-income-inmoney">هزینه ها</label>#}
+{#                                    </div>#}
+{#                                    <!-- outcome money -->#}
+{#                                    <div class="form-check ">#}
+{#                                        <input type="checkbox" class="form-check-input" id="filter-income-outmoney" {{ filter_param.is_outcome|is_true:filter_param.is_outcome }}>#}
+{#                                        <label class="form-check-label" for="filter-income-outmoney">درآمدها</label>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        {% endif %}#}
+{##}
+{#                        <!-- date filter -->#}
+{#                        <div class="list-group-item d-flex justify-content-between">#}
+{##}
+{#                            <a onclick="incomeFilterChanged()" class="btn btn-rounded btn-outline-primary btn-block" >فیلتر</a>#}
+{#                        </div>#}
+{##}
+{#                        <!-- link for apply filter -->#}
+{#                        <a id="income-tag-a-filter" class="d-none" href="?page-size=20">20</a>#}
+{#                        <script>#}
                             {#document.getElementById('income-selector-page-size').value={{ page_size }};#}
-                            function incomeFilterChanged() {
-
-                                //-- get selected projects --//
-                                let project_list = document.getElementById("filter-income-project");
-                                let res = getSelectedOptions(project_list);
-                                let selectedTemp = [];
-                                for( let i=1; i<res.length; i++){
+{#                            function incomeFilterChanged() {#}
+{##}
+{#                                //-- get selected projects --//#}
+{#                                let project_list = document.getElementById("filter-income-project");#}
+{#                                let res = getSelectedOptions(project_list);#}
+{#                                let selectedTemp = [];#}
+{#                                for( let i=1; i<res.length; i++){#}
                                     {#console.log(res[i].text + res[i].value);#}
-                                    selectedTemp.push(res[i].value);
-                                }
-                                let selectedProject = selectedTemp.join("_");
-
-
-                                let date_start = document.getElementById("filter-income-startDate").value;
-                                let date_end = document.getElementById("filter-income-endDate").value;
-                                let tag_a = document.getElementById("income-tag-a-filter");
-
-                                let isIncome = document.getElementById("filter-income-inmoney").checked;
-                                let isOutcome = document.getElementById("filter-income-outmoney").checked;
-
-                                document.getElementById("query-filter").setAttribute("value", "&start_date=" + date_start
-                                    + "&end_date=" + date_end + "&isIncome=" + isIncome + "&isOutcome=" + isOutcome + "&selectedProjects=" + selectedProject);
-
-                                let query_search = document.getElementById("query-search").value;
-                                let query_filter = document.getElementById("query-filter").value;
-
-                                tag_a.href = "?page-size=" + {{page_size}} + query_search + query_filter;
-                                tag_a.click();
-                            }
-
-                            // arguments: reference to select list, callback function (optional)
-                            function getSelectedOptions(sel, fn) {
-                                var opts = [], opt;
-
-                                // loop through options in select list
-                                for (var i=0, len=sel.options.length; i<len; i++) {
-                                    opt = sel.options[i];
-
-                                    // check if selected
-                                    if ( opt.selected ) {
-                                        // add to array of option elements to return from this function
-                                        opts.push(opt);
-
-                                        // invoke optional callback function if provided
-                                        if (fn) {
-                                            fn(opt);
-                                        }
-                                    }
-                                }
-
-                                // return array containing references to selected option elements
-                                return opts;
-                            }
-                        </script>
-
-                    </div>
-                </div>
-
-            </div>
-            <!-- Panel -->
-
-        </div>
+{#                                    selectedTemp.push(res[i].value);#}
+{#                                }#}
+{#                                let selectedProject = selectedTemp.join("_");#}
+{##}
+{##}
+{#                                let date_start = document.getElementById("filter-income-startDate").value;#}
+{#                                let date_end = document.getElementById("filter-income-endDate").value;#}
+{#                                let tag_a = document.getElementById("income-tag-a-filter");#}
+{##}
+{#                                let isIncome = document.getElementById("filter-income-inmoney").checked;#}
+{#                                let isOutcome = document.getElementById("filter-income-outmoney").checked;#}
+{##}
+{#                                document.getElementById("query-filter").setAttribute("value", "&start_date=" + date_start#}
+{#                                    + "&end_date=" + date_end + "&isIncome=" + isIncome + "&isOutcome=" + isOutcome + "&selectedProjects=" + selectedProject);#}
+{##}
+{#                                let query_search = document.getElementById("query-search").value;#}
+{#                                let query_filter = document.getElementById("query-filter").value;#}
+{##}
+{#                                tag_a.href = "?page-size=" + {{page_size}} + query_search + query_filter;#}
+{#                                tag_a.click();#}
+{#                            }#}
+{##}
+{#                            // arguments: reference to select list, callback function (optional)#}
+{#                            function getSelectedOptions(sel, fn) {#}
+{#                                var opts = [], opt;#}
+{##}
+{#                                // loop through options in select list#}
+{#                                for (var i=0, len=sel.options.length; i<len; i++) {#}
+{#                                    opt = sel.options[i];#}
+{##}
+{#                                    // check if selected#}
+{#                                    if ( opt.selected ) {#}
+{#                                        // add to array of option elements to return from this function#}
+{#                                        opts.push(opt);#}
+{##}
+{#                                        // invoke optional callback function if provided#}
+{#                                        if (fn) {#}
+{#                                            fn(opt);#}
+{#                                        }#}
+{#                                    }#}
+{#                                }#}
+{##}
+{#                                // return array containing references to selected option elements#}
+{#                                return opts;#}
+{#                            }#}
+{#                        </script>#}
+{##}
+{#                    </div>#}
+{#                </div>#}
+{##}
+{#            </div>#}
+{#            <!-- Panel -->#}
+{##}
+{#        </div>#}
 
     </div>
 
     <!-- Modal new -->
-    <div class="modal fade" id="modelIncomeNew" tabindex="-1" role="dialog" aria-labelledby="modelIncomeNewLabel"
+    <div class="modal fade" id="modelTransactionNew" tabindex="-1" role="dialog" aria-labelledby="modelTransactionNewLabel"
       aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -361,53 +361,99 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h5 class="modal-title" id="modelIncomeNewLabel">ایجاد درآمد/هزینه جدید</h5>
+                <h5 class="modal-title" id="modelTransactionNewLabel">تراکنش جدید</h5>
             </div>
             <div class="card-body pr-5">
                 <!-- form -->
-                <form name="FormIncome" action="{% url 'project:income-create' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateIncomeForm()">
+                <form name="FormTransaction" action="{% url 'project:transaction-create' %}" method="post" enctype="multipart/form-data"  onsubmit="return validateTransactionForm()">
                     {% csrf_token %}
                     <input type="hidden" name="user" value="{{ user.id }}">
                     <!-- picture field is empty or not? -->
-                    <input type="hidden" id="income-picValidator" name="isIncomePicValid" value="true">
+                    <input type="hidden" id="transaction-picValidator" name="isTransactionPicValid" value="true">
                     <!-- model body -->
                     <div class="modal-body">
                         <div class="col-md-12 col-xl-12">
 
-                            <!--Dropdown project-->
-                            <div class="row">
-                                <div class="col-md-12">
+                            <!--Dropdown project/employee-->
+                            <div class="row" dir="ltr">
+
+                                <!--Dropdown project-->
+                                <div class="col-md-6">
                                     <div class="md-form">
-                                        <input type="hidden" id="income-selected-project-id" name="project" value="-1">
-                                        <select class="mdb-select md-form" id="income-selectBox-project" searchable="جست و جو" onchange="changeIncomeProjectNewFunc()">
-                                            <option value="" disabled selected >.    پروژه موردنظر را اتخاب کنید</option>
+                                        <input type="hidden" id="transaction-selected-project-id" name="project" value="-1">
+                                        <select class="mdb-select md-form" id="transaction-selectBox-project" searchable="جست و جو" onchange="changeTransactionProjectNewFunc()">
+                                            <option value="" disabled selected >انتخاب پروژه</option>
                                             {% for project in projects %}
-                                                <option value="{{ project.id }}" >.    {{ project.title }}</option>
+                                                <option value="{{ project.id }}" >{{ project.title }}</option>
                                             {% endfor %}
                                         </select>
                                         <script>
-                                            function changeIncomeProjectNewFunc() {
-                                                let selectBox = document.getElementById("income-selectBox-project");
+                                            function changeTransactionProjectNewFunc() {
+                                                let selectBox = document.getElementById("transaction-selectBox-project");
                                                 let selectedValue = selectBox.options[selectBox.selectedIndex].value;
-                                                document.getElementById('income-selected-project-id').value=selectedValue
+                                                document.getElementById('transaction-selected-project-id').value=selectedValue
                                            }
                                         </script>
                                     </div>
                                 </div>
+
+                                <!--Dropdown employee-->
+                                <div class="col-md-6">
+                                    <div class="md-form">
+                                        <input type="hidden" id="transaction-selected-employee-id" name="employee" value="-1">
+                                        <select class="mdb-select md-form" id="transaction-selectBox-employee" searchable="جست و جو" onchange="changeTransactionEmployeeNewFunc()">
+                                            <option value="" disabled selected >انتخاب کارمند</option>
+                                            {% for employee in employees %}
+                                                <option value="{{ employee.id }}" >{{ employee.fullName }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <script>
+                                            function changeTransactionEmployeeNewFunc() {
+                                                let selectBox = document.getElementById("transaction-selectBox-employee");
+                                                let selectedValue = selectBox.options[selectBox.selectedIndex].value;
+                                                document.getElementById('transaction-selected-employee-id').value=selectedValue
+                                           }
+                                        </script>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <!-- Grid row (money) -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="md-form">
-                                        <input type="text" id="income-input-new-money" name="money" class="form-control">
-                                        <label for="contact-Subject" class="">هزینه</label>
+                                        <input type="text" id="transaction-input-new-money" name="money" value="0" class="form-control">
+                                        <label for="contact-Subject" class="">هزینه (تومان)</label>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Grid row (isOutcome) -->
-                            <input id="isOutcome-input" type="hidden" name="isOutcome" value="true">
+                            <!-- Grid row (source/destination account) -->
+                            <div class="row">
+
+                                <!-- source -->
+                                <div class="col-md-6">
+                                    <div class="md-form">
+                                        <input type="text" id="transaction-input-new-sourceAccount" class="form-control" onclick="callAccountModal('transaction-input-new-sourceAccount')">
+                                        <input type="hidden" id="transaction-input-new-sourceAccount-id" name="sourceAccount" value="-1">
+                                        <label for="contact-Subject" class="">حساب مبدا</label>
+                                    </div>
+                                </div>
+
+                                <!-- destination -->
+                                <div class="col-md-6">
+                                    <div class="md-form">
+                                        <input type="text" id="transaction-input-new-destinationAccount" class="form-control" onclick="callAccountModal('transaction-input-new-destinationAccount')">
+                                        <input type="hidden" id="transaction-input-new-destinationAccount-id" name="destinationAccount" value="-1">
+                                        <label for="contact-Subject" class="">حساب مقصد</label>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Grid row (type) -->
+                            <input id="transaction-type-input" type="hidden" name="type" value="1">
                             {% if user.is_superuser %}
                                 <div class="row">
                                     <div class="col-md-12">
@@ -415,14 +461,20 @@
                                             <div class="row">
                                                 <!-- Group of material radios - option 1 -->
                                                 <div class="form-check">
-                                                    <input type="radio" class="form-check-input" id="income-input-new-isOutcome-false" name="groupOfNewIsOutcomeRadio">
-                                                    <label class="form-check-label" for="income-input-new-isOutcome-false">درآمد</label>
+                                                    <input type="radio" class="form-check-input" id="transaction-input-new-income" name="groupOfNewIsOutcomeRadio">
+                                                    <label class="form-check-label" for="transaction-input-new-income">دریافت</label>
                                                 </div>
 
                                                 <!-- Group of material radios - option 2 -->
                                                 <div class="form-check">
-                                                    <input type="radio" class="form-check-input" id="income-input-new-isOutcome-true" name="groupOfNewIsOutcomeRadio" checked>
-                                                    <label class="form-check-label" for="income-input-new-isOutcome-true">هزینه</label>
+                                                    <input type="radio" class="form-check-input" id="transaction-input-new-outcome" name="groupOfNewIsOutcomeRadio" checked>
+                                                    <label class="form-check-label" for="transaction-input-new-outcome">پرداخت</label>
+                                                </div>
+
+                                                <!-- Group of material radios - option 3 -->
+                                                <div class="form-check">
+                                                    <input type="radio" class="form-check-input" id="transaction-input-new-transfer" name="groupOfNewIsOutcomeRadio">
+                                                    <label class="form-check-label" for="transaction-input-new-transfer">انتقال</label>
                                                 </div>
                                             </div>
 
@@ -432,16 +484,16 @@
                             {% endif %}
 
 
-                            <!-- Grid row (incomeDate) -->
+                            <!-- Grid row (createdAt) -->
                             <label for="contact-Subject" class="mt-2">تاریخ</label>
                             <div class="row" dir="ltr">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text cursor-pointer" id="dt_class_new_incomeDate"><i class="fa fa-calendar-alt"></i></span>
+                                        <span class="input-group-text cursor-pointer" id="dt_class_new_createdAt"><i class="fa fa-calendar-alt"></i></span>
                                     </div>
-                                    <input type="text" id="income-input-new-incomeDate" name="incomeDate" class="form-control" value="{% now "yy-m-d" %}">
+                                    <input type="text" id="transaction-input-new-createdAt" name="createdAt" class="form-control" value="{% now "yy-m-d" %}">
                                 </div>
-                                <label id="showDate_class_new_incomeDate"> </label>
+                                <label id="showDate_class_new_createdAt"> </label>
                             </div>
 
                             <!-- Grid row (description) -->
@@ -464,7 +516,7 @@
                                     <div class="file-field">
                                         <div class="btn btn-primary btn-sm float-left">
                                           <span>انتخاب تصویر</span>
-                                          <input type="file"  name="pic" id="income-modal-new-upload-img">
+                                          <input type="file"  name="pic" id="transaction-modal-new-upload-img">
                                         </div>
                                         <div class="file-path-wrapper">
                                           <input class="file-path validate" type="text" placeholder="Upload your file">
@@ -658,6 +710,9 @@
       </div>
     </div>
 
+    {% include 'project/category_list.html' %}
+
+    <button onclick="callAccountModal()">modal</button>
 
     <!-- base url address -->
     <input type="hidden" id="url-base" data-url="http://{{ request.get_host }}/" />
@@ -667,12 +722,32 @@
     <!-- search queries -->
     <input type="hidden" id="query-search" value="&search={{search}}">
 
+    <!-- selected elemnt for accounts -->
+    <input type="hidden" id="account-selected-element" data-item="">
+
+
 
 {% endblock %}
 
 {% block javascript %}
 
+    <!-- account modal manager -->
+    <script>
+    function callAccountModal(element) {
+        $('#account-selected-element').attr('data-item', element);
+        $('#btn-account-modal-expander').click();
+    }
 
+    function captureSelectedAccount(cat_id, cat_title) {
+        {#console.log(cat_id + ',' + cat_title);#}
+        let itm = '#' + $('#account-selected-element').attr('data-item');
+        $(itm).attr('value', cat_title);
+        itm = '#' + $('#account-selected-element').attr('data-item') + '-id';
+        $(itm).attr('value', cat_id);
+    }
+    </script>
+
+    <!-- delete modal manager -->
     <script>
         //-- handle delete modal --//
         function showIncomeDeleteModal() {
@@ -747,33 +822,33 @@
         });
 
 
-        //-- validate image field in new project form --//
-        function validateIncomeForm() {
+        //-- validate image field in new Transaction form --//
+        function validateTransactionForm() {
 
-            let isOutcome = $('#income-input-new-isOutcome-false').is(':checked');
-            if(isOutcome == true){
-                $('#isOutcome-input').val('False');
+            if($('#transaction-input-new-income').is(':checked')){
+                $('#transaction-type-input').val("0");
             }
-            else{
-                $('#isOutcome-input').val('True');
+            else if($('#transaction-input-new-outcome').is(':checked')){
+                $('#transaction-type-input').val("1");
+            }
+            else if($('#transaction-input-new-transfer').is(':checked')){
+                $('#transaction-type-input').val("2");
             }
 
 
-            let pic = document.forms["FormIncome"]["income-modal-new-upload-img"].value;
+            let pic = document.forms["FormTransaction"]["transaction-modal-new-upload-img"].value;
             if (pic === null || pic === "") {
-                $('#income-picValidator').attr('value', false)
+                $('#transaction-picValidator').attr('value', false)
             }
-            let incomeDate = document.forms["FormIncome"]["income-input-new-incomeDate"].value;
-            if (incomeDate === null || incomeDate === "") {
-                $('#income-input-new-incomeDate').attr('value', 0)
+
+            let sourcrAccountId = document.forms["FormTransaction"]["transaction-input-new-sourceAccount-id"].value;
+            if (sourcrAccountId === "-1") {
+                alert("حساب مبدا را انتخاب کنید")
+                return false
             }
-            let taskDate = document.forms["FormIncome"]["income-input-new-money"].value;
-            if (taskDate === null || taskDate === "") {
-                $('#income-input-new-money').attr('value', 0)
-            }
-            let eprojectId = document.forms["FormIncome"]["income-selected-project-id"].value;
-            if (eprojectId === "-1") {
-                alert("پروژه مورد نظر را انتخاب کنید")
+            let destinationAccountId = document.forms["FormTransaction"]["transaction-input-new-destinationAccount-id"].value;
+            if (destinationAccountId === "-1") {
+                alert("حساب مقصد را انتخاب کنید")
                 return false
             }
 
@@ -819,18 +894,18 @@
     <script>
     // persian calender : https://github.com/Mds92/MD.BootstrapPersianDateTimePicker
         $(document).ready(function () {
-            $("#dt_class_new_incomeDate").MdPersianDateTimePicker({
-                targetDateSelector: "#income-input-new-incomeDate",
-                targetTextSelector: "#showDate_class_new_incomeDate",
+            $("#dt_class_new_createdAt").MdPersianDateTimePicker({
+                targetDateSelector: "#income-input-new-createdAt",
+                targetTextSelector: "#showDate_class_new_createdAt",
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",
                 //inLine: true,
                 //rangeSelector: true
             });
-            $("#dt_class_edit_incomeDate").MdPersianDateTimePicker({
-                targetDateSelector: "#income-input-edit-incomeDate",
-                targetTextSelector: "#showDate_class_edit_incomeDate",
+            $("#dt_class_edit_createdAt").MdPersianDateTimePicker({
+                targetDateSelector: "#income-input-edit-createdAt",
+                targetTextSelector: "#showDate_class_edit_createdAt",
                 textFormat: " dddd dd MMMM yyyy ",
                 isGregorian: false,
                 dateFormat: "yyyy-MM-dd",

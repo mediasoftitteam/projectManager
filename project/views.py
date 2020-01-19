@@ -1324,12 +1324,61 @@ def transaction_list(request):
         except EmptyPage:
             transaction = paginator.page(paginator.num_pages)
 
+        accounts = models.Account.objects.all();
+        sub_accounts = models.SubAccount.objects.all();
+
         return render(request, 'project/transaction_list.html', {'transactions': transaction,
                                                                    'projects': projects,
                                                                    'employees': employees,
                                                                    'search': search,
                                                                    'page_size': page_size,
                                                                    'filter_param': filter_param,
+                                                                   'accounts': accounts,
+                                                                   'sub_accounts': sub_accounts,
                                                                    })
+    else:
+        return render(request, 'project/505.html')
+
+
+@login_required
+def transaction_create(request):
+    if request.user.is_superuser or request.user.groups.filter(name='level1').exists():
+        post_data = request.POST
+        m_user = User.objects.get(id=post_data['user'])
+        m_sourceAccount = models.SubAccount.objects.get(id=post_data['sourceAccount'])
+        m_destinationAccount = models.SubAccount.objects.get(id=post_data['destinationAccount'])
+        if post_data['project'] != '-1':
+            m_project = models.Project.objects.get(id=post_data['project'])
+        else:
+            m_project = None
+        if post_data['employee'] != '-1':
+            m_employee = models.Employee.objects.get(id=post_data['employee'])
+        else:
+            m_employee = None
+        m_pic = None
+        if post_data['isTransactionPicValid'] == 'true':
+            m_pic = request.FILES['pic']
+        try:
+            m_createdAt = (post_data['createdAt'])
+        except ValueError:
+            m_createdAt = str(timezone.now)
+
+        m_money = int(post_data['money'])
+        m_type = post_data['type']
+        m_description = post_data['description']
+
+        p = models.Transaction(user=m_user
+                               , project=m_project
+                               , employee=m_employee
+                               , pic=m_pic
+                               , type=m_type
+                               , money=m_money
+                               , createdAt=m_createdAt
+                               , source=m_sourceAccount
+                               , destination=m_destinationAccount
+                               , description=m_description)
+        p.save()
+
+        return redirect('project:transaction-list')
     else:
         return render(request, 'project/505.html')
